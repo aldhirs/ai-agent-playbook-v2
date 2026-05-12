@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gate 1 · Grooming &amp; PRD — Playbook v2</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="detail-page">
+
+  <div class="breadcrumb">
+    <a href="../index.html">← Playbook v2</a> · <a href="../index.html#workflow">Workflow 7 Gate</a> · <strong>Gate 1: Grooming &amp; PRD</strong>
+  </div>
+
+  <header class="detail-hero">
+    <div class="gate-badge">GATE 1</div>
+    <h1>Grooming &amp; PRD</h1>
+    <p class="lead">Dari epic mentah ke PRD yang siap di-tech-design. Target: 2-4 jam (sebelumnya 2-3 hari). Tujuan utamanya bukan "menggambar requirements lebih cepat" — tapi <em>menemukan semua ambiguitas sebelum tim mulai ngoding</em>.</p>
+
+    <div class="meta-grid">
+      <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">PM / BA</div></div>
+      <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Groomer</div></div>
+      <div class="meta-item"><div class="lbl">Input</div><div class="val">Epic mentah (Jira/Linear)</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>features/&lt;slug&gt;/PRD.md</code></div></div>
+      <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">PRD SIGNED · LGTM-PRD ×2</div></div>
+      <div class="meta-item"><div class="lbl">Target Durasi</div><div class="val">2-4 jam</div></div>
+    </div>
+  </header>
+
+  <h2>Detailed Flow</h2>
+  <p>Flow ini bisa selesai dalam 1 setengah hari kerja, tapi waktu efektifnya cuma 2-4 jam karena fase tunggu (PM jawab Q, Tech Lead review) overlap dengan kerja lain.</p>
+
+  <ol class="stepflow">
+    <li class="human-step"><strong>PM submit epic mentah</strong> ke Jira/Linear. Cukup 1-3 paragraf — siapa user-nya, masalah apa, kenapa sekarang. Tidak perlu rapi.</li>
+    <li class="ai-step"><strong>PM / Dev run <code>/groom &lt;jira-id&gt;</code></strong> di Claude Code. Argumen bisa berupa Jira ID, link, atau paste deskripsi mentah.</li>
+    <li class="ai-step"><strong>Groomer Agent baca konteks:</strong> tarik isi epic (lewat Jira MCP kalau tersedia), baca CLAUDE.md hierarchy untuk konvensi domain, scan <code>LESSONS.md</code> untuk pattern yang relevan.</li>
+    <li class="ai-step"><strong>Groomer buat folder feature</strong> <code>features/&lt;slug&gt;/</code> (slug = kebab-case dari judul) dan generate <code>PRD.md</code> dari template.</li>
+    <li class="ai-step"><strong>Groomer isi section yang bisa diisi dengan high-confidence:</strong> problem statement, target user &amp; JTBD, tentative scope, draft user stories dengan AC (Given/When/Then), NFR (perf/security/privacy berdasarkan CLAUDE.md), dependencies yang terlihat, risk awal.</li>
+    <li class="ai-step"><strong>Groomer generate Open Questions</strong> — 5-10 pertanyaan tajam tentang hal yang masih ambigu. Ini bagian terpenting: pertanyaan yang bagus = revisi yang dihindari nanti.</li>
+    <li class="human-step"><strong>PM review PRD draft</strong> &amp; mulai jawab Open Questions. Yang tidak tahu jawabannya → eskalasi ke stakeholder bisnis.</li>
+    <li class="ai-step"><strong>Iterate 1-2 putaran</strong>: PM tag jawaban di file, Groomer update PRD body, generate ulang Q yang masih missing kalau ada.</li>
+    <li class="human-step"><strong>Tech Lead review high-level feasibility</strong> — 15-30 menit. Bukan code-level review; cuma cek: service yang harus diubah feasible? Ada dependency tim lain yang harus dijadwalkan?</li>
+    <li class="gate-step"><strong>Gate 1: LGTM-PRD ×2.</strong> PM dan Tech Lead masing-masing comment <code>LGTM-PRD</code> di file PRD.md (di PR). Status PRD → <code>SIGNED</code>. Lanjut ke Gate 2.</li>
+  </ol>
+
+  <h2>Cara Kerja AI &amp; Cara Kerja Human</h2>
+
+  <div class="swim">
+    <div class="lane ai">
+      <h4 class="ai-h">🤖 Groomer Agent</h4>
+      <p><strong>Yang dilakukan:</strong></p>
+      <ul>
+        <li>Baca <em>seluruh</em> CLAUDE.md hierarchy (org → tribe → service) sebelum drafting</li>
+        <li>Scan <code>LESSONS.md</code> untuk pattern yang menyentuh service / pattern serupa</li>
+        <li>Generate PRD <em>persis</em> sesuai struktur <code>templates/PRD-template.md</code></li>
+        <li>Tag setiap asumsi sebagai Open Question, bukan ditulis di body PRD</li>
+        <li>Update PRD setelah setiap putaran PM, mark Q resolved → RESOLVED</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh dilakukan:</strong></p>
+      <ul>
+        <li>Tebak hal yang ambigu (paksa naik ke Open Questions)</li>
+        <li>Skip section template (kalau tidak relevan → tulis "Tidak berlaku — alasan: ...")</li>
+        <li>Generate AC tanpa format Given/When/Then</li>
+        <li>Lompat ke detail teknis (itu kerjaan Gate 2)</li>
+      </ul>
+      <p><strong>Prompt yang dipakai:</strong> <code>commands/groom.md</code></p>
+    </div>
+
+    <div class="lane human">
+      <h4 class="human-h">👤 PM / BA &amp; Tech Lead</h4>
+      <p><strong>PM / BA accountable untuk:</strong></p>
+      <ul>
+        <li>Submit epic mentah dengan cukup konteks (1-3 paragraf — siapa, masalah, kenapa)</li>
+        <li>Jawab semua Open Questions; yang tidak tahu → eskalasi ke stakeholder bisnis</li>
+        <li>Validate problem statement &amp; scope (in/out) tajam — tidak generic</li>
+        <li>Validate user persona &amp; JTBD</li>
+        <li>Pastikan acceptance criteria <em>terukur</em>, bukan "should work"</li>
+      </ul>
+      <p><strong>Tech Lead accountable untuk:</strong></p>
+      <ul>
+        <li>Review feasibility tingkat tinggi (15-30 menit) — service yang disentuh mampu menampung?</li>
+        <li>Flag dependency yang perlu dijadwalkan dengan tribe lain</li>
+        <li>Flag risk awal yang harus masuk Risk Register</li>
+        <li>Tag <code>LGTM-PRD</code> setelah yakin tidak ada blocker konseptual</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh dilakukan:</strong></p>
+      <ul>
+        <li>Skip Open Questions ("LGTM aja, nanti dijawab di tech disc") — itu utang yang dibayar 3× nanti</li>
+        <li>Setujui PRD yang lompat ke solusi teknis (gate 2 kerjaan beda)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Output yang Dihasilkan</h2>
+  <table>
+    <tr><th>Artefak</th><th>Lokasi</th><th>Status saat Gate 1 lulus</th></tr>
+    <tr><td><code>PRD.md</code></td><td><code>features/&lt;slug&gt;/PRD.md</code></td><td>Status <code>SIGNED</code> · semua field terisi · tidak ada placeholder <code>&lt;...&gt;</code></td></tr>
+    <tr><td>Folder feature</td><td><code>features/&lt;slug&gt;/</code></td><td>Tercipta · siap diisi artefak gate berikutnya</td></tr>
+    <tr><td>Open Questions log</td><td>Section 8 di <code>PRD.md</code></td><td>Semua status <code>RESOLVED</code> dengan jawaban tertulis</td></tr>
+    <tr><td>PR (di repo)</td><td>GitHub / GitLab</td><td>Comment <code>LGTM-PRD</code> dari PM &amp; Tech Lead</td></tr>
+  </table>
+
+  <h2>Approval Mekanisme</h2>
+  <div class="callout">
+    <strong>Gate 1 ditutup oleh:</strong>
+    <ol>
+      <li>Comment <code>LGTM-PRD</code> dari PM/BA di file PRD.md (di PR yang menambahkan file).</li>
+      <li>Comment <code>LGTM-PRD</code> dari Tech Lead.</li>
+      <li>CI check otomatis: <code>features/&lt;slug&gt;/PRD.md</code> ada, tidak ada Open Questions ber-status <code>OPEN</code>.</li>
+      <li>PR merged → status feature transition ke <em>"Ready for Tech Design"</em>.</li>
+    </ol>
+    <strong>Tidak terhitung sebagai approval:</strong> chat di Slack, verbal di rapat, thumbs-up di Jira. Harus di artefak yang bisa di-<code>grep</code> nanti.
+  </div>
+
+  <h2>Anti-pattern Khusus Gate 1</h2>
+  <ol>
+    <li><strong>"LGTM aja, nanti dibahas di tech disc."</strong> Open Questions yang dibawa ke Gate 2 = utang yang akan menumbangkan tech design.</li>
+    <li><strong>Out-of-scope kosong.</strong> Kalau tidak ada item out-of-scope, kemungkinan scope belum dipikirkan tajam. Paksa minimal 2.</li>
+    <li><strong>AC bunyinya "should work"</strong> atau "user-friendly". Tidak boleh — selalu Given/When/Then yang bisa di-test.</li>
+    <li><strong>PRD lompat ke solusi teknis</strong> ("pakai Kafka karena…"). Itu Gate 2. PRD = problem &amp; behavior, bukan implementation.</li>
+    <li><strong>Tech Lead approve tanpa baca.</strong> Cross-check: setelah 15 menit, dia bisa menyebut 1 risk yang dia khawatirkan? Kalau tidak, dia belum baca.</li>
+    <li><strong>Folder feature tidak dibuat.</strong> Semua artefak gate harus di satu tempat — tanpa folder, context drift ke Slack/DM mulai.</li>
+  </ol>
+
+  <h2>Example Walkthrough — "Add Apple Pay to Checkout"</h2>
+  <table>
+    <tr><th>Waktu</th><th>Aksi</th><th>Pelaku</th></tr>
+    <tr><td>09:00</td><td>Submit epic 2 paragraf di Jira: "User Apple ingin checkout pakai Apple Pay; saat ini hanya kartu manual."</td><td>👤 PM</td></tr>
+    <tr><td>09:15</td><td>Run <code>/groom PAY-1234</code> di Claude Code</td><td>👤 PM</td></tr>
+    <tr><td>09:18</td><td>Generate <code>features/apple-pay-checkout/PRD.md</code> dengan 3 user stories + 8 Open Questions</td><td>🤖 Groomer</td></tr>
+    <tr><td>09:30 - 10:30</td><td>Resolve 6 dari 8 Q (yang menyentuh UX flow &amp; error handling). 2 Q soal tarif merchant → eskalasi ke business stakeholder</td><td>👤 PM</td></tr>
+    <tr><td>11:30</td><td>Stakeholder jawab 2 Q terakhir di file PRD</td><td>👤 Business stakeholder</td></tr>
+    <tr><td>11:45</td><td>PM mark semua Q <code>RESOLVED</code>, tag Tech Lead di PR</td><td>👤 PM</td></tr>
+    <tr><td>12:15 - 12:45</td><td>Tech Lead review. Flag 1 dependency: gateway provider butuh whitelisting domain → harus dijadwalkan minggu depan</td><td>👤 Tech Lead</td></tr>
+    <tr><td>13:00</td><td>PM update Risks section sesuai feedback. Tech Lead tag <code>LGTM-PRD</code></td><td>👤 PM + Tech Lead</td></tr>
+    <tr><td>13:05</td><td>Status PRD → <code>SIGNED</code> · Gate 1 passed</td><td>—</td></tr>
+  </table>
+  <p><strong>Total waktu kalender:</strong> ~4 jam. <strong>Total waktu aktif:</strong> ~2.5 jam (sebagian besar adalah PM &amp; Tech Lead async).</p>
+
+  <h2>Kalau Macet di Gate Ini</h2>
+  <div class="callout warn">
+    <strong>Open Questions banyak yang tidak bisa dijawab PM sendirian.</strong> Itu bagus — bukan blocker, sinyal feature memang ambigu di level bisnis. Aksi: jadwalkan 30 menit dengan stakeholder yang relevan. Jangan paksa PRD lulus dengan asumsi tertulis.
+  </div>
+  <div class="callout warn">
+    <strong>Tech Lead tidak setuju scope (terlalu besar/kecil).</strong> Aksi: pecah feature jadi 2 PRD terpisah, atau gabung dengan feature lain yang berdekatan. Jangan dipaksa lulus dengan scope yang Tech Lead ragu.
+  </div>
+  <div class="callout danger">
+    <strong>PRD bolak-balik &gt;3 putaran.</strong> Itu sinyal masalahnya bukan di PRD — biasanya target user tidak jelas atau problem belum tajam. Aksi: stop iterate, ambil 30 menit dengan PM untuk re-define problem statement dari awal.
+  </div>
+
+  <nav class="phase-nav">
+    <a href="../index.html#workflow" class="prev">
+      <div class="nav-label">← Kembali</div>
+      <div class="nav-title">Workflow Overview</div>
+    </a>
+    <a href="2-tech-design.html" class="next">
+      <div class="nav-label">Selanjutnya →</div>
+      <div class="nav-title">Gate 2: Tech Discussion</div>
+    </a>
+  </nav>
+
+</div>
+</body>
+</html>

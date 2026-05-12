@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gate 3 · Planning &amp; Task Breakdown — Playbook v2</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="detail-page">
+
+  <div class="breadcrumb">
+    <a href="../index.html">← Playbook v2</a> · <a href="../index.html#workflow">Workflow 7 Gate</a> · <strong>Gate 3: Planning</strong>
+  </div>
+
+  <header class="detail-hero">
+    <div class="gate-badge">GATE 3</div>
+    <h1>Planning &amp; Task Breakdown</h1>
+    <p class="lead">Dari tech design signed ke daftar task yang Dev bisa claim. Target: 1-2 jam. Fokus: <em>granularity konsisten, dependency jelas, paralelisasi optimal, estimate berbasis T-shirt (bukan jam)</em>.</p>
+
+    <div class="meta-grid">
+      <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">Tech Lead + Dev</div></div>
+      <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Planner</div></div>
+      <div class="meta-item"><div class="lbl">Input</div><div class="val">Tech Design signed</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>IMPL-PLAN.md</code> + task di Jira</div></div>
+      <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">Tech Lead merge plan PR</div></div>
+      <div class="meta-item"><div class="lbl">Target Durasi</div><div class="val">1-2 jam</div></div>
+    </div>
+  </header>
+
+  <h2>Detailed Flow</h2>
+  <ol class="stepflow">
+    <li class="ai-step"><strong>Run <code>/plan &lt;feature-slug&gt;</code></strong> setelah TD signed.</li>
+    <li class="ai-step"><strong>Planner Agent baca TD &amp; existing code.</strong> Identifikasi: file yang harus diubah, file baru, endpoint baru, migration, observability hook, test scaffold.</li>
+    <li class="ai-step"><strong>Generate <code>IMPL-PLAN.md</code></strong> dengan topological task list. Setiap task: ID, judul, estimate (T-shirt XS/S/M/L), dependency, parallelizable y/n, risk flag (red/yellow/green).</li>
+    <li class="ai-step"><strong>Dependency graph</strong> di-render Mermaid. Critical path diidentifikasi eksplisit.</li>
+    <li class="ai-step"><strong>Wajib include task pertama:</strong> "Setup feature flag + folder evidence/". <strong>Task terakhir:</strong> "Cleanup feature flag + post-launch retro draft". <strong>Paralel:</strong> "Tester Agent generate test plan" dimulai bersamaan dengan task implementasi pertama.</li>
+    <li class="human-step"><strong>Tech Lead validate breakdown.</strong> Cek granularity: 1 task = 1 PR yang bisa di-review &lt;30 menit. Kalau ada task L, paksa pecah.</li>
+    <li class="human-step"><strong>Tech Lead validate risk flag.</strong> Task red butuh spike sebelum mulai. Task yellow butuh pair atau extra review.</li>
+    <li class="human-step"><strong>Dev claim task</strong> (di Jira / Linear). Auto-assignment kalau MCP terhubung.</li>
+    <li class="gate-step"><strong>Gate 3: Tech Lead merge plan PR.</strong> Otomatis create task di tracker (kalau MCP aktif). Feature status → <em>"In Development"</em>.</li>
+  </ol>
+
+  <h2>Cara Kerja AI &amp; Cara Kerja Human</h2>
+
+  <div class="swim">
+    <div class="lane ai">
+      <h4 class="ai-h">🤖 Planner Agent</h4>
+      <ul>
+        <li>Baca TECH-DESIGN.md + existing code untuk identifikasi file yang berubah</li>
+        <li>Generate task list urut topologis dengan dependency graph (Mermaid)</li>
+        <li>Estimate T-shirt (XS/S/M/L) — bukan jam (jam selalu salah)</li>
+        <li>Risk flag: red (perlu spike), yellow (perlu pair), green (straightforward)</li>
+        <li>Tag suggestion untuk auto-assign di tracker: <code>backend</code>/<code>frontend</code>/<code>db-migration</code>/<code>contract</code>/<code>infra</code>/<code>test</code></li>
+        <li>Identifikasi paralelisasi maksimum (test plan paralel dengan dev — kunci pemangkasan waktu)</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh:</strong></p>
+      <ul>
+        <li>Estimate dalam jam</li>
+        <li>Task ukuran &gt;L (paksa pecah)</li>
+        <li>Task tanpa owner role yang jelas</li>
+        <li>Lupa task feature flag setup + cleanup</li>
+      </ul>
+      <p><strong>Prompt:</strong> <code>commands/plan.md</code></p>
+    </div>
+
+    <div class="lane human">
+      <h4 class="human-h">👤 Tech Lead + Developer</h4>
+      <p><strong>Tech Lead:</strong></p>
+      <ul>
+        <li>Validate granularity (1 task = 1 PR &lt;30 menit review)</li>
+        <li>Validate dependency graph; cek critical path realistis</li>
+        <li>Identifikasi task red yang butuh spike → assign ke senior</li>
+        <li>Setujui pair-up untuk task yellow</li>
+      </ul>
+      <p><strong>Developer:</strong></p>
+      <ul>
+        <li>Claim task sesuai kapasitas &amp; skill</li>
+        <li>Kalau merasa task terlalu besar, propose pecahan ke Tech Lead</li>
+        <li>Cek dependency sebelum mulai (task yang block harus closed dulu)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Output yang Dihasilkan</h2>
+  <table>
+    <tr><th>Artefak</th><th>Lokasi</th><th>Konten</th></tr>
+    <tr><td><code>IMPL-PLAN.md</code></td><td><code>features/&lt;slug&gt;/</code></td><td>Topological task list · dependency graph (Mermaid) · critical path · risk flags</td></tr>
+    <tr><td>Task di tracker</td><td>Jira / Linear</td><td>1 task per item di IMPL-PLAN, ter-tag dengan label sesuai (backend/frontend/dll.)</td></tr>
+    <tr><td>Spike doc (kalau ada task red)</td><td><code>features/&lt;slug&gt;/spikes/&lt;name&gt;.md</code></td><td>Investigation result sebelum task red dimulai</td></tr>
+  </table>
+
+  <h2>Aturan Granularity Task</h2>
+  <div class="callout">
+    <strong>1 task = 1 PR yang bisa di-review &lt;30 menit.</strong>
+    <ul>
+      <li><strong>XS</strong> (½ - 1 jam): config change, dependency bump, copy edit</li>
+      <li><strong>S</strong> (½ - 1 hari): single function, satu endpoint, satu komponen UI sederhana</li>
+      <li><strong>M</strong> (1-2 hari): feature kecil, multi-file tapi 1 layer (handler atau usecase atau repo)</li>
+      <li><strong>L</strong> (2-3 hari): MAX. Lebih dari ini wajib pecah jadi M atau S</li>
+    </ul>
+    Estimate &gt;L = sinyal task belum cukup dipikirkan. Pecah dulu.
+  </div>
+
+  <h2>Anti-pattern Khusus Gate 3</h2>
+  <ol>
+    <li><strong>Estimate dalam jam.</strong> Jam selalu meleset. T-shirt cukup untuk planning + di akhir kuartal velocity bisa di-kalibrasi.</li>
+    <li><strong>"Bikin endpoint" sebagai 1 task.</strong> Pecah jadi: contract, handler, validation, observability, test, evidence.</li>
+    <li><strong>Tidak ada task feature flag.</strong> Setup flag harus task pertama; cleanup harus task terakhir.</li>
+    <li><strong>Test plan dimulai setelah dev selesai.</strong> Test plan harus paralel — dimulai bersamaan task implementasi pertama.</li>
+    <li><strong>Task red tanpa spike.</strong> Task red &amp; mulai langsung = kemungkinan besar miss-estimate &amp; rework.</li>
+    <li><strong>Dependency graph tidak di-render.</strong> Tanpa visual, paralelisasi pasti suboptimal.</li>
+  </ol>
+
+  <h2>Example Walkthrough — "Apple Pay Checkout" lanjut dari Gate 2</h2>
+  <table>
+    <tr><th>Waktu</th><th>Aksi</th><th>Pelaku</th></tr>
+    <tr><td>09:00</td><td>Run <code>/plan apple-pay-checkout</code></td><td>👤 Tech Lead</td></tr>
+    <tr><td>09:05</td><td>Generate IMPL-PLAN: 12 task. 1 red (spike Apple Pay SDK auth), 3 yellow (gateway integration paths), 8 green</td><td>🤖 Planner</td></tr>
+    <tr><td>09:30</td><td>Tech Lead pecah 1 task L (gateway integration) → 2 task M. Total: 13 task</td><td>👤 Tech Lead</td></tr>
+    <tr><td>09:45</td><td>Tag spike ke Dev A (senior). Pair-up Dev B + Dev C untuk gateway path</td><td>👤 Tech Lead</td></tr>
+    <tr><td>10:00</td><td>Dev A-D claim task. Auto-create di Jira</td><td>👤 Dev × 4</td></tr>
+    <tr><td>10:15</td><td>Tech Lead merge plan PR. Gate 3 passed. Spike start.</td><td>—</td></tr>
+  </table>
+
+  <h2>Kalau Macet di Gate Ini</h2>
+  <div class="callout warn">
+    <strong>Task terlalu banyak ber-flag merah (red).</strong> Sinyal: TD belum cukup detail di area tertentu. Aksi: balik ke Gate 2, expand section yang relevan, rerun /plan.
+  </div>
+  <div class="callout warn">
+    <strong>Dev tidak yakin estimate.</strong> Wajar untuk task baru. Aksi: tag yellow + pair-up; jangan dipaksa green.
+  </div>
+
+  <nav class="phase-nav">
+    <a href="2-tech-design.html" class="prev">
+      <div class="nav-label">← Sebelumnya</div>
+      <div class="nav-title">Gate 2: Tech Discussion</div>
+    </a>
+    <a href="4-development.html" class="next">
+      <div class="nav-label">Selanjutnya →</div>
+      <div class="nav-title">Gate 4: Development</div>
+    </a>
+  </nav>
+
+</div>
+</body>
+</html>

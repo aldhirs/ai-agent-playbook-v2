@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gate 6 · Defects &amp; QA Greenlight — Playbook v2</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="detail-page">
+
+  <div class="breadcrumb">
+    <a href="../index.html">← Playbook v2</a> · <a href="../index.html#workflow">Workflow 7 Gate</a> · <strong>Gate 6: Defects &amp; Greenlight</strong>
+  </div>
+
+  <header class="detail-hero">
+    <div class="gate-badge">GATE 6</div>
+    <h1>Defects &amp; QA Greenlight</h1>
+    <p class="lead">Triage bug dari Gate 5 dengan disiplin: <em>klasifikasi prioritas, root-cause hypothesis, lesson candidate untuk pattern recurring</em>. Tujuan bukan hanya menutup bug — tapi memastikan bug tidak terulang dengan lesson loop.</p>
+
+    <div class="meta-grid">
+      <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">QA + Tech Lead</div></div>
+      <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Triage</div></div>
+      <div class="meta-item"><div class="lbl">Input</div><div class="val">Defect dari Gate 5</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val">Defect closed + lesson candidate</div></div>
+      <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">Zero P0/P1 · QA sign-off</div></div>
+      <div class="meta-item"><div class="lbl">Target Durasi</div><div class="val">Volume defect dependent</div></div>
+    </div>
+  </header>
+
+  <h2>Detailed Flow per Defect</h2>
+  <ol class="stepflow">
+    <li class="human-step"><strong>QA log defect</strong> di tracker dengan template: judul, repro step, expected vs actual, environment, attachment (screenshot/log/curl).</li>
+    <li class="ai-step"><strong>Triage Agent classify otomatis:</strong> prioritas (P0/P1/P2/P3), area (backend/frontend/contract/infra), root-cause hypothesis (3 kandidat dengan likelihood).</li>
+    <li class="ai-step"><strong>Cek apakah ini lesson candidate.</strong> Triage cocokkan dengan <code>LESSONS.md</code> existing — kalau pattern serupa pernah muncul, flag sebagai recurring.</li>
+    <li class="human-step"><strong>Tech Lead validate klasifikasi.</strong> Adjust prioritas kalau perlu (Triage konservatif untuk under-estimate). Assign owner fix.</li>
+    <li class="human-step"><strong>Dev investigate &amp; fix.</strong> Untuk P0/P1, pair dengan reviewer. Fix wajib disertai test yang reproduce bug (regression test).</li>
+    <li class="human-step"><strong>QA verify fix.</strong> Jalankan test plan + skenario yang relevan + exploratory.</li>
+    <li class="human-step"><strong>Kalau pattern recurring: tulis lesson</strong> di <code>tribes/&lt;id&gt;/LESSONS.md</code> dengan format konsisten (run <code>/lesson "&lt;judul&gt;"</code>).</li>
+    <li class="gate-step"><strong>Gate 6: QA sign-off.</strong> Semua P0/P1 closed, P2 ≤3, lesson recurring sudah di-tulis. Status feature → <em>"Ready for Release"</em>.</li>
+  </ol>
+
+  <h2>Klasifikasi Prioritas Defect</h2>
+  <table>
+    <tr><th>Prio</th><th>Definisi</th><th>SLA fix</th><th>Block release?</th></tr>
+    <tr><td><strong>P0</strong></td><td>Crash, data loss, security hole, kebocoran PII, blocker total</td><td>≤4 jam</td><td>YA</td></tr>
+    <tr><td><strong>P1</strong></td><td>Core user journey broken, no workaround, regression dari behavior existing</td><td>≤1 hari kerja</td><td>YA</td></tr>
+    <tr><td><strong>P2</strong></td><td>Minor user journey broken / workaround tersedia / cosmetic high-impact</td><td>≤1 minggu</td><td>TIDAK (max 3)</td></tr>
+    <tr><td><strong>P3</strong></td><td>Cosmetic / nice-to-have / edge case obscure</td><td>Backlog</td><td>TIDAK</td></tr>
+  </table>
+
+  <h2>Cara Kerja AI &amp; Cara Kerja Human</h2>
+
+  <div class="swim">
+    <div class="lane ai">
+      <h4 class="ai-h">🤖 Triage Agent</h4>
+      <ul>
+        <li>Auto-classify prioritas berdasarkan: severity user impact, breadth (berapa banyak user terkena), workaround availability</li>
+        <li>Identifikasi area (backend, frontend, contract, infra, third-party)</li>
+        <li>Generate 3 root-cause hypothesis dengan likelihood (high/medium/low)</li>
+        <li>Cocokkan dengan LESSONS.md — kalau ada pattern, flag recurring</li>
+        <li>Kalau bug crosses tribe boundary, tag tribe terkait</li>
+        <li>Generate regression test skeleton (yang harus diisi assertion oleh dev)</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh:</strong></p>
+      <ul>
+        <li>Auto-close defect berdasarkan classification saja</li>
+        <li>Down-rank prioritas (konservatif: kalau ragu, naikkan)</li>
+      </ul>
+    </div>
+
+    <div class="lane human">
+      <h4 class="human-h">👤 QA + Tech Lead + Dev</h4>
+      <p><strong>QA:</strong></p>
+      <ul>
+        <li>Log defect dengan reproducibility yang clear (siapa pun harus bisa reproduce)</li>
+        <li>Verify fix (bukan cuma re-test, juga regression set)</li>
+        <li>Tag lesson kalau pattern recurring</li>
+      </ul>
+      <p><strong>Tech Lead:</strong></p>
+      <ul>
+        <li>Validate klasifikasi prioritas Triage</li>
+        <li>Assign owner fix (sesuai kapasitas)</li>
+        <li>Approve fix sebelum merge</li>
+        <li>Decide lesson promotion (tribe → org kalau muncul lintas tribe)</li>
+      </ul>
+      <p><strong>Dev:</strong></p>
+      <ul>
+        <li>Reproduce dulu sebelum fix (kalau tidak bisa reproduce, eskalasi balik ke QA)</li>
+        <li>Fix wajib disertai regression test</li>
+        <li>Self-review checklist (Gate 4) berlaku juga untuk fix PR</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Output yang Dihasilkan</h2>
+  <table>
+    <tr><th>Artefak</th><th>Lokasi</th><th>Konten</th></tr>
+    <tr><td>Defect entry</td><td>Jira / Linear</td><td>Status closed · linked ke PR fix · linked ke regression test</td></tr>
+    <tr><td>Regression test</td><td><code>features/&lt;slug&gt;/tests/integration/</code> atau <code>features/&lt;slug&gt;/tests/e2e/</code></td><td>Test yang reproduce bug sebelum fix; pass setelah fix. Tag dengan ID defect di test name.</td></tr>
+    <tr><td>Lesson (kalau recurring)</td><td><code>tribes/&lt;id&gt;/LESSONS.md</code></td><td>Format konsisten: title, context, root cause, prevention, related principle</td></tr>
+    <tr><td>QA sign-off</td><td>Tag rilis di tracker</td><td><code>qa-signed-off</code> + tanggal + nama</td></tr>
+  </table>
+
+  <h2>Format Lesson (Wajib)</h2>
+  <pre><code>## [LESSON-yyyy-mm-dd-N] &lt;Judul singkat&gt;
+
+**Context:** dimana &amp; kapan ini muncul
+
+**Root cause:** akar masalahnya (bukan symptom)
+
+**Prevention:**
+- [ ] Aksi konkret 1 (mis. tambah test type X)
+- [ ] Aksi konkret 2 (mis. update CLAUDE.md service)
+
+**Related:** principle CLAUDE.md §X.Y · related lessons LESSON-yyyy-mm-dd-M
+
+**Status:** active / promoted-to-tribe / promoted-to-org / retired
+</code></pre>
+
+  <h2>Lesson Promotion (Cross-Tribe)</h2>
+  <p>Pattern yang muncul di ≥2 service di tribe sama → promote ke <code>tribes/&lt;id&gt;/CLAUDE.md</code> sebagai do/don't. Pattern di ≥2 tribe → promote ke <code>org/.claude/CLAUDE.md</code> sebagai principle baru. Triage Agent scan otomatis tiap bulan.</p>
+
+  <h2>Anti-pattern Khusus Gate 6</h2>
+  <ol>
+    <li><strong>Fix tanpa regression test.</strong> Bug yang tidak punya test akan kembali. Selalu reproduce dulu via test, baru fix.</li>
+    <li><strong>Lesson tidak ditulis untuk pattern recurring.</strong> Sinyal lesson loop mati. Owner playbook wajib facilitate retro mini.</li>
+    <li><strong>QA sign-off dengan P1 open.</strong> Tidak boleh, terlepas dari "deadline".</li>
+    <li><strong>Triage Agent down-rank prioritas tanpa human review.</strong> Triage konservatif by default; Tech Lead yang adjust kalau perlu.</li>
+    <li><strong>"Defect ini bukan tanggung jawab kami" (tribe lain).</strong> Bug yang crosses tribe boundary harus di-co-own, bukan dilempar.</li>
+    <li><strong>Auto-close defect tanpa verify fix.</strong> Selalu verify dengan re-test, bukan cuma cek code merged.</li>
+  </ol>
+
+  <h2>Example Walkthrough — Bug Triage</h2>
+  <table>
+    <tr><th>Aksi</th><th>Pelaku</th></tr>
+    <tr><td>QA log bug: "Apple Pay button hang di Safari 17 setelah 5 detik. Repro: open checkout, klik Apple Pay, wait 5s."</td><td>👤 QA</td></tr>
+    <tr><td>Triage classify: P1 (core journey, regression dari Safari 17), area frontend. 3 hipotesis: (1) timeout SDK Apple Pay; (2) Safari security policy; (3) iframe sandbox issue. Highest likelihood: timeout (matches LESSON-2026-03-12 di tribe 1)</td><td>🤖 Triage</td></tr>
+    <tr><td>Tech Lead confirm P1. Assign Dev B (yang familiar SDK).</td><td>👤 Tech Lead</td></tr>
+    <tr><td>Dev B reproduce, find: timeout di SDK call 5s, perlu 10s untuk Safari 17. Fix: bump timeout + tambah retry. Regression test: integration test simulate Safari 17 timing.</td><td>👤 Dev B</td></tr>
+    <tr><td>QA verify fix. Pass. Sign-off P1.</td><td>👤 QA</td></tr>
+    <tr><td>Pattern matches LESSON-2026-03-12 (Safari quirks). Promote dari tribe-local jadi lesson tribe-wide di <code>tribes/3/LESSONS.md</code>: "Selalu test SDK third-party di Safari latest + Safari latest-1; default timeout 5s sering terlalu pendek."</td><td>👤 QA + Tech Lead</td></tr>
+  </table>
+
+  <h2>Kalau Macet di Gate Ini</h2>
+  <div class="callout warn">
+    <strong>P1 tidak bisa diperbaiki tepat waktu (vendor third-party).</strong> Aksi: turunkan ke P2 + feature flag off untuk Safari 17 saja + commit untuk fix di rilis berikutnya. Sebutkan eksplisit di release note.
+  </div>
+  <div class="callout warn">
+    <strong>Defect tidak reproducible.</strong> Aksi: tetap log + tag <code>not-reproducible</code> + minta QA tangkap recording / network trace di session berikutnya. Jangan auto-close.
+  </div>
+
+  <nav class="phase-nav">
+    <a href="5-testing.html" class="prev">
+      <div class="nav-label">← Sebelumnya</div>
+      <div class="nav-title">Gate 5: Testing</div>
+    </a>
+    <a href="7-live.html" class="next">
+      <div class="nav-label">Selanjutnya →</div>
+      <div class="nav-title">Gate 7: Live</div>
+    </a>
+  </nav>
+
+</div>
+</body>
+</html>

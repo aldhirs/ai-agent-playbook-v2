@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Playbook v2 — Team Edition</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific tweaks (basic vars kept as fallback if styles.css not loaded) */
+  :root {
+    --bg: #0f1115;
+    --bg-soft: #161922;
+    --bg-card: #1c2030;
+    --border: #2a2f3f;
+    --text: #e6e9ef;
+    --text-dim: #9aa3b2;
+    --accent: #6ee7b7;
+    --accent-2: #60a5fa;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --code-bg: #0b0d12;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif; line-height: 1.6; font-size: 16px; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: var(--accent); font-family: "SF Mono", Monaco, Consolas, monospace; }
+  pre { background: var(--code-bg); padding: 16px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); }
+  pre code { background: none; padding: 0; color: var(--text); }
+  h1, h2, h3, h4 { color: var(--text); line-height: 1.3; }
+  h1 { font-size: 2.2rem; margin-top: 0; }
+  h2 { font-size: 1.6rem; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 48px; }
+  h3 { font-size: 1.25rem; color: var(--accent); margin-top: 32px; }
+  h4 { font-size: 1.05rem; color: var(--accent-2); margin-top: 24px; }
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+  .sidebar { background: var(--bg-soft); border-right: 1px solid var(--border); padding: 24px 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .sidebar h2 { font-size: 1rem; border: none; margin-top: 16px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+  .sidebar a { display: block; padding: 6px 0; color: var(--text-dim); font-size: 0.92rem; border-left: 2px solid transparent; padding-left: 10px; }
+  .sidebar a:hover { color: var(--text); border-left-color: var(--accent); text-decoration: none; }
+  .sidebar .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent); margin-bottom: 4px; }
+  .sidebar .tagline { color: var(--text-dim); font-size: 0.8rem; }
+  .main { padding: 48px 64px; max-width: 980px; }
+  .hero { background: linear-gradient(135deg, #1c2030 0%, #2a2f3f 100%); padding: 32px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 32px; }
+  .hero .pill { display: inline-block; background: rgba(110, 231, 183, 0.15); color: var(--accent); padding: 4px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; }
+  .hero h1 { margin: 0 0 8px 0; }
+  .hero p { margin: 8px 0 0; color: var(--text-dim); font-size: 1.05rem; }
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .card .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 8px; }
+  .card h3 { margin: 0 0 8px; font-size: 1.1rem; color: var(--text); }
+  .card p { margin: 0; color: var(--text-dim); font-size: 0.95rem; }
+  .callout { background: rgba(96, 165, 250, 0.1); border-left: 4px solid var(--accent-2); padding: 14px 18px; border-radius: 6px; margin: 16px 0; }
+  .callout.warn { background: rgba(251, 191, 36, 0.1); border-left-color: var(--warn); }
+  .callout.danger { background: rgba(248, 113, 113, 0.1); border-left-color: var(--danger); }
+  .callout.good { background: rgba(110, 231, 183, 0.08); border-left-color: var(--accent); }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.95rem; }
+  th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; vertical-align: top; }
+  th { background: var(--bg-soft); color: var(--text); font-weight: 600; }
+  td { color: var(--text-dim); }
+  td strong { color: var(--text); }
+  .phase { display: flex; align-items: stretch; margin: 24px 0; gap: 16px; }
+  .phase-num { background: var(--accent); color: var(--bg); font-weight: 700; font-size: 1.4rem; min-width: 56px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+  .phase-body { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; }
+  .phase-body h3 { margin-top: 0; }
+  .phase-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip { display: inline-block; background: var(--bg-soft); border: 1px solid var(--border); color: var(--text-dim); padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; }
+  .chip.human { color: var(--warn); border-color: rgba(251,191,36,0.3); }
+  .chip.ai { color: var(--accent); border-color: rgba(110,231,183,0.3); }
+  .chip.gate { color: var(--accent-2); border-color: rgba(96,165,250,0.3); font-weight: 600; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 6px 0; }
+  .toc-link.active { color: var(--accent); border-left-color: var(--accent); }
+  .footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 0.85rem; }
+  .diagram { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin: 24px 0; }
+  .diagram svg { display: block; width: 100%; height: auto; max-width: 100%; }
+  .diagram .caption { margin-top: 10px; font-size: 0.85rem; color: var(--text-dim); text-align: center; font-style: italic; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: relative; height: auto; }
+    .main { padding: 32px 20px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">Agent Playbook v2</div>
+    <div class="tagline">Team Edition · Multi-tribe</div>
+
+    <h2>Bagian</h2>
+    <a href="#overview">Overview</a>
+    <a href="#what-changed">Apa yang Berubah dari v1</a>
+    <a href="#principles">1. Prinsip v2</a>
+    <a href="#operating-model">2. Operating Model</a>
+    <a href="#workflow">3. Workflow 7 Gate</a>
+    <a href="#tribe-arch">4. Tribe Architecture</a>
+    <a href="#feature-folder">5. Feature Folder Structure</a>
+    <a href="#tooling">6. Tooling &amp; Setup</a>
+    <a href="#templates">7. Templates &amp; Prompts</a>
+    <a href="#governance">8. Governance &amp; Rollout</a>
+    <a href="#metrics">9. Metrik Sukses</a>
+    <a href="#antipatterns">10. Anti-pattern</a>
+
+    <h2>Cepat</h2>
+    <a href="#quickstart">Quick Start (1 Hari)</a>
+    <a href="#rollout-plan">Rollout Plan (90 Hari)</a>
+  </aside>
+
+  <main class="main">
+
+    <section id="overview" class="hero">
+      <div class="pill">Playbook v2 · Team Edition</div>
+      <h1>Cara Tim Bekerja dengan AI Agent</h1>
+      <p>Workflow untuk multi-tribe (1, 2, 3a, 3b, 3c) yang memangkas waktu di fase grooming, tech discussion, development, dan testing — dengan review &amp; approval tetap di tangan developer.</p>
+      <p style="margin-top:16px;"><strong>Tagline:</strong> <em>Contract first. Evidence always. AI proposes, human approves. Tribe shares, service owns.</em></p>
+    </section>
+
+    <section id="what-changed">
+      <h2>Apa yang Berubah dari v1</h2>
+      <p>Playbook v1 sudah solid sebagai <em>solo-operator setup</em>: prinsip ketat, 12+ agent specialist, evidence gate, dan lessons loop. Tapi saat dipakai tim (4-8 dev × 5 tribe), muncul 4 gap yang harus ditutup:</p>
+
+      <table>
+        <tr><th>Gap di v1</th><th>Solusi di v2</th></tr>
+        <tr>
+          <td><strong>Solo-oriented.</strong> Asumsi satu human orchestrasi semua agent.</td>
+          <td><strong>Operating Model dengan role split.</strong> 5 human role × 5 AI agent counterpart. Setiap fase punya pemilik manusia + agent pendamping.</td>
+        </tr>
+        <tr>
+          <td><strong>Tidak ada handoff antar-human.</strong> Konteks hilang saat PM hand-off ke Dev, Dev hand-off ke QA.</td>
+          <td><strong>Feature Folder.</strong> Satu folder per feature membawa PRD → tech design → impl plan → test plan → evidence. Dipakai semua peran.</td>
+        </tr>
+        <tr>
+          <td><strong>Tidak ada tribe-level governance.</strong> Tribe 3a/3b/3c share context tapi v1 tidak punya cara share principle.</td>
+          <td><strong>CLAUDE.md hierarchy 3 layer:</strong> org → tribe → service. Tribe 3 punya CLAUDE.md sendiri yang inherit dari org dan di-override di service.</td>
+        </tr>
+        <tr>
+          <td><strong>Grooming/PRD &amp; Testing tipis.</strong> v1 fokus engineering. Padahal 2 fase ini paling sakit (per Aldhi).</td>
+          <td><strong>Groomer Agent &amp; Tester Agent</strong> jadi first-class. Lengkap dengan template PRD, ADR, dan test plan generator.</td>
+        </tr>
+      </table>
+
+      <p style="margin-top:24px;"><strong>Yang dipertahankan utuh dari v1:</strong> Evidence Gate (3 artifact + <code>make verify-feature</code>), Lessons Loop, dan 14 Principles (CLAUDE.md). Itu sudah benar — kita tinggal tambah lapisan tim di atasnya.</p>
+    </section>
+
+    <section id="principles">
+      <h2>1. Prinsip v2 — 4 Tambahan untuk Tim</h2>
+      <p>v1 punya 14 prinsip teknis. v2 menambahkan 4 prinsip <em>operating</em> khusus untuk tim:</p>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="label">Prinsip 15</div>
+          <h3>AI Proposes, Human Approves</h3>
+          <p>Setiap gate ditutup oleh artefak yang di-approve oleh peran manusia tertentu. Approval = signed comment di PR / tag di doc, bukan verbal. Tanpa approval, gate tidak boleh maju.</p>
+        </div>
+        <div class="card">
+          <div class="label">Prinsip 16</div>
+          <h3>Tribe Shares, Service Owns</h3>
+          <p>Pola yang dipakai &gt;1 service di tribe yang sama wajib naik ke <code>tribes/X/CLAUDE.md</code>. Pola yang dipakai &gt;1 tribe wajib naik ke <code>org/CLAUDE.md</code>. Konvensi diturunkan, bukan ditemukan ulang.</p>
+        </div>
+        <div class="card">
+          <div class="label">Prinsip 17</div>
+          <h3>One Folder, All Phases</h3>
+          <p>Setiap feature/epic punya satu folder <code>features/&lt;slug&gt;/</code> yang berisi seluruh artefak dari grooming sampai post-launch. Tidak ada konteks yang hidup di Slack/DM/kepala orang.</p>
+        </div>
+        <div class="card">
+          <div class="label">Prinsip 18</div>
+          <h3>Async by Default, Sync on Conflict</h3>
+          <p>Agent menghasilkan draft async (jalan di background). Manusia review batched (pagi/sore). Sync meeting hanya dipanggil saat <em>ada konflik desain</em>, bukan untuk ratifikasi yang AI sudah selesai.</p>
+        </div>
+      </div>
+
+      <div class="callout good">
+        <strong>Kenapa 4 prinsip ini cukup?</strong> Mereka menutup 4 mode kegagalan tim: keputusan ambigu (15), reinventing the wheel (16), context drift (17), dan rapat tak perlu (18).
+      </div>
+    </section>
+
+    <section id="operating-model">
+      <h2>2. Operating Model — Human × AI</h2>
+      <p>Setiap fase punya <em>satu</em> pemilik manusia dan <em>satu</em> agent utama. Boleh dipanggil sub-agent lain, tapi yang accountable jelas.</p>
+
+      <table>
+        <tr>
+          <th>Fase</th>
+          <th>Human Owner</th>
+          <th>AI Counterpart</th>
+          <th>Output</th>
+        </tr>
+        <tr>
+          <td>Grooming / Discovery</td>
+          <td>PM / BA</td>
+          <td><strong>Groomer Agent</strong></td>
+          <td>PRD draft, user stories, acceptance criteria, open questions</td>
+        </tr>
+        <tr>
+          <td>Tech Discussion</td>
+          <td>Tech Lead</td>
+          <td><strong>Architect Agent</strong></td>
+          <td>Tech design, ADR, OpenAPI/proto contract, sequence diagram, risk register</td>
+        </tr>
+        <tr>
+          <td>Planning</td>
+          <td>Tech Lead + Dev</td>
+          <td><strong>Planner Agent</strong></td>
+          <td>Implementation plan, task breakdown dengan estimate &amp; dependency</td>
+        </tr>
+        <tr>
+          <td>Development</td>
+          <td>Developer</td>
+          <td><strong>Coder Agent</strong> + <strong>Reviewer Agent</strong></td>
+          <td>Code, unit test, evidence artifact per task, self-review checklist</td>
+        </tr>
+        <tr>
+          <td>Testing</td>
+          <td>QA Engineer</td>
+          <td><strong>Tester Agent</strong></td>
+          <td>Test plan, automated test suite, regression matrix</td>
+        </tr>
+        <tr>
+          <td>Defects &amp; Greenlight</td>
+          <td>QA + Tech Lead</td>
+          <td><strong>Triage Agent</strong></td>
+          <td>Defect classification, root-cause analysis, lesson candidate</td>
+        </tr>
+        <tr>
+          <td>Live / Post-launch</td>
+          <td>SRE / Tech Lead</td>
+          <td><strong>Reliability Agent</strong></td>
+          <td>Runbook, alert config, dashboard link, post-launch retrospective</td>
+        </tr>
+      </table>
+
+      <div class="callout">
+        <strong>Catatan:</strong> "Agent" di sini bukan harus jadi entitas teknis terpisah. Praktiknya: 1 Claude Code session + 1 slash command spesifik per fase (lihat Bagian 5). Bisa juga jadi sub-agent terpisah kalau kamu mau strict isolation.
+      </div>
+    </section>
+
+    <section id="workflow">
+      <h2>3. Workflow 7 Gate — Dari Ide ke Live</h2>
+      <p>Tiap gate punya <strong>input</strong>, <strong>aksi AI</strong>, <strong>aksi human</strong>, <strong>exit criteria</strong>, dan <strong>artefak</strong>. Tidak lulus gate = tidak boleh lanjut. Tidak ada "skip karena buru-buru".</p>
+
+      <div class="diagram">
+        <svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+          <title>Playbook v2 — Workflow 7 Gate</title>
+          <desc>Alur 7 fase development dari grooming sampai live. Phase 4 (Development) dan Phase 5 (Testing) berjalan paralel. Setiap fase punya pemilik manusia dan AI agent.</desc>
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#60a5fa"/></marker>
+            <marker id="arrParallel" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a78bfa"/></marker>
+          </defs>
+          <text x="500" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#e6e9ef">Workflow 7 Gate · Playbook v2</text>
+          <text x="500" y="56" text-anchor="middle" font-size="13" fill="#9aa3b2">AI proposes, human approves · Setiap gate ditutup approval eksplisit di artefak</text>
+          <line x1="80" y1="260" x2="920" y2="260" stroke="#2a2f3f" stroke-width="1" stroke-dasharray="3,4"/>
+
+          <a href="phases/1-grooming.html"><g transform="translate(60,200)">
+            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#2a2f3f" stroke-width="1"/>
+            <rect width="130" height="24" rx="10" fill="#60a5fa"/><rect y="14" width="130" height="10" fill="#60a5fa"/>
+            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 1</text>
+            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Grooming</text>
+            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">&amp; PRD</text>
+            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 PM / BA</text>
+            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Groomer</text>
+          </g></a>
+
+          <a href="phases/2-tech-design.html"><g transform="translate(210,200)">
+            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#2a2f3f"/>
+            <rect width="130" height="24" rx="10" fill="#60a5fa"/><rect y="14" width="130" height="10" fill="#60a5fa"/>
+            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 2</text>
+            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Tech Disc.</text>
+            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ ADR + API</text>
+            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 Tech Lead</text>
+            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Architect</text>
+          </g></a>
+
+          <a href="phases/3-planning.html"><g transform="translate(360,200)">
+            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#2a2f3f"/>
+            <rect width="130" height="24" rx="10" fill="#60a5fa"/><rect y="14" width="130" height="10" fill="#60a5fa"/>
+            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 3</text>
+            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Planning</text>
+            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ Task breakdown</text>
+            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 TL + Dev</text>
+            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Planner</text>
+          </g></a>
+
+          <a href="phases/4-development.html"><g transform="translate(510,130)">
+            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#a78bfa" stroke-width="1.5"/>
+            <rect width="130" height="24" rx="10" fill="#a78bfa"/><rect y="14" width="130" height="10" fill="#a78bfa"/>
+            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 4</text>
+            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Development</text>
+            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ Evidence</text>
+            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 Developer</text>
+            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Coder + Rvw</text>
+          </g></a>
+
+          <a href="phases/5-testing.html"><g transform="translate(510,290)">
+            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#a78bfa" stroke-width="1.5"/>
+            <rect width="130" height="24" rx="10" fill="#a78bfa"/><rect y="14" width="130" height="10" fill="#a78bfa"/>
+            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 5</text>
+            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Testing</text>
+            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ Test plan</text>
+            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 QA</text>
+            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Tester</text>
+          </g></a>
+
+          <g transform="translate(575,255)">
+            <rect x="-42" y="-11" width="84" height="22" rx="11" fill="#0f1115" stroke="#a78bfa" stroke-width="1"/>
+            <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#a78bfa">PARALLEL</text>
+          </g>
+
+          <a href="phases/6-defects.html"><g transform="translate(660,200)">
+            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#2a2f3f"/>
+            <rect width="130" height="24" rx="10" fill="#60a5fa"/><rect y="14" width="130" height="10" fill="#60a5fa"/>
+            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 6</text>
+            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Defects &amp;</text>
+            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">Greenlight</text>
+            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 QA + TL</text>
+            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Triage</text>
+          </g></a>
+
+          <a href="phases/7-live.html"><g transform="translate(810,200)">
+            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#6ee7b7" stroke-width="1.5"/>
+            <rect width="130" height="24" rx="10" fill="#6ee7b7"/><rect y="14" width="130" height="10" fill="#6ee7b7"/>
+            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 7</text>
+            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Live</text>
+            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ Post-launch retro</text>
+            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 SRE / TL</text>
+            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Reliability</text>
+          </g></a>
+
+          <line x1="190" y1="260" x2="208" y2="260" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="340" y1="260" x2="358" y2="260" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+          <path d="M 490 260 C 500 260, 500 190, 508 190" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrParallel)"/>
+          <path d="M 490 260 C 500 260, 500 350, 508 350" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrParallel)"/>
+          <path d="M 640 190 C 650 190, 650 260, 658 260" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrParallel)"/>
+          <path d="M 640 350 C 650 350, 650 260, 658 260" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrParallel)"/>
+          <line x1="790" y1="260" x2="808" y2="260" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+
+          <g font-size="9" fill="#6b7280" text-anchor="middle">
+            <text x="125" y="340">~2-4 jam</text>
+            <text x="275" y="340">~4-6 jam</text>
+            <text x="425" y="340">~1-2 jam</text>
+            <text x="575" y="440">running paralel</text>
+            <text x="725" y="340">on defect</text>
+            <text x="875" y="340">+ T+7 retro</text>
+          </g>
+
+          <g transform="translate(60,475)">
+            <text x="0" y="0" font-size="11" font-weight="700" fill="#9aa3b2">LEGEND</text>
+            <rect x="0" y="14" width="14" height="14" rx="3" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.4)"/><text x="20" y="25" font-size="11" fill="#e6e9ef">Human owner (accountable)</text>
+            <rect x="200" y="14" width="14" height="14" rx="3" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.4)"/><text x="220" y="25" font-size="11" fill="#e6e9ef">AI agent (drafts &amp; checks)</text>
+            <rect x="400" y="14" width="14" height="14" rx="3" fill="#60a5fa"/><text x="420" y="25" font-size="11" fill="#e6e9ef">Approval gate</text>
+            <rect x="540" y="14" width="14" height="14" rx="3" fill="#a78bfa"/><text x="560" y="25" font-size="11" fill="#e6e9ef">Parallel track (Dev || Test)</text>
+            <rect x="740" y="14" width="14" height="14" rx="3" fill="#6ee7b7"/><text x="760" y="25" font-size="11" fill="#e6e9ef">Production</text>
+          </g>
+
+          <g transform="translate(60,520)">
+            <rect width="880" height="30" rx="6" fill="rgba(110,231,183,0.08)" stroke="rgba(110,231,183,0.3)"/>
+            <text x="14" y="20" font-size="12" fill="#6ee7b7" font-weight="600">⚡ Kunci pemangkasan waktu:</text>
+            <text x="195" y="20" font-size="12" fill="#e6e9ef">Gate 1+2 yang biasanya 4-6 hari → 1-1.5 hari. Testing tidak lagi blocker (paralel dengan dev).</text>
+          </g>
+        </svg>
+        <div class="caption">Diagram 1 · Workflow 7 Gate end-to-end. Dev + Test paralel; sisanya sekuensial dengan approval gate eksplisit.</div>
+        <div class="click-hint">👆 Klik tiap gate untuk lihat detail flow, cara kerja AI &amp; Dev, dan output yang dihasilkan.</div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-num">1</div>
+        <div class="phase-body">
+          <h3>Grooming &amp; PRD</h3>
+          <p><strong>Input:</strong> Epic mentah dari Jira/Linear (1-3 paragraf). <strong>AI:</strong> Groomer Agent baca epic + repo context + lessons relevan, lalu drafting PRD pakai template + munculkan daftar <em>open questions</em> (apa yang belum jelas). <strong>Human:</strong> PM jawab open questions, iterate 1-2 putaran, lalu Tech Lead review high-level feasibility.</p>
+          <div class="phase-meta">
+            <span class="chip human">Owner: PM</span>
+            <span class="chip ai">Agent: Groomer</span>
+            <span class="chip gate">Gate 1: PRD signed</span>
+            <span class="chip">~2-4 jam (vs. 2-3 hari)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-num">2</div>
+        <div class="phase-body">
+          <h3>Tech Discussion</h3>
+          <p><strong>Input:</strong> PRD yang sudah signed. <strong>AI:</strong> Architect Agent baca PRD + service map + existing API contract, drafting: tech design doc, OpenAPI / proto contract, sequence diagram, data model, alternatif (3 opsi minimal), dan risk register. <strong>Human:</strong> Tech Lead pilih opsi, tribe peer review (1 reviewer dari tribe lain WAJIB untuk cross-pollination), lalu sign.</p>
+          <div class="phase-meta">
+            <span class="chip human">Owner: Tech Lead</span>
+            <span class="chip ai">Agent: Architect</span>
+            <span class="chip gate">Gate 2: Tech Design signed</span>
+            <span class="chip">~4-6 jam (vs. 2-3 hari)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-num">3</div>
+        <div class="phase-body">
+          <h3>Planning &amp; Task Breakdown</h3>
+          <p><strong>Input:</strong> Tech design yang sudah signed. <strong>AI:</strong> Planner Agent generate impl plan: list task urut topologis, dependency graph, estimasi (T-shirt), parallelizable ya/tidak, risk flag. <strong>Human:</strong> Tech Lead validate breakdown, Dev claim task (auto-assigned di Jira).</p>
+          <div class="phase-meta">
+            <span class="chip human">Owner: Tech Lead + Dev</span>
+            <span class="chip ai">Agent: Planner</span>
+            <span class="chip gate">Gate 3: Plan signed</span>
+            <span class="chip">~1-2 jam</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-num">4</div>
+        <div class="phase-body">
+          <h3>Development</h3>
+          <p><strong>Input:</strong> Task dari impl plan. <strong>AI:</strong> Coder Agent implement task pakai CLAUDE.md service-level + skill go-microservice / vue-frontend. Wajib generate: code + unit test + evidence (curl.txt, test.log, screenshots/) + self-review checklist. Reviewer Agent jalankan static check + checklist sebelum dev push. <strong>Human:</strong> Dev review hasil agent, iterate, lalu open PR. Peer dev review fokus ke <em>kelogisan keputusan</em>, bukan style (style sudah dihandle linter).</p>
+          <div class="phase-meta">
+            <span class="chip human">Owner: Dev</span>
+            <span class="chip ai">Agent: Coder + Reviewer</span>
+            <span class="chip gate">Gate 4: PR + evidence</span>
+            <span class="chip">~40-60% lebih cepat</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-num">5</div>
+        <div class="phase-body">
+          <h3>Testing</h3>
+          <p><strong>Input:</strong> PRD + tech design + acceptance criteria. <strong>AI:</strong> Tester Agent generate test plan (functional matrix, edge case, regression, perf hot-spot), drafting E2E test script (Playwright untuk Vue, integration test untuk Go). <strong>Human:</strong> QA review &amp; supplement (yang AI bisa miss: domain quirks, regulasi). QA jalankan, agent bantu triase failure. <em>Kunci: test plan disiapkan paralel dengan development, bukan setelah</em>.</p>
+          <div class="phase-meta">
+            <span class="chip human">Owner: QA</span>
+            <span class="chip ai">Agent: Tester</span>
+            <span class="chip gate">Gate 5: Test plan green</span>
+            <span class="chip">Bukan blocker lagi</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-num">6</div>
+        <div class="phase-body">
+          <h3>Defects &amp; QA Greenlight</h3>
+          <p><strong>Input:</strong> Bug report dari Gate 5. <strong>AI:</strong> Triage Agent classify (P0-P3, area, root-cause hypothesis), cek apakah ini lesson candidate. <strong>Human:</strong> Tech Lead &amp; QA approve fix, tag lesson kalau pattern recurring.</p>
+          <div class="phase-meta">
+            <span class="chip human">Owner: QA + Tech Lead</span>
+            <span class="chip ai">Agent: Triage</span>
+            <span class="chip gate">Gate 6: QA sign-off</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-num">7</div>
+        <div class="phase-body">
+          <h3>Live &amp; Post-launch</h3>
+          <p><strong>Input:</strong> Build yang sudah QA-green. <strong>AI:</strong> Reliability Agent generate runbook, alert config, dashboard. Post-launch (T+7 hari) agent generate post-launch retrospective draft dari log + metrics + incident. <strong>Human:</strong> SRE / Tech Lead validate runbook, sign-off rilis. Setelah 7 hari, retro singkat → lesson baru.</p>
+          <div class="phase-meta">
+            <span class="chip human">Owner: SRE / Tech Lead</span>
+            <span class="chip ai">Agent: Reliability</span>
+            <span class="chip gate">Gate 7: Retro + lesson</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout good">
+        <strong>Estimasi pemangkasan waktu:</strong> Grooming + Tech Disc yang biasanya 4-6 hari kalender → bisa jadi 1-1.5 hari kalender (dengan AI draft + 1-2 putaran review). Testing yang sering 3-5 hari blocker → paralel dengan development. Total: <em>feature lead time turun 40-60% untuk feature medium</em>.
+      </div>
+    </section>
+
+    <section id="tribe-arch">
+      <h2>4. Tribe Architecture — Berbagi Tanpa Coupling</h2>
+      <p>Konteks kerja Aldhi: tribe 1, 2, 3a, 3b, 3c. Tribe 3 share <em>domain context</em> tapi fokus berbeda. v2 menjawab ini dengan struktur 3-layer.</p>
+
+      <div class="diagram">
+        <svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+          <title>Tribe Architecture — Hierarki CLAUDE.md</title>
+          <desc>Hierarki 3-layer: org level, tribe level (dengan sub-tribe 3a/3b/3c yang berbagi context tribe 3), dan service level. Lesson promotion mengalir bottom-up.</desc>
+          <defs>
+            <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9aa3b2"/></marker>
+            <marker id="arrPromote" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#fbbf24"/></marker>
+          </defs>
+          <text x="500" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#e6e9ef">Tribe Architecture · 3-Layer Context</text>
+          <text x="500" y="56" text-anchor="middle" font-size="13" fill="#9aa3b2">Tribe shares, service owns · Claude Code accumulates CLAUDE.md dari leaf → root</text>
+
+          <g transform="translate(140,90)">
+            <rect width="720" height="70" rx="10" fill="#1c2030" stroke="#60a5fa" stroke-width="1.5"/>
+            <rect width="120" height="70" rx="10" fill="rgba(96,165,250,0.15)"/>
+            <text x="60" y="33" text-anchor="middle" font-size="11" font-weight="700" fill="#60a5fa">LAYER 1</text>
+            <text x="60" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">ORG</text>
+            <text x="140" y="28" font-size="13" font-weight="700" fill="#e6e9ef">org/.claude/CLAUDE.md</text>
+            <text x="140" y="45" font-size="11" fill="#9aa3b2">14 principles teknis + 4 prinsip tim · skills · 6 slash command</text>
+            <text x="140" y="60" font-size="10" fill="#6b7280">Dipakai SEMUA tribe. Override hanya kalau benar-benar perlu.</text>
+          </g>
+
+          <g transform="translate(40,200)">
+            <rect width="170" height="80" rx="8" fill="#1c2030" stroke="#2a2f3f"/>
+            <rect width="170" height="22" rx="8" fill="rgba(110,231,183,0.18)"/><rect y="14" width="170" height="8" fill="rgba(110,231,183,0.18)"/>
+            <text x="85" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#6ee7b7">TRIBE 1</text>
+            <text x="10" y="40" font-size="11" font-weight="600" fill="#e6e9ef">tribes/1/CLAUDE.md</text>
+            <text x="10" y="56" font-size="9" fill="#9aa3b2">domain glossary + 5 do/don't</text>
+            <text x="10" y="70" font-size="9" fill="#9aa3b2">LESSONS.md (tribe-local)</text>
+          </g>
+
+          <g transform="translate(230,200)">
+            <rect width="170" height="80" rx="8" fill="#1c2030" stroke="#2a2f3f"/>
+            <rect width="170" height="22" rx="8" fill="rgba(110,231,183,0.18)"/><rect y="14" width="170" height="8" fill="rgba(110,231,183,0.18)"/>
+            <text x="85" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#6ee7b7">TRIBE 2</text>
+            <text x="10" y="40" font-size="11" font-weight="600" fill="#e6e9ef">tribes/2/CLAUDE.md</text>
+            <text x="10" y="56" font-size="9" fill="#9aa3b2">domain glossary + 5 do/don't</text>
+            <text x="10" y="70" font-size="9" fill="#9aa3b2">LESSONS.md (tribe-local)</text>
+          </g>
+
+          <g transform="translate(420,200)">
+            <rect width="540" height="80" rx="8" fill="#1c2030" stroke="#a78bfa" stroke-width="1.5"/>
+            <rect width="540" height="22" rx="8" fill="rgba(167,139,250,0.25)"/><rect y="14" width="540" height="8" fill="rgba(167,139,250,0.25)"/>
+            <text x="270" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#a78bfa">TRIBE 3 · shared context untuk 3a / 3b / 3c</text>
+            <text x="14" y="40" font-size="11" font-weight="600" fill="#e6e9ef">tribes/3/CLAUDE.md</text>
+            <text x="14" y="56" font-size="10" fill="#9aa3b2">domain payment + regulasi + 5 do/don't · konvensi API tribe 3</text>
+            <text x="14" y="72" font-size="10" fill="#a78bfa">⚡ Satu sumber kebenaran untuk 3 sub-tribe. Bukan 3 file terpisah.</text>
+          </g>
+
+          <g transform="translate(440,310)">
+            <rect width="160" height="60" rx="8" fill="#1c2030" stroke="#2a2f3f"/>
+            <text x="10" y="20" font-size="11" font-weight="700" fill="#a78bfa">3a</text><text x="32" y="20" font-size="10" fill="#9aa3b2">fokus spesifik</text>
+            <text x="10" y="38" font-size="10" font-weight="600" fill="#e6e9ef">tribes/3/3a/CLAUDE.md</text>
+            <text x="10" y="52" font-size="9" fill="#6b7280">(opsional — hanya kalau perlu deviasi)</text>
+          </g>
+          <g transform="translate(610,310)">
+            <rect width="160" height="60" rx="8" fill="#1c2030" stroke="#2a2f3f"/>
+            <text x="10" y="20" font-size="11" font-weight="700" fill="#a78bfa">3b</text><text x="32" y="20" font-size="10" fill="#9aa3b2">fokus spesifik</text>
+            <text x="10" y="38" font-size="10" font-weight="600" fill="#e6e9ef">tribes/3/3b/CLAUDE.md</text>
+            <text x="10" y="52" font-size="9" fill="#6b7280">(opsional)</text>
+          </g>
+          <g transform="translate(780,310)">
+            <rect width="160" height="60" rx="8" fill="#1c2030" stroke="#2a2f3f"/>
+            <text x="10" y="20" font-size="11" font-weight="700" fill="#a78bfa">3c</text><text x="32" y="20" font-size="10" fill="#9aa3b2">fokus spesifik</text>
+            <text x="10" y="38" font-size="10" font-weight="600" fill="#e6e9ef">tribes/3/3c/CLAUDE.md</text>
+            <text x="10" y="52" font-size="9" fill="#6b7280">(opsional)</text>
+          </g>
+
+          <g transform="translate(40,410)">
+            <rect width="920" height="100" rx="10" fill="#1c2030" stroke="#2a2f3f"/>
+            <rect width="120" height="100" rx="10" fill="rgba(251,191,36,0.10)"/>
+            <text x="60" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#fbbf24">LAYER 3</text>
+            <text x="60" y="58" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">SERVICE</text>
+            <text x="60" y="74" text-anchor="middle" font-size="9" fill="#9aa3b2">per service</text>
+            <g transform="translate(140,15)"><rect width="140" height="30" rx="5" fill="#0f1115" stroke="#2a2f3f"/><text x="70" y="20" text-anchor="middle" font-size="10" fill="#e6e9ef">payment-gateway/</text></g>
+            <g transform="translate(290,15)"><rect width="140" height="30" rx="5" fill="#0f1115" stroke="#2a2f3f"/><text x="70" y="20" text-anchor="middle" font-size="10" fill="#e6e9ef">checkout-api/</text></g>
+            <g transform="translate(440,15)"><rect width="140" height="30" rx="5" fill="#0f1115" stroke="#2a2f3f"/><text x="70" y="20" text-anchor="middle" font-size="10" fill="#e6e9ef">settlement-svc/</text></g>
+            <g transform="translate(590,15)"><rect width="140" height="30" rx="5" fill="#0f1115" stroke="#2a2f3f"/><text x="70" y="20" text-anchor="middle" font-size="10" fill="#e6e9ef">notif-worker/</text></g>
+            <g transform="translate(740,15)"><rect width="170" height="30" rx="5" fill="#0f1115" stroke="#2a2f3f"/><text x="85" y="20" text-anchor="middle" font-size="10" fill="#9aa3b2">... dst per tribe</text></g>
+            <text x="148" y="65" font-size="10" font-weight="600" fill="#e6e9ef">CLAUDE.md (service-level)</text>
+            <text x="148" y="80" font-size="9" fill="#9aa3b2">stack &amp; layout · owners · gotchas · local dev · conventions yang nonstandard</text>
+            <text x="148" y="92" font-size="9" fill="#fbbf24">+ features/&lt;slug&gt;/ → PRD · TECH-DESIGN · IMPL-PLAN · TEST-PLAN · evidence/</text>
+          </g>
+
+          <g transform="translate(40,540)">
+            <text x="0" y="0" font-size="10" font-weight="700" fill="#9aa3b2">CLAUDE.md ACCUMULATION (saat agent kerja di service):</text>
+            <text x="0" y="18" font-size="11" fill="#e6e9ef">services/payment-gateway/CLAUDE.md → tribes/3/3a/CLAUDE.md → tribes/3/CLAUDE.md → org/.claude/CLAUDE.md</text>
+            <text x="0" y="33" font-size="10" font-style="italic" fill="#6b7280">(paling spesifik di depan, paling umum di belakang. Agent baca semua, override sesuai prioritas leaf → root.)</text>
+          </g>
+
+          <line x1="125" y1="160" x2="125" y2="200" stroke="#9aa3b2" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arr2)"/>
+          <line x1="315" y1="160" x2="315" y2="200" stroke="#9aa3b2" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arr2)"/>
+          <line x1="690" y1="160" x2="690" y2="200" stroke="#9aa3b2" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arr2)"/>
+          <line x1="520" y1="280" x2="520" y2="310" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arr2)"/>
+          <line x1="690" y1="280" x2="690" y2="310" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arr2)"/>
+          <line x1="860" y1="280" x2="860" y2="310" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arr2)"/>
+          <line x1="125" y1="280" x2="125" y2="410" stroke="#9aa3b2" stroke-width="1" stroke-dasharray="2,3" marker-end="url(#arr2)"/>
+          <line x1="315" y1="280" x2="315" y2="410" stroke="#9aa3b2" stroke-width="1" stroke-dasharray="2,3" marker-end="url(#arr2)"/>
+          <line x1="520" y1="370" x2="520" y2="410" stroke="#a78bfa" stroke-width="1" stroke-dasharray="2,3" marker-end="url(#arr2)"/>
+          <line x1="690" y1="370" x2="690" y2="410" stroke="#a78bfa" stroke-width="1" stroke-dasharray="2,3" marker-end="url(#arr2)"/>
+          <line x1="860" y1="370" x2="860" y2="410" stroke="#a78bfa" stroke-width="1" stroke-dasharray="2,3" marker-end="url(#arr2)"/>
+
+          <g transform="translate(820,415)">
+            <path d="M 0 0 C -30 -40, -30 -90, -50 -120" fill="none" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrPromote)"/>
+          </g>
+
+          <g transform="translate(40,580)">
+            <text x="0" y="0" font-size="10" fill="#fbbf24" font-weight="700">LESSON PROMOTION:</text>
+            <text x="125" y="0" font-size="10" fill="#e6e9ef">lesson di service → tribe (≥2 service) → org (≥2 tribe) · monthly cross-tribe scan oleh Triage Agent</text>
+          </g>
+        </svg>
+        <div class="caption">Diagram 2 · Tribe architecture 3-layer. Tribe 3a/3b/3c berbagi <code>tribes/3/CLAUDE.md</code>; sub-tribe CLAUDE.md hanya dipakai kalau perlu deviasi.</div>
+      </div>
+
+      <h3>4.1 Hierarki CLAUDE.md &amp; Skills</h3>
+      <pre><code>org/
+├── .claude/
+│   ├── CLAUDE.md            # 14+4 principles, glossary, do/don't org-wide
+│   ├── skills/              # skill yang relevan semua tribe
+│   │   ├── golang-microservice/
+│   │   ├── vue-frontend/
+│   │   ├── grpc-contract/
+│   │   └── openapi-design/
+│   └── commands/            # slash command shared
+│       ├── groom.md
+│       ├── tech-design.md
+│       ├── plan.md
+│       ├── implement.md
+│       ├── test-plan.md
+│       └── code-review.md
+│
+├── tribes/
+│   ├── 1/
+│   │   ├── CLAUDE.md        # principle override + domain glossary tribe 1
+│   │   └── LESSONS.md
+│   ├── 2/...
+│   └── 3/
+│       ├── CLAUDE.md        # SHARED untuk 3a/3b/3c (domain payment, regulasi, dsb)
+│       ├── 3a/
+│       │   ├── CLAUDE.md    # fokus spesifik 3a
+│       │   └── services/
+│       ├── 3b/...
+│       └── 3c/...
+│
+└── services/
+    └── &lt;service-name&gt;/
+        ├── CLAUDE.md        # quirk &amp; convention service
+        ├── features/
+        │   └── &lt;feature-slug&gt;/
+        │       ├── PRD.md
+        │       ├── TECH-DESIGN.md
+        │       ├── IMPL-PLAN.md
+        │       ├── TEST-PLAN.md
+        │       └── evidence/
+        └── ...
+</code></pre>
+
+      <p>Claude Code otomatis mengakumulasi CLAUDE.md dari leaf → root. Jadi saat dev kerja di <code>tribes/3/3a/services/payment-gateway/</code>, agent membaca:</p>
+      <ol>
+        <li><code>services/payment-gateway/CLAUDE.md</code> (paling spesifik)</li>
+        <li><code>tribes/3/3a/CLAUDE.md</code></li>
+        <li><code>tribes/3/CLAUDE.md</code> (shared 3a/3b/3c)</li>
+        <li><code>org/.claude/CLAUDE.md</code> (paling umum)</li>
+      </ol>
+
+      <h3>4.2 Memory Federation — Lessons</h3>
+      <p>Setiap tribe punya <code>LESSONS.md</code> sendiri. Tiap akhir bulan, Triage Agent run cross-tribe scan: lesson yang muncul di ≥2 tribe → promote ke <code>org/.claude/LESSONS.md</code> dan (kalau pattern engineering) dikodifikasi sebagai principle baru di <code>org/.claude/CLAUDE.md</code>.</p>
+
+      <table>
+        <tr><th>Skenario</th><th>Aksi</th></tr>
+        <tr><td>Tribe 3a temu pattern baru di payment</td><td>Tulis di <code>tribes/3/3a/LESSONS.md</code></td></tr>
+        <tr><td>Pattern muncul juga di 3b dan 3c</td><td>Promote ke <code>tribes/3/LESSONS.md</code> + <code>CLAUDE.md</code> tribe 3</td></tr>
+        <tr><td>Tribe 1 &amp; 2 juga punya kasus serupa</td><td>Promote ke <code>org/.claude/CLAUDE.md</code> sebagai principle ke-19, 20, dst.</td></tr>
+      </table>
+
+      <h3>4.3 Cross-Tribe Review (Wajib di Gate 2)</h3>
+      <p>Untuk tech design (Gate 2), <strong>minimal 1 reviewer dari tribe lain</strong>. Tujuan: bukan "permission" tapi <em>cross-pollination</em> — supaya pola di tribe 3 tidak buta tribe 1, dst. Reviewer punya 24 jam SLA; lewat itu, otomatis di-skip (tidak block).</p>
+
+      <div class="callout warn">
+        <strong>Anti-pattern:</strong> Tribe yang membangun ulang CLAUDE.md dari nol. Selalu mulai dari org-level, override seperlunya. Kalau merasa &gt;50% perlu di-override, itu sinyal arsitektur tribe terlalu beda dari org — bicarakan di forum tech lead, jangan fork diam-diam.
+      </div>
+    </section>
+
+    <section id="feature-folder">
+      <h2>5. Feature Folder — Struktur Output Kanonik</h2>
+      <p>Aturan emas (Prinsip 17): <strong>1 feature = 1 folder = semua output di sana</strong>. Tidak ada artefak yang tercecer di Slack, DM, root repo, atau wiki terpisah. Kalau seseorang ingin tahu apa pun tentang feature X, mereka buka <code>features/&lt;slug&gt;/</code> dan menemukan semuanya — dari PRD sampai runbook produksi.</p>
+
+      <h3>5.1 Struktur Folder Lengkap</h3>
+<pre><code>features/&lt;slug&gt;/
+├── README.md                    ← Auto-generated index, link ke semua artefak
+├── PRD.md                       ← Gate 1 · Problem + user stories + AC
+├── TECH-DESIGN.md               ← Gate 2 · Decision + sequence diagram + risk
+├── IMPL-PLAN.md                 ← Gate 3 · Task list + dependency graph
+├── TEST-PLAN.md                 ← Gate 5 (mulai Gate 3) · Test matrix + edge case
+├── POST-LAUNCH-RETRO.md         ← Gate 7 · T+7 retro + lessons extracted
+│
+├── decisions/                   ← ADR per keputusan besar (pisah dari TD kalau perlu)
+│   └── ADR-001-&lt;judul&gt;.md
+│
+├── contract/                    ← API contract khusus feature ini
+│   ├── openapi.yaml             ← REST endpoint additions/changes
+│   └── proto/
+│       └── &lt;name&gt;.proto         ← gRPC definitions
+│
+├── migrations/                  ← DB migration scoped ke feature ini
+│   ├── 001-&lt;name&gt;.up.sql
+│   └── 001-&lt;name&gt;.down.sql      ← WAJIB pasangan, backward-compatible
+│
+├── tests/                       ← Test file yang lahir bersama feature
+│   ├── integration/             ← Go testcontainers test
+│   ├── e2e/                     ← Playwright E2E
+│   └── exploratory.md           ← Manual exploratory scenario
+│
+├── runbook/                     ← SRE &amp; on-call artifacts (Gate 7)
+│   ├── failure-modes.md         ← Top 3-5 failure: symptom → check → mitigation
+│   ├── alerts.yaml              ← Alert config (Grafana / Datadog)
+│   └── dashboard.json           ← Dashboard panel definition
+│
+├── evidence/                    ← Bukti per task (Gate 4)
+│   └── &lt;task-id&gt;/
+│       ├── curl.txt             ← Request/response endpoint
+│       ├── test.log             ← Output test run
+│       └── screenshots/         ← Min. 3 kalau UI change
+│
+└── code-manifest.md             ← Pointer ke file CODE di service layout
+                                    (karena Go module butuh standard layout)
+</code></pre>
+
+      <h3>5.2 Mapping Artefak per Gate</h3>
+      <table>
+        <tr><th>Gate</th><th>Artefak yang dihasilkan</th><th>Lokasi di feature folder</th></tr>
+        <tr><td>1 Grooming</td><td>PRD</td><td><code>PRD.md</code></td></tr>
+        <tr><td>2 Tech Disc.</td><td>Tech design, ADR, API contract, migration plan</td><td><code>TECH-DESIGN.md</code> · <code>decisions/</code> · <code>contract/</code> · <code>migrations/</code></td></tr>
+        <tr><td>3 Planning</td><td>Impl plan, task breakdown</td><td><code>IMPL-PLAN.md</code></td></tr>
+        <tr><td>4 Development</td><td>Evidence per task</td><td><code>evidence/&lt;task-id&gt;/</code> + update <code>code-manifest.md</code></td></tr>
+        <tr><td>5 Testing</td><td>Test plan, test files</td><td><code>TEST-PLAN.md</code> · <code>tests/</code></td></tr>
+        <tr><td>6 Defects</td><td>Regression test, lesson candidate</td><td><code>tests/</code> + (lesson di <code>tribes/&lt;id&gt;/LESSONS.md</code>)</td></tr>
+        <tr><td>7 Live</td><td>Runbook, alerts, retro</td><td><code>runbook/</code> · <code>POST-LAUNCH-RETRO.md</code></td></tr>
+      </table>
+
+      <h3>5.3 Code Manifest — Kenapa Ada?</h3>
+      <p>Code (Go handler/usecase/repo, Vue component) tetap harus di standard service layout — bukan di feature folder — karena Go module &amp; bundler perlu layout standar. Tapi tetap harus bisa ditemukan dari feature folder.</p>
+      <p><strong>Solusi:</strong> <code>features/&lt;slug&gt;/code-manifest.md</code> mencatat semua file code yang disentuh feature ini:</p>
+<pre><code># Code Manifest — apple-pay-checkout
+
+## Files added
+- `internal/handler/http/apple_pay.go` (Gate 4 · Task T03)
+- `internal/usecase/apple_pay_charge.go` (Gate 4 · Task T05)
+- `internal/repository/apple_pay_token.go` (Gate 4 · Task T04)
+- `web/src/components/ApplePayButton.vue` (Gate 4 · Task T07)
+
+## Files modified
+- `internal/handler/http/router.go` (route registration · Task T03)
+- `api/openapi.yaml` (← di-generate dari `features/apple-pay-checkout/contract/openapi.yaml`)
+
+## Migrations applied
+- `migrations/2026_05_12_001_apple_pay_token.up.sql` (← copy dari feature folder)
+
+## Standard locations updated (auto via `make feature-apply`)
+- `monitoring/alerts/apple_pay_checkout.yaml`
+- `runbooks/payment/apple-pay-checkout.md`
+</code></pre>
+
+      <h3>5.4 Build Tooling — <code>make feature-apply</code></h3>
+      <p>Beberapa artefak harus di-mirror ke standard location supaya tooling generic ikut. Ini di-handle satu perintah:</p>
+<pre><code># Saat feature siap merge (Gate 4):
+make feature-apply FEATURE=apple-pay-checkout
+# Yang dilakukan:
+# 1. Merge features/&lt;slug&gt;/contract/openapi.yaml → api/openapi.yaml (additive)
+# 2. Copy features/&lt;slug&gt;/migrations/* → migrations/ (dengan timestamp)
+# 3. Copy features/&lt;slug&gt;/runbook/alerts.yaml → monitoring/alerts/&lt;slug&gt;.yaml
+# 4. Copy features/&lt;slug&gt;/runbook/failure-modes.md → runbooks/&lt;service&gt;/&lt;slug&gt;.md
+# 5. Update code-manifest.md dengan timestamp
+
+# Saat perlu rollback feature:
+make feature-rollback FEATURE=apple-pay-checkout
+</code></pre>
+      <p>Source of truth tetap di feature folder. Standard location adalah <em>view</em> yang di-regenerate dari feature folder.</p>
+
+      <h3>5.5 Lifecycle Feature Folder</h3>
+      <table>
+        <tr><th>Status</th><th>Aksi</th><th>Folder location</th></tr>
+        <tr><td><strong>Active</strong></td><td>Dalam progres (Gate 1-7)</td><td><code>features/&lt;slug&gt;/</code></td></tr>
+        <tr><td><strong>Live &amp; Maintained</strong></td><td>Sudah Gate 7 closed; folder tetap aktif sebagai referensi</td><td><code>features/&lt;slug&gt;/</code></td></tr>
+        <tr><td><strong>Archived</strong></td><td>Feature stabil ≥6 bulan; pindahkan ke arsip untuk de-clutter</td><td><code>features/_archived/&lt;year&gt;/&lt;slug&gt;/</code></td></tr>
+        <tr><td><strong>Deprecated</strong></td><td>Feature di-sunset; folder tetap untuk historical lesson</td><td><code>features/_archived/&lt;year&gt;/&lt;slug&gt;-DEPRECATED/</code></td></tr>
+      </table>
+
+      <div class="callout good">
+        <strong>Manfaat konkret struktur ini:</strong>
+        <ul>
+          <li><strong>Onboarding cepat:</strong> dev baru baca 1 folder, dia paham seluruh konteks feature</li>
+          <li><strong>Audit trail:</strong> compliance/security audit cukup buka folder, semua bukti ada</li>
+          <li><strong>Rollback bersih:</strong> kalau harus undo feature, semua artefak teridentifikasi di 1 tempat</li>
+          <li><strong>Lesson extraction:</strong> retro ngeliat 1 folder, tahu apa yang berubah &amp; kenapa</li>
+          <li><strong>AI agent context:</strong> agent baca 1 folder = semua konteks feature; tidak perlu cari ke Slack/wiki</li>
+        </ul>
+      </div>
+
+      <div class="callout warn">
+        <strong>Anti-pattern yang dilarang:</strong>
+        <ul>
+          <li>PRD di Notion, tech design di Confluence, test plan di Google Doc — <em>itu context drift</em></li>
+          <li>Migration di <code>migrations/</code> root tanpa link ke feature mana yang melahirkannya</li>
+          <li>Alert config &amp; runbook hilang setelah feature live</li>
+          <li>Evidence cuma di screenshot di chat PR</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="tooling">
+      <h2>6. Tooling &amp; Setup</h2>
+      <p>Stack minimum yang dibutuhkan tiap dev. Tujuannya zero-config: clone repo → <code>make agent-setup</code> → siap kerja.</p>
+
+      <h3>6.1 Claude Code Setup</h3>
+      <p>Versi Claude Code terbaru. Per dev, sekali setup di shell:</p>
+      <pre><code>npm install -g @anthropic-ai/claude-code   # atau sesuai instruksi resmi
+# di root repo:
+make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
+</code></pre>
+
+      <h3>6.2 Slash Commands (per fase)</h3>
+      <p>Disimpan di <code>org/.claude/commands/</code> dan otomatis tersedia di semua repo yang ikut struktur ini.</p>
+
+      <table>
+        <tr><th>Command</th><th>Fase</th><th>Aksi</th></tr>
+        <tr><td><code>/groom &lt;jira-id&gt;</code></td><td>1</td><td>Tarik epic, generate PRD draft + open questions</td></tr>
+        <tr><td><code>/tech-design &lt;feature-slug&gt;</code></td><td>2</td><td>Generate tech design + ADR + OpenAPI / proto + risk register</td></tr>
+        <tr><td><code>/plan &lt;feature-slug&gt;</code></td><td>3</td><td>Generate impl plan + task breakdown + estimate</td></tr>
+        <tr><td><code>/implement &lt;task-id&gt;</code></td><td>4</td><td>Implement task spesifik, generate code + test + evidence</td></tr>
+        <tr><td><code>/test-plan &lt;feature-slug&gt;</code></td><td>5</td><td>Generate test plan + skeleton E2E test</td></tr>
+        <tr><td><code>/code-review &lt;pr-id&gt;</code></td><td>4-6</td><td>Self-review checklist + static analysis summary</td></tr>
+        <tr><td><code>/evidence &lt;task-id&gt;</code></td><td>4</td><td>Collect &amp; format curl.txt + test.log + screenshots</td></tr>
+        <tr><td><code>/lesson "&lt;judul&gt;"</code></td><td>6-7</td><td>Tambahkan lesson ke LESSONS.md dengan format konsisten</td></tr>
+      </table>
+
+      <h3>6.3 Skills — Stack-Specific Knowledge</h3>
+      <p>Skill di-bundle di <code>org/.claude/skills/</code>. Per skill: SKILL.md + helper scripts + template kode.</p>
+
+      <ul>
+        <li><strong>golang-microservice</strong> — layout standar (cmd/, internal/, pkg/), pattern handler/service/repo, observability hook, graceful shutdown, error wrapping.</li>
+        <li><strong>vue-frontend</strong> — composition API + Pinia store + script setup, 5 UI states (default/loading/empty/error/success), accessibility checklist.</li>
+        <li><strong>grpc-contract</strong> — proto file convention, buf lint, backward-compat rule, codegen pipeline.</li>
+        <li><strong>openapi-design</strong> — spec-first, validation matrix, 422 dengan friendly message (sesuai prinsip v1).</li>
+        <li><strong>test-scaffolding</strong> — Go: table-driven test + testcontainers untuk integration. Vue: Vitest + Playwright.</li>
+      </ul>
+
+      <h3>6.4 MCP Servers (opsional, kuat)</h3>
+      <p>Kalau tim siap, sambungkan MCP untuk integrasi langsung:</p>
+      <ul>
+        <li><strong>Jira/Linear MCP</strong> — Groomer Agent tarik epic, update status, comment</li>
+        <li><strong>GitHub MCP</strong> — Coder Agent buka PR, baca diff, baca CI log</li>
+        <li><strong>Confluence/Notion MCP</strong> — sync PRD/Tech Design ke wiki tim</li>
+        <li><strong>Monitoring MCP (Grafana/Datadog)</strong> — Reliability Agent baca metric + log untuk post-launch retro</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Saran rollout MCP:</strong> Mulai dari GitHub MCP saja (paling impactful untuk gate 4). Tambah Jira MCP di bulan 2. Tambah lainnya kalau benar-benar dibutuhkan — jangan kelebihan tool.
+      </div>
+    </section>
+
+    <section id="templates">
+      <h2>7. Templates &amp; Prompts</h2>
+      <p>Template fisik ada di folder <code>templates/</code> di playbook ini. Ringkasan struktur tiap dokumen di bawah. Filosofi: <em>setiap dokumen punya skeleton yang sama di semua tribe</em> supaya reviewer dari tribe lain tidak perlu belajar format baru.</p>
+
+      <h3>7.1 PRD Template</h3>
+      <ul>
+        <li><strong>Problem statement</strong> (1 paragraf, no jargon)</li>
+        <li><strong>Target user &amp; jobs-to-be-done</strong></li>
+        <li><strong>In scope / Out of scope</strong> (eksplisit)</li>
+        <li><strong>User stories + acceptance criteria</strong> (format Given/When/Then)</li>
+        <li><strong>Non-functional requirements</strong> (perf, security, privacy)</li>
+        <li><strong>Dependencies</strong> (service lain, tim lain, vendor)</li>
+        <li><strong>Risks &amp; mitigations</strong></li>
+        <li><strong>Open questions</strong> (auto-generated oleh Groomer; harus tuntas sebelum Gate 1)</li>
+      </ul>
+
+      <h3>7.2 Tech Design Template</h3>
+      <ul>
+        <li><strong>Context</strong> (link ke PRD)</li>
+        <li><strong>Options considered</strong> (minimal 3, dengan trade-off matrix)</li>
+        <li><strong>Decision</strong> + rationale (= ADR inline)</li>
+        <li><strong>API contract</strong> (OpenAPI snippet untuk REST, proto untuk gRPC)</li>
+        <li><strong>Data model</strong> (ERD atau struct)</li>
+        <li><strong>Sequence diagram</strong> (Mermaid, jangan PowerPoint)</li>
+        <li><strong>Failure modes &amp; recovery</strong></li>
+        <li><strong>Observability plan</strong> (apa yang di-log/metric/trace)</li>
+        <li><strong>Rollout plan</strong> (feature flag? canary? big-bang?)</li>
+        <li><strong>Cross-tribe reviewer</strong> (nama + tribe)</li>
+      </ul>
+
+      <h3>7.3 Test Plan Template</h3>
+      <ul>
+        <li><strong>Scope</strong> (mapping ke acceptance criteria di PRD)</li>
+        <li><strong>Test matrix</strong> (state × action; tiap baris = 1 test case)</li>
+        <li><strong>Edge cases</strong> (Tester Agent generate; QA tambahkan domain-specific)</li>
+        <li><strong>Automation strategy</strong> (mana unit, mana integration, mana E2E)</li>
+        <li><strong>Regression set</strong> (tag test mana yang masuk regression suite)</li>
+        <li><strong>Performance / load (jika relevan)</strong></li>
+        <li><strong>Exit criteria</strong> (pass rate, defect density threshold)</li>
+      </ul>
+
+      <h3>7.4 CLAUDE.md Template (Service-level)</h3>
+      <ul>
+        <li><strong>What this service does</strong> (1-2 paragraf, no marketing)</li>
+        <li><strong>Owners</strong> (primary + secondary on-call)</li>
+        <li><strong>Stack &amp; layout</strong> (Go versi, layout folder)</li>
+        <li><strong>External dependencies</strong> (DB, queue, downstream service)</li>
+        <li><strong>Local dev</strong> (cara run, test, debug — 1 perintah ideal)</li>
+        <li><strong>Conventions yang nonstandard</strong> (kalau ada deviasi dari org)</li>
+        <li><strong>Gotchas</strong> (hal yang sering nyangkut — dari LESSONS.md)</li>
+      </ul>
+
+      <p><em>File konkret: lihat <code>templates/</code> di folder ini.</em></p>
+    </section>
+
+    <section id="governance">
+      <h2>8. Governance &amp; Rollout</h2>
+
+      <h3 id="rollout-plan">8.1 Rollout 90 Hari (rekomendasi)</h3>
+
+      <table>
+        <tr><th>Fase</th><th>Durasi</th><th>Aksi</th><th>Sukses kriteria</th></tr>
+        <tr>
+          <td><strong>Pilot</strong> (1 tribe)</td>
+          <td>Minggu 1-4</td>
+          <td>Pilih 1 tribe (saran: <strong>tribe 3a</strong> — context kuat, 4-8 dev). Setup CLAUDE.md hierarchy, slash commands, 2-3 skill paling relevan. Jalankan 2-3 feature end-to-end.</td>
+          <td>1 feature lulus 7 gate. Lead time turun minimum 25%. Tim merasa "ini bantuan, bukan beban".</td>
+        </tr>
+        <tr>
+          <td><strong>Replikasi</strong> (3 tribe)</td>
+          <td>Minggu 5-8</td>
+          <td>Rollout ke tribe 3b, 3c (share context dengan 3a, paling murah). Mulai cross-tribe review. Aktifkan lesson promotion bulanan.</td>
+          <td>Tribe 3 jalan paralel pakai playbook v2. Cross-tribe review jalan minimal 50% gate 2.</td>
+        </tr>
+        <tr>
+          <td><strong>Skala</strong> (semua tribe)</td>
+          <td>Minggu 9-12</td>
+          <td>Rollout tribe 1 &amp; 2. Setup MCP Jira (atau equivalent). Bikin internal showcase / brownbag per bulan.</td>
+          <td>Semua tribe pakai playbook. Lead time turun 40%+. Min. 5 lesson di-promote ke org-level.</td>
+        </tr>
+      </table>
+
+      <h3 id="quickstart">8.2 Quick Start untuk Tribe Baru (1 hari)</h3>
+      <ol>
+        <li><strong>Pagi:</strong> Tech Lead clone playbook v2 → adapt <code>tribes/X/CLAUDE.md</code> (cukup isi domain glossary + 5 do/don't tribe). Setup repo skeleton.</li>
+        <li><strong>Siang:</strong> Walkthrough 1 jam ke seluruh dev tribe: 4 prinsip baru + 7 gate + slash command. Tunjukkan demo <code>/groom</code> + <code>/tech-design</code> di feature yang sedang antre.</li>
+        <li><strong>Sore:</strong> Tiap dev coba <code>/implement</code> di 1 task kecil. Catat friction. Friction → backlog improvement playbook.</li>
+      </ol>
+
+      <h3>8.3 Versi &amp; Maintenance Playbook</h3>
+      <ul>
+        <li>Playbook ada di repo terpisah (atau <code>org/.claude/</code>). Versi semantik: <em>major.minor</em>. Major bump kalau workflow gate berubah; minor kalau template/command ditambah.</li>
+        <li><strong>Quarterly review:</strong> 1 jam tiap kuartal — tech lead tribe + 1 PM + 1 QA. Bahas: lesson apa yang naik ke principle, command/skill apa yang ditambah/dibuang, gate mana yang sering di-skip (sinyal gate problem).</li>
+        <li><strong>Owner playbook</strong> ditugaskan eksplisit (1 orang, rotate per kuartal — biar ownership tidak diffuse).</li>
+      </ul>
+
+      <h3>8.4 Approval Mekanisme Konkret</h3>
+      <table>
+        <tr><th>Gate</th><th>Bentuk Approval</th></tr>
+        <tr><td>1 (PRD)</td><td>Comment "LGTM-PRD" oleh PM + Tech Lead di file PRD.md di PR; CI cek file ada</td></tr>
+        <tr><td>2 (Tech Design)</td><td>Comment "LGTM-TD" oleh Tech Lead + cross-tribe reviewer di PR</td></tr>
+        <tr><td>3 (Plan)</td><td>Tech Lead merge plan PR; auto-create task di Jira/Linear</td></tr>
+        <tr><td>4 (Dev PR)</td><td>Peer review approve + CI hijau + evidence folder tidak kosong</td></tr>
+        <tr><td>5 (Test)</td><td>QA tag rilis: <code>qa-greenlight</code></td></tr>
+        <tr><td>6 (Defect closure)</td><td>Defect status closed + lesson di-link kalau ada</td></tr>
+        <tr><td>7 (Live)</td><td>SRE checklist hijau + post-launch retro file commit</td></tr>
+      </table>
+    </section>
+
+    <section id="metrics">
+      <h2>9. Metrik Sukses — Cek Realita, Bukan Vibe</h2>
+      <p>4 metrik wajib, di-track tribe-level dan org-level. Auto-generated dari Jira + GitHub setiap minggu.</p>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="label">Lead time</div>
+          <h3>Hari dari Gate 1 (PRD signed) → Gate 7 (live)</h3>
+          <p>Target: turun 40% dalam 90 hari. Median, bukan rata-rata (outlier menipu).</p>
+        </div>
+        <div class="card">
+          <div class="label">Defect escape rate</div>
+          <h3>Bug yang ketemu di produksi / total bug</h3>
+          <p>Target: stagnan atau turun. Kalau naik = AI cuma mempercepat tapi kualitas turun. Stop dan investigasi.</p>
+        </div>
+        <div class="card">
+          <div class="label">Review time</div>
+          <h3>Median jam dari PR open → merge</h3>
+          <p>Target: turun 30%. Sinyal bahwa review fokus ke <em>keputusan</em>, bukan style.</p>
+        </div>
+        <div class="card">
+          <div class="label">Lesson velocity</div>
+          <h3>Jumlah lesson baru per bulan</h3>
+          <p>Target: ≥3 per tribe per bulan. Lesson terlalu sedikit = tim tidak refleksi; terlalu banyak = ada masalah sistemik.</p>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <strong>Hati-hati metric gaming.</strong> Kalau lead time turun tapi defect escape naik, itu bukan win. Selalu lihat keempat metrik bersamaan.
+      </div>
+    </section>
+
+    <section id="antipatterns">
+      <h2>10. Anti-pattern Khusus Tim</h2>
+      <ol>
+        <li><strong>"AI bilang begitu" sebagai justifikasi.</strong> Output AI tetap perlu reasoning manusia. Approval gate ada karena ini.</li>
+        <li><strong>Skip gate karena buru-buru.</strong> Skip 1 gate = utang yang dibayar 3× di gate berikutnya. Kalau benar-benar urgent, ada <em>emergency lane</em> yang punya retro wajib.</li>
+        <li><strong>Tribe fork CLAUDE.md.</strong> Kalau merasa override &gt;50%, hentikan — bahas di forum tech lead.</li>
+        <li><strong>Reviewer cross-tribe perfunctory.</strong> Reviewer cross-tribe minimal harus tulis 1 pertanyaan / saran spesifik; "LGTM" kosong tidak diterima.</li>
+        <li><strong>Slash command jadi black box.</strong> Tiap command harus punya doc 1 halaman: input, output, asumsi. Kalau tidak, hilangkan.</li>
+        <li><strong>Lesson loop mati.</strong> Kalau 1 bulan tidak ada lesson naik, owner playbook wajib facilitate retro mini.</li>
+        <li><strong>Approval pakai chat.</strong> Approval di Slack tidak terhitung. Harus di artefak yang bisa di-grep nanti.</li>
+        <li><strong>"Ini buat developer senior aja".</strong> Justru junior paling diuntungkan playbook. Pastikan onboarding masuk hari ke-2 dev baru.</li>
+      </ol>
+    </section>
+
+    <div class="footer">
+      Agent Playbook v2 — Team Edition · Disusun untuk tim multi-tribe yang ingin AI handle fase paling sakit (grooming, tech disc, dev, testing) dengan tetap menjaga keputusan di developer.<br>
+      Versi ini didasari Agent Playbook v1 (<a href="https://aldhirs.github.io/ai-agent-playbook/index.html">SafeTech</a>) — dengan tambahan 4 prinsip tim, 7 gate workflow, 3-layer tribe architecture, dan rollout 90 hari.<br>
+      Last updated: 2026-05-12.
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // active section highlight in sidebar
+  const sections = document.querySelectorAll('section[id], div.hero[id]');
+  const links = document.querySelectorAll('.sidebar a');
+  function onScroll() {
+    let current = '';
+    sections.forEach(s => {
+      const r = s.getBoundingClientRect();
+      if (r.top < 120) current = s.id;
+    });
+    links.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+</body>
+</html>

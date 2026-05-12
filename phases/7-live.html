@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gate 7 · Live &amp; Post-launch — Playbook v2</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="detail-page">
+
+  <div class="breadcrumb">
+    <a href="../index.html">← Playbook v2</a> · <a href="../index.html#workflow">Workflow 7 Gate</a> · <strong>Gate 7: Live</strong>
+  </div>
+
+  <header class="detail-hero">
+    <div class="gate-badge">GATE 7</div>
+    <h1>Live &amp; Post-launch</h1>
+    <p class="lead">Rilis ke produksi dengan runbook, observability, &amp; rollout plan. Post-launch (T+7 hari) retro otomatis untuk extract lesson. Tujuan: <em>tidak ada "launched and forgotten" — setiap rilis punya feedback loop yang structured</em>.</p>
+
+    <div class="meta-grid">
+      <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">SRE / Tech Lead</div></div>
+      <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Reliability</div></div>
+      <div class="meta-item"><div class="lbl">Input</div><div class="val">Build QA-signed-off</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val">Runbook · alerts · post-launch retro</div></div>
+      <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">SRE checklist hijau + retro committed</div></div>
+      <div class="meta-item"><div class="lbl">Retro Trigger</div><div class="val">T+7 hari otomatis</div></div>
+    </div>
+  </header>
+
+  <h2>Detailed Flow</h2>
+  <ol class="stepflow">
+    <li class="ai-step"><strong>Run <code>/runbook &lt;feature-slug&gt;</code></strong> (atau ke Reliability Agent). Baca TD (observability plan, failure modes, rollback) + alert config existing.</li>
+    <li class="ai-step"><strong>Generate runbook</strong>: alur on-call response untuk top 3-5 failure mode. Tiap entry: symptom → first-check → mitigation → escalation path.</li>
+    <li class="ai-step"><strong>Generate alert config</strong> sesuai observability plan TD (Grafana / Datadog YAML). SLO target ditulis eksplisit.</li>
+    <li class="ai-step"><strong>Generate dashboard panel</strong> baru di folder team. Panel: traffic, latency p50/p99, error rate, custom metric dari feature.</li>
+    <li class="human-step"><strong>SRE validate runbook</strong>. Cek: bisakah on-call junior ikuti tanpa context tambahan? Mitigation reversible?</li>
+    <li class="human-step"><strong>Rilis dengan canary</strong>: feature flag on 1% traffic for 24h → 10% for 24h → 100%. Default. Big-bang hanya dengan alasan eksplisit di TD.</li>
+    <li class="human-step"><strong>SRE / Tech Lead monitor canary</strong>: SLO terpenuhi? error rate naik? complaint user? Kalau ada anomaly → rollback (toggle flag off), bukan "wait and see".</li>
+    <li class="ai-step"><strong>T+7 hari otomatis: Reliability Agent generate post-launch retro draft</strong> dari log + metric + incident yang muncul.</li>
+    <li class="human-step"><strong>Tim review retro</strong> di 30 menit meeting (max). Output: 1-3 lesson baru ditulis di <code>tribes/&lt;id&gt;/LESSONS.md</code>.</li>
+    <li class="gate-step"><strong>Gate 7: SRE checklist hijau + retro file committed.</strong> Feature flag cleanup task di-claim. Feature status → <em>"Live &amp; Maintained"</em>.</li>
+  </ol>
+
+  <h2>Cara Kerja AI &amp; Cara Kerja Human</h2>
+
+  <div class="swim">
+    <div class="lane ai">
+      <h4 class="ai-h">🤖 Reliability Agent</h4>
+      <ul>
+        <li>Baca TD observability plan + failure modes</li>
+        <li>Generate runbook untuk top 3-5 failure mode</li>
+        <li>Generate alert config YAML (Grafana / Datadog)</li>
+        <li>Generate dashboard panel definition</li>
+        <li>T+7: scrape log + metric + incident, generate retro draft</li>
+        <li>Compare aktual vs SLO target di TD; flag deviasi</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh:</strong></p>
+      <ul>
+        <li>Auto-deploy ke produksi (selalu human-triggered)</li>
+        <li>Generate runbook tanpa mitigation step</li>
+        <li>Skip mention rollback path</li>
+      </ul>
+    </div>
+
+    <div class="lane human">
+      <h4 class="human-h">👤 SRE / Tech Lead</h4>
+      <ul>
+        <li>Validate runbook bisa diikuti on-call junior</li>
+        <li>Monitor canary stage demi stage</li>
+        <li>Decide promotion ke stage berikutnya (1% → 10% → 100%)</li>
+        <li>Decide rollback kalau ada anomaly (toggle flag, bukan tunggu)</li>
+        <li>Facilitate post-launch retro</li>
+        <li>Sign-off SRE checklist sebelum closure</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh:</strong></p>
+      <ul>
+        <li>"Wait and see" saat ada anomaly di canary (selalu rollback dulu, debug kemudian)</li>
+        <li>Skip post-launch retro</li>
+        <li>Tidak cleanup feature flag (utang technical)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Output yang Dihasilkan</h2>
+  <table>
+    <tr><th>Artefak</th><th>Lokasi</th><th>Konten</th></tr>
+    <tr><td>Runbook</td><td><code>features/&lt;slug&gt;/runbook/failure-modes.md</code></td><td>Top 3-5 failure mode dengan symptom → check → mitigation → escalation. Di-copy ke <code>runbooks/&lt;service&gt;/</code> standard saat <code>make feature-apply</code>.</td></tr>
+    <tr><td>Alert config</td><td><code>features/&lt;slug&gt;/runbook/alerts.yaml</code></td><td>SLO-based alert (bukan threshold-based liar). Di-apply ke <code>monitoring/alerts/</code> saat <code>make feature-apply</code>.</td></tr>
+    <tr><td>Dashboard panel</td><td><code>features/&lt;slug&gt;/runbook/dashboard.json</code></td><td>Definition file (Grafana/Datadog). Traffic, latency, error rate, custom feature metric. Apply ke dashboard team saat <code>make feature-apply</code>.</td></tr>
+    <tr><td>Post-launch retro</td><td><code>features/&lt;slug&gt;/POST-LAUNCH-RETRO.md</code></td><td>Aktual vs plan, incident, lesson, action items</td></tr>
+    <tr><td>Lessons</td><td><code>tribes/&lt;id&gt;/LESSONS.md</code></td><td>1-3 lesson dari retro, format konsisten</td></tr>
+  </table>
+
+  <h2>SRE Checklist Pre-Release</h2>
+  <div class="callout good">
+    <strong>Sebelum canary 1% start, semua wajib hijau:</strong>
+    <ol>
+      <li>Runbook lengkap &amp; validated</li>
+      <li>Alert config deployed (yang relevant: error rate spike, latency p99 breach, custom feature failure)</li>
+      <li>Dashboard panel live</li>
+      <li>Feature flag ada &amp; default off di produksi</li>
+      <li>Rollback path tested (toggle flag → bisa balik dalam &lt;5 menit)</li>
+      <li>Migration backward-compatible (no destructive change yang tidak bisa di-rollback)</li>
+      <li>On-call notified (Slack + tag di rotation tool)</li>
+      <li>Release note ditulis (untuk customer-facing change)</li>
+    </ol>
+  </div>
+
+  <h2>Canary Stage Detail</h2>
+  <table>
+    <tr><th>Stage</th><th>Traffic</th><th>Durasi</th><th>Promote criteria</th><th>Rollback trigger</th></tr>
+    <tr><td>Canary</td><td>1%</td><td>24 jam</td><td>SLO terpenuhi, error rate ≤ baseline+0.1%, no P1 customer report</td><td>P1 incident, error rate &gt;baseline+0.5%</td></tr>
+    <tr><td>Partial</td><td>10%</td><td>24 jam</td><td>SLO terpenuhi, no degradasi user-perceived metric</td><td>P1, latency p99 +20%</td></tr>
+    <tr><td>Full</td><td>100%</td><td>Sustained</td><td>—</td><td>Selalu siap (toggle flag)</td></tr>
+  </table>
+
+  <h2>Post-launch Retro (T+7 Hari)</h2>
+  <div class="callout">
+    <strong>Format retro otomatis (draft oleh AI, refine oleh tim):</strong>
+    <ol>
+      <li><strong>Aktual vs Plan:</strong> lead time gate 1→7 aktual, defect escape rate, perf metric aktual vs SLO</li>
+      <li><strong>Incident (kalau ada):</strong> apa terjadi, MTTR, root cause</li>
+      <li><strong>What worked:</strong> 2-3 hal yang efektif (untuk replikasi)</li>
+      <li><strong>What didn't:</strong> 2-3 hal yang nyangkut (untuk improvement)</li>
+      <li><strong>Lessons:</strong> 1-3 lesson baru ditulis ke LESSONS.md</li>
+      <li><strong>Action items:</strong> owner + deadline</li>
+    </ol>
+    <strong>Max 30 menit meeting.</strong> Kalau lebih lama, fokus retro hilang.
+  </div>
+
+  <h2>Anti-pattern Khusus Gate 7</h2>
+  <ol>
+    <li><strong>Big-bang rilis ("toh sudah QA-green").</strong> Default selalu canary. Real users selalu menemukan sesuatu yang QA miss.</li>
+    <li><strong>"Wait and see" saat anomaly di canary.</strong> Rollback first, debug second. Rollback &lt;5 menit harus reflexive.</li>
+    <li><strong>Runbook tanpa mitigation step.</strong> Runbook yang cuma "page Tech Lead" bukan runbook — itu escalation tree.</li>
+    <li><strong>Skip post-launch retro.</strong> Retro adalah cara extracting lesson. Skip = lesson loop mati = playbook stagnan.</li>
+    <li><strong>Feature flag tidak di-cleanup.</strong> Flag yang tetap ada setelah feature stable = utang technical &amp; sumber bug masa depan.</li>
+    <li><strong>Alert generic "service down".</strong> Alert wajib aksi-driven; on-call harus tahu apa yang harus dia lakukan dalam 30 detik baca.</li>
+  </ol>
+
+  <h2>Example Walkthrough — "Apple Pay" Live</h2>
+  <table>
+    <tr><th>Waktu</th><th>Aksi</th><th>Pelaku</th></tr>
+    <tr><td>D+0 09:00</td><td>SRE run <code>/runbook apple-pay-checkout</code>. Generate runbook 4 failure mode + alert config + Grafana panel.</td><td>🤖 Reliability</td></tr>
+    <tr><td>D+0 10:00</td><td>SRE validate runbook. Tambah 1 mitigation step untuk gateway timeout (manual retry via admin tool).</td><td>👤 SRE</td></tr>
+    <tr><td>D+0 11:00</td><td>SRE checklist hijau. Toggle feature flag ke 1% (canary). Pin Slack thread untuk monitoring.</td><td>👤 SRE</td></tr>
+    <tr><td>D+1 11:00</td><td>Canary 24 jam selesai. SLO terpenuhi. Error rate baseline+0.05%. Promote ke 10%.</td><td>👤 SRE</td></tr>
+    <tr><td>D+2 11:00</td><td>Partial 24 jam selesai. Latency p99 di budget. Promote ke 100%.</td><td>👤 SRE</td></tr>
+    <tr><td>D+2 11:05</td><td>Customer support: 2 user complaint Apple Pay button "tidak muncul" di Safari mobile.</td><td>👤 Support</td></tr>
+    <tr><td>D+2 11:10</td><td>SRE rollback feature flag untuk Safari mobile saja (regex condition). Debug paralel.</td><td>👤 SRE</td></tr>
+    <tr><td>D+2 13:00</td><td>Found: viewport detection bug. Dev fix. Re-rollout untuk Safari mobile.</td><td>👤 Dev + SRE</td></tr>
+    <tr><td>D+9 (T+7)</td><td>Reliability Agent generate retro draft. Tim review 25 menit. 2 lesson: (1) viewport detection di mobile, (2) rollback target specific (cohort) lebih cepat dari rollback full.</td><td>👤 Tim + 🤖 Reliability</td></tr>
+    <tr><td>D+9</td><td>Lesson di-commit. Feature flag cleanup task di-claim (target 2 minggu). Gate 7 closed.</td><td>—</td></tr>
+  </table>
+
+  <h2>Kalau Macet di Gate Ini</h2>
+  <div class="callout warn">
+    <strong>Canary error rate naik tapi tidak meyakinkan rollback.</strong> Default tetap: rollback first. "Investigate live" cuma bila ada SLO budget cukup. Sebagai aturan: kalau ragu, rollback. Re-deploy &lt;1 jam.
+  </div>
+  <div class="callout danger">
+    <strong>Migration tidak bisa di-rollback (sudah destructive).</strong> Sinyal: TD/Gate 2 ada kesalahan. Lesson WAJIB ditulis. Untuk recovery: forward-fix dengan migration baru, bukan rollback.
+  </div>
+
+  <nav class="phase-nav">
+    <a href="6-defects.html" class="prev">
+      <div class="nav-label">← Sebelumnya</div>
+      <div class="nav-title">Gate 6: Defects &amp; Greenlight</div>
+    </a>
+    <a href="../index.html#metrics" class="next">
+      <div class="nav-label">Berikutnya →</div>
+      <div class="nav-title">Metrik Sukses Playbook</div>
+    </a>
+  </nav>
+
+</div>
+</body>
+</html>

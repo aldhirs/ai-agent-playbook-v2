@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gate 4 · Development — Playbook v2</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="detail-page">
+
+  <div class="breadcrumb">
+    <a href="../index.html">← Playbook v2</a> · <a href="../index.html#workflow">Workflow 7 Gate</a> · <strong>Gate 4: Development</strong>
+  </div>
+
+  <header class="detail-hero">
+    <div class="gate-badge">GATE 4</div>
+    <h1>Development</h1>
+    <p class="lead">Dari task assigned ke PR merged dengan evidence. Target: <em>40-60% lebih cepat</em> dari baseline (per task). Fokus: <em>Dev tetap accountable; AI generate boilerplate, scaffold test, draft evidence — bukan "AI bikin semuanya, dev tinggal merge"</em>.</p>
+
+    <div class="meta-grid">
+      <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">Developer</div></div>
+      <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Coder + Reviewer</div></div>
+      <div class="meta-item"><div class="lbl">Input</div><div class="val">Task dari IMPL-PLAN</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val">PR merged + evidence folder</div></div>
+      <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">CI hijau + evidence + peer approve</div></div>
+      <div class="meta-item"><div class="lbl">Target Speedup</div><div class="val">40-60% per task</div></div>
+    </div>
+  </header>
+
+  <h2>Detailed Flow (per task)</h2>
+  <ol class="stepflow">
+    <li class="human-step"><strong>Dev cek prasyarat:</strong> task tidak punya dependency yang belum closed. Baca task spec di IMPL-PLAN.</li>
+    <li class="ai-step"><strong>Dev run <code>/implement &lt;feature-slug&gt;/&lt;task-id&gt;</code>.</strong> Coder Agent baca CLAUDE.md hierarchy, PRD, TECH-DESIGN, existing code untuk consistency.</li>
+    <li class="ai-step"><strong>Coder implement.</strong> Pakai pattern service (layout cmd/internal/usecase/handler/repository untuk Go; composition API + Pinia + 5 UI state untuk Vue). Update <code>features/&lt;slug&gt;/contract/openapi.yaml</code> atau <code>features/&lt;slug&gt;/contract/proto/</code> sesuai TD. Tulis unit test minimal happy + 2 sad path. Tambahkan file code yang dimodifikasi ke <code>features/&lt;slug&gt;/code-manifest.md</code>.</li>
+    <li class="ai-step"><strong>Coder generate evidence</strong> di <code>features/&lt;slug&gt;/evidence/&lt;task-id&gt;/</code>: <code>curl.txt</code> (request/response), <code>test.log</code> (output go test -v), <code>screenshots/</code> kalau UI change (min. 3: default, loading, error).</li>
+    <li class="human-step"><strong>Dev review output Coder.</strong> Validate: logika benar? edge case missed? error message friendly? Bagian yang Coder tidak yakin akan disebut eksplisit — Dev wajib pelajari ulang.</li>
+    <li class="human-step"><strong>Dev iterate dengan Coder</strong> sampai puas (biasanya 1-3 putaran).</li>
+    <li class="ai-step"><strong>Dev run <code>/code-review &lt;feature-slug&gt;/&lt;task-id&gt;</code>.</strong> Reviewer Agent jalankan self-review checklist (contract conformance, observability, privacy, idempotency, evidence completeness) + static analysis summary + AC coverage check.</li>
+    <li class="human-step"><strong>Dev fix red findings dari Reviewer.</strong> Hijau / kuning yang reasonable bisa di-defer; merah wajib fix.</li>
+    <li class="human-step"><strong>Dev run <code>make verify-feature FEATURE=&lt;slug&gt;</code></strong>. Harus exit 0. Tanpa ini, PR jangan dibuka.</li>
+    <li class="human-step"><strong>Dev open PR.</strong> Title sebut task ID. Description copy self-review checklist + AC coverage table dari Reviewer.</li>
+    <li class="human-step"><strong>Peer review fokus ke keputusan</strong> (logic, contract, observability) — bukan style (sudah dihandle linter). SLA 4 jam kerja.</li>
+    <li class="gate-step"><strong>Gate 4: PR merged.</strong> CI hijau + peer approve + evidence folder tidak kosong. Lanjut ke Gate 5 (parallel sebenarnya: testing sudah jalan).</li>
+  </ol>
+
+  <h2>Cara Kerja AI &amp; Cara Kerja Human</h2>
+
+  <div class="swim">
+    <div class="lane ai">
+      <h4 class="ai-h">🤖 Coder + Reviewer Agent</h4>
+      <p><strong>Coder Agent:</strong></p>
+      <ul>
+        <li>Baca CLAUDE.md hierarchy (org → tribe → service) — wajib semuanya</li>
+        <li>Baca PRD + TD untuk AC &amp; design decisions</li>
+        <li>Implement dengan pattern existing service (jangan reinvent)</li>
+        <li>Generate unit test minimal happy + 2 sad</li>
+        <li>Generate evidence: curl.txt, test.log, screenshots/</li>
+        <li>Self-review checklist di PR description</li>
+        <li>Jangan modifikasi file di luar scope task; kalau perlu touch → warning ke user</li>
+      </ul>
+      <p><strong>Reviewer Agent:</strong></p>
+      <ul>
+        <li>Run checklist 6 kategori: contract, code quality, observability, privacy/security, test, evidence</li>
+        <li>Static analysis summary (top 3 finding)</li>
+        <li>AC coverage table — setiap AC di PRD → test mana yang verify</li>
+        <li>Output rekomendasi: ready / fix-first (dengan list spesifik)</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh:</strong></p>
+      <ul>
+        <li>Coder over-claim ("semua sudah selesai") — wajib sebut bagian yang butuh review manual</li>
+        <li>Reviewer nag soal style (itu noise — linter sudah handle)</li>
+        <li>Klaim evidence tanpa cek folder benar-benar berisi 3 file wajib</li>
+      </ul>
+      <p><strong>Prompt:</strong> <code>commands/implement.md</code> &amp; <code>commands/code-review.md</code></p>
+    </div>
+
+    <div class="lane human">
+      <h4 class="human-h">👤 Developer + Peer Reviewer</h4>
+      <p><strong>Developer accountable untuk:</strong></p>
+      <ul>
+        <li>Validate logika output Coder (bukan rubber-stamp)</li>
+        <li>Tanggung jawab penuh untuk code yang merged (Coder = alat bantu, bukan owner)</li>
+        <li>Fix red findings dari Reviewer Agent</li>
+        <li>Pastikan <code>make verify-feature</code> exit 0</li>
+        <li>Self-review checklist di PR description</li>
+      </ul>
+      <p><strong>Peer reviewer accountable untuk:</strong></p>
+      <ul>
+        <li>Fokus ke <em>keputusan</em>, bukan style</li>
+        <li>Tanya: "Apakah error case ini handled?"; "Idempotency-Key sudah?"; "Observability cukup?"</li>
+        <li>SLA 4 jam kerja; di luar itu, auto-ping</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh:</strong></p>
+      <ul>
+        <li>Merge PR tanpa evidence folder</li>
+        <li>"AI bilang udah benar" sebagai justifikasi</li>
+        <li>Skip <code>make verify-feature</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Output yang Dihasilkan (per task)</h2>
+  <table>
+    <tr><th>Artefak</th><th>Lokasi</th><th>Konten</th></tr>
+    <tr><td>Code diff</td><td>PR di repo</td><td>Implementasi sesuai task scope. Backward-compatible. Sesuai pattern service.</td></tr>
+    <tr><td>Unit test</td><td>Sebelah file yang diimplement (Go) atau <code>__tests__/</code> (Vue)</td><td>Minimal happy + 2 sad path. Naming <code>TestX_When_Then</code>.</td></tr>
+    <tr><td><code>curl.txt</code></td><td><code>features/&lt;slug&gt;/evidence/&lt;task-id&gt;/</code></td><td>Request &amp; response dari endpoint yang disentuh</td></tr>
+    <tr><td><code>test.log</code></td><td><code>features/&lt;slug&gt;/evidence/&lt;task-id&gt;/</code></td><td>Output <code>go test -v ./...</code> atau equivalent</td></tr>
+    <tr><td><code>screenshots/</code></td><td><code>features/&lt;slug&gt;/evidence/&lt;task-id&gt;/</code></td><td>Min. 3 screenshot UI state kalau ada change visual</td></tr>
+    <tr><td>Migration files</td><td><code>features/&lt;slug&gt;/migrations/</code></td><td><code>001-&lt;name&gt;.up.sql</code> + <code>001-&lt;name&gt;.down.sql</code>, backward-compatible</td></tr>
+    <tr><td>Code manifest</td><td><code>features/&lt;slug&gt;/code-manifest.md</code></td><td>Updated dengan file code yang ditambahkan/dimodifikasi oleh task ini</td></tr>
+  </table>
+
+  <h2>Definition of Done untuk 1 Task</h2>
+  <div class="callout good">
+    <strong>Task = DONE kalau (semuanya):</strong>
+    <ol>
+      <li>Code diff sesuai task scope · tidak menyentuh file di luar scope tanpa diskusi</li>
+      <li>Unit test pass · minimal happy + 2 sad</li>
+      <li>Evidence folder ada 3 file wajib (curl.txt, test.log, screenshots/ kalau UI)</li>
+      <li><code>make verify-feature FEATURE=&lt;slug&gt;</code> exit 0</li>
+      <li>CI hijau di PR</li>
+      <li>Reviewer Agent self-review: tidak ada red finding</li>
+      <li>Peer review approve</li>
+      <li>Self-review checklist (7 item) di PR description</li>
+    </ol>
+    <strong>Tanpa salah satu di atas = TIDAK done</strong>, terlepas dari "kayaknya jalan".
+  </div>
+
+  <h2>Anti-pattern Khusus Gate 4</h2>
+  <ol>
+    <li><strong>"AI bilang udah benar."</strong> Dev tetap accountable. Kalau bug di prod, "AI bilang" bukan jawaban.</li>
+    <li><strong>Evidence kosong / placeholder.</strong> Tanpa evidence = belum done. Tidak ada exception.</li>
+    <li><strong>Skip <code>make verify-feature</code>.</strong> Itu satu-satunya cara cek otomatis bahwa kontrak masih utuh.</li>
+    <li><strong>Modifikasi file di luar task scope.</strong> Kalau perlu refactor lain, buat task baru — jangan smuggling di PR yang seharusnya fokus.</li>
+    <li><strong>Peer review &lt;5 menit untuk PR ukuran M.</strong> Sinyal review tidak serius. Counter: ukur median review time per ukuran task.</li>
+    <li><strong>Unit test cuma happy path.</strong> Minimal 2 sad path wajib. Test name informatif.</li>
+    <li><strong>PR description kosong / cuma "see task".</strong> Wajib checklist + AC coverage table.</li>
+  </ol>
+
+  <h2>Example Walkthrough — Task "Implement Apple Pay tokenization endpoint"</h2>
+  <table>
+    <tr><th>Waktu</th><th>Aksi</th><th>Pelaku</th></tr>
+    <tr><td>09:00</td><td>Dev claim task PAY-1234-T05. Baca task spec di IMPL-PLAN.</td><td>👤 Dev</td></tr>
+    <tr><td>09:10</td><td>Run <code>/implement apple-pay-checkout/T05</code></td><td>👤 Dev</td></tr>
+    <tr><td>09:15</td><td>Coder generate: handler + usecase + repo glue + unit test (happy + 2 sad) + curl.txt + test.log. Mention 2 bagian butuh review manual: rate-limit param &amp; error message untuk gateway timeout.</td><td>🤖 Coder</td></tr>
+    <tr><td>09:30 - 10:30</td><td>Dev pelajari ulang 2 bagian itu. Adjust rate-limit ke 5 RPS (sesuai SLA tribe). Tulis error message yang sesuai brand.</td><td>👤 Dev</td></tr>
+    <tr><td>10:35</td><td>Run <code>/code-review apple-pay-checkout/T05</code></td><td>👤 Dev</td></tr>
+    <tr><td>10:37</td><td>Reviewer: 1 red (lupa trace span untuk gateway call), 2 yellow (test naming bisa lebih explicit). AC coverage: 100%.</td><td>🤖 Reviewer</td></tr>
+    <tr><td>10:45</td><td>Dev fix red. Push.</td><td>👤 Dev</td></tr>
+    <tr><td>10:50</td><td>Run <code>make verify-feature FEATURE=apple-pay-checkout</code>. Exit 0.</td><td>👤 Dev</td></tr>
+    <tr><td>10:55</td><td>Open PR. Title <code>[PAY-1234-T05] Implement Apple Pay tokenization endpoint</code>. Description: checklist + AC table.</td><td>👤 Dev</td></tr>
+    <tr><td>12:30</td><td>Peer review approve setelah 2 small comment (variable naming).</td><td>👤 Peer Dev</td></tr>
+    <tr><td>13:00</td><td>PR merged. Gate 4 task T05 done.</td><td>—</td></tr>
+  </table>
+  <p><strong>Total waktu Dev:</strong> ~4 jam. <strong>Baseline manual:</strong> ~8-10 jam. <strong>Speedup:</strong> ~55%.</p>
+
+  <h2>Kalau Macet di Gate Ini</h2>
+  <div class="callout warn">
+    <strong>Coder generate code yang aneh / tidak sesuai pattern service.</strong> Sinyal: CLAUDE.md service belum lengkap (tidak punya cukup konteks). Aksi: update CLAUDE.md service, rerun /implement.
+  </div>
+  <div class="callout warn">
+    <strong>Test gagal karena flaky.</strong> Tidak boleh di-merge. Aksi: investigate root cause; biasanya share state antar test atau race. Catat sebagai lesson.
+  </div>
+  <div class="callout danger">
+    <strong>Dev menemukan kontrak TD ternyata salah.</strong> Aksi: balik ke Gate 2, update TD, re-LGTM. Memang menyebalkan, tapi merge dengan TD yang salah = utang besar.
+  </div>
+
+  <nav class="phase-nav">
+    <a href="3-planning.html" class="prev">
+      <div class="nav-label">← Sebelumnya</div>
+      <div class="nav-title">Gate 3: Planning</div>
+    </a>
+    <a href="5-testing.html" class="next">
+      <div class="nav-label">Selanjutnya →</div>
+      <div class="nav-title">Gate 5: Testing (paralel)</div>
+    </a>
+  </nav>
+
+</div>
+</body>
+</html>

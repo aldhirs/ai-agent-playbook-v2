@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gate 2 · Tech Discussion — Playbook v2</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="detail-page">
+
+  <div class="breadcrumb">
+    <a href="../index.html">← Playbook v2</a> · <a href="../index.html#workflow">Workflow 7 Gate</a> · <strong>Gate 2: Tech Discussion</strong>
+  </div>
+
+  <header class="detail-hero">
+    <div class="gate-badge">GATE 2</div>
+    <h1>Tech Discussion</h1>
+    <p class="lead">Dari PRD signed ke tech design + ADR + API contract yang lengkap. Target: 4-6 jam (sebelumnya 2-3 hari). Fokus: <em>tiga opsi minimal, pilih dengan alasan eksplisit, kontrak API tegas, rollout reversible</em>.</p>
+
+    <div class="meta-grid">
+      <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">Tech Lead</div></div>
+      <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Architect</div></div>
+      <div class="meta-item"><div class="lbl">Input</div><div class="val">PRD signed</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>TECH-DESIGN.md</code> + ADR + contract</div></div>
+      <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">LGTM-TD + cross-tribe reviewer</div></div>
+      <div class="meta-item"><div class="lbl">Target Durasi</div><div class="val">4-6 jam</div></div>
+    </div>
+  </header>
+
+  <h2>Detailed Flow</h2>
+  <ol class="stepflow">
+    <li class="human-step"><strong>Tech Lead validate prasyarat:</strong> PRD harus berstatus <code>SIGNED</code>. Cek di <code>features/&lt;slug&gt;/PRD.md</code>.</li>
+    <li class="ai-step"><strong>Tech Lead run <code>/tech-design &lt;feature-slug&gt;</code></strong>. Architect Agent membaca PRD, CLAUDE.md hierarchy, OpenAPI/proto existing, dan service map.</li>
+    <li class="ai-step"><strong>Architect generate minimal 3 opsi.</strong> Wajib: 1 opsi konservatif (paling sedikit mengubah arsitektur), 1 opsi agresif (membuka kapabilitas baru), 1 di tengah. Tiap opsi: cara kerja, pros, cons, effort (S/M/L), risk (L/M/H).</li>
+    <li class="ai-step"><strong>Trade-off matrix.</strong> Bandingkan 5 aspek minimum: latency, effort, operational complexity, regression risk, reversibility.</li>
+    <li class="ai-step"><strong>Architect drafting:</strong> Decision (= ADR inline) + rationale yang merujuk eksplisit ke matrix, API contract (OpenAPI snippet untuk REST atau proto untuk gRPC), data model + migration plan (kalau ada DDL), sequence diagram (Mermaid), failure modes, observability plan, rollout plan.</li>
+    <li class="human-step"><strong>Tech Lead review &amp; pilih opsi.</strong> Tidak boleh "AI bilang option B"; Tech Lead harus bisa jelaskan kenapa B menang dari A &amp; C.</li>
+    <li class="human-step"><strong>Tag cross-tribe reviewer.</strong> Wajib minimal 1 reviewer dari tribe lain (dari daftar buddy di <code>tribes/&lt;id&gt;/CLAUDE.md</code>). Tujuan: cross-pollination, bukan permission.</li>
+    <li class="human-step"><strong>Cross-tribe reviewer kasih ≥1 pertanyaan/saran spesifik</strong> (≤24 jam SLA; lewat itu auto-skip — tidak block). "LGTM" kosong tidak diterima.</li>
+    <li class="human-step"><strong>Tech Lead iterate kalau perlu</strong> (biasanya 0-1 putaran kecil). Open Items di TD harus tuntas; maks 5, kalau lebih = design belum matang.</li>
+    <li class="gate-step"><strong>Gate 2: LGTM-TD ×2.</strong> Tech Lead + cross-tribe reviewer tag <code>LGTM-TD</code> di TECH-DESIGN.md. Status → <code>SIGNED</code>. Lanjut ke Gate 3.</li>
+  </ol>
+
+  <h2>Cara Kerja AI &amp; Cara Kerja Human</h2>
+
+  <div class="swim">
+    <div class="lane ai">
+      <h4 class="ai-h">🤖 Architect Agent</h4>
+      <p><strong>Yang dilakukan:</strong></p>
+      <ul>
+        <li>Baca PRD + CLAUDE.md hierarchy + <em>existing</em> OpenAPI/proto untuk konsistensi naming</li>
+        <li>Generate minimal 3 opsi termasuk satu yang konservatif</li>
+        <li>Trade-off matrix dengan 5 aspek wajib</li>
+        <li>Mermaid sequence diagram (bukan ASCII)</li>
+        <li>API contract dengan validation matrix &amp; 422 friendly message</li>
+        <li>Migration plan: backward-compatible only (dual-write 1 release sebelum drop column)</li>
+        <li>Rollout default: feature flag + canary 1% → 10% → 100%, rollback reversible</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh dilakukan:</strong></p>
+      <ul>
+        <li>Loncat langsung ke opsi "paling keren" tanpa bandingkan 3</li>
+        <li>Ubah contract endpoint existing tanpa migration path</li>
+        <li>Skip section template</li>
+        <li>Bikin Decision tanpa rationale berbasis matrix (tidak boleh: "karena best practice")</li>
+      </ul>
+      <p><strong>Prompt yang dipakai:</strong> <code>commands/tech-design.md</code></p>
+    </div>
+
+    <div class="lane human">
+      <h4 class="human-h">👤 Tech Lead &amp; Cross-tribe Reviewer</h4>
+      <p><strong>Tech Lead accountable untuk:</strong></p>
+      <ul>
+        <li>Pilih opsi (tidak boleh delegasikan ke AI) &amp; tulis konsekuensi yang diterima</li>
+        <li>Validate API contract: backward-compatible? naming sesuai konvensi tribe?</li>
+        <li>Validate observability plan: log/metric/trace cukup untuk debug pos-launch?</li>
+        <li>Validate rollout: reversible? feature flag namanya jelas?</li>
+        <li>Tag cross-tribe reviewer yang relevan</li>
+      </ul>
+      <p><strong>Cross-tribe reviewer accountable untuk:</strong></p>
+      <ul>
+        <li>Tidak hanya "LGTM" — wajib ≥1 pertanyaan/saran spesifik (misal: "Service kami juga handle idempotency seperti ini, sudah cek konsistensi?")</li>
+        <li>Bawa pengalaman dari tribe-nya: pattern yang berhasil, kegagalan yang pernah dialami</li>
+        <li>≤24 jam SLA; setelah itu auto-skip tanpa block</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh dilakukan:</strong></p>
+      <ul>
+        <li>"AI bilang option B" tanpa rationale dari Tech Lead</li>
+        <li>Skip cross-tribe review (kecuali emergency lane)</li>
+        <li>Approve TD dengan Open Items &gt;5</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Output yang Dihasilkan</h2>
+  <table>
+    <tr><th>Artefak</th><th>Lokasi</th><th>Konten</th></tr>
+    <tr><td><code>TECH-DESIGN.md</code></td><td><code>features/&lt;slug&gt;/</code></td><td>Status <code>SIGNED</code> · 3 opsi + matrix + Decision dengan rationale · sequence diagram · failure modes · observability plan · rollout plan</td></tr>
+    <tr><td>API contract</td><td><code>features/&lt;slug&gt;/contract/openapi.yaml</code> dan/atau <code>features/&lt;slug&gt;/contract/proto/&lt;name&gt;.proto</code></td><td>Snippet baru atau modifikasi (additive only). Di-merge ke <code>api/openapi.yaml</code> standard saat <code>make feature-apply</code>.</td></tr>
+    <tr><td>Migration files</td><td><code>features/&lt;slug&gt;/migrations/001-&lt;name&gt;.{up,down}.sql</code></td><td>Backward-compatible. Wajib ada down.sql. Di-copy ke <code>migrations/</code> standard saat <code>make feature-apply</code>.</td></tr>
+    <tr><td>Risk register</td><td>Section di TECH-DESIGN.md</td><td>Likelihood × impact × mitigation untuk top risk</td></tr>
+  </table>
+
+  <h2>Approval Mekanisme</h2>
+  <div class="callout">
+    <strong>Gate 2 ditutup oleh:</strong>
+    <ol>
+      <li><code>LGTM-TD</code> dari Tech Lead di file TECH-DESIGN.md.</li>
+      <li><code>LGTM-TD</code> dari cross-tribe reviewer (dari daftar buddy di CLAUDE.md tribe).</li>
+      <li>CI check: file ada, semua section template terisi, mermaid syntax valid, OpenAPI/proto lint pass.</li>
+      <li>PR merged → status feature → <em>"Ready for Planning"</em>.</li>
+    </ol>
+  </div>
+
+  <h2>Anti-pattern Khusus Gate 2</h2>
+  <ol>
+    <li><strong>Tek Lead langsung pilih opsi AI tanpa bandingkan.</strong> AI proposes, human approves — bukan "human rubber-stamps".</li>
+    <li><strong>Cuma 1 opsi di TD.</strong> Tanpa opsi alternatif, kita tidak bisa mengukur trade-off. Min. 3 wajib.</li>
+    <li><strong>Cross-tribe reviewer pasif.</strong> Reviewer cuma jadi formalitas. Counter: ukur jumlah pertanyaan/saran rata-rata per review; kalau &lt;1, sinyal mati rasa.</li>
+    <li><strong>Contract breaking change tanpa migration.</strong> Endpoint existing yang dipakai client lain — tidak boleh diubah tanpa dual-write / versioning.</li>
+    <li><strong>Rollout big-bang.</strong> Default selalu canary. Big-bang hanya kalau benar-benar tidak bisa di-feature-flag, dan harus disebut alasannya.</li>
+    <li><strong>Migration destructive di rilis pertama.</strong> <code>DROP COLUMN</code> di rilis yang sama dengan code change = rollback mati. Selalu pisah 2 rilis.</li>
+  </ol>
+
+  <h2>Example Walkthrough — "Apple Pay Checkout" lanjut dari Gate 1</h2>
+  <table>
+    <tr><th>Waktu</th><th>Aksi</th><th>Pelaku</th></tr>
+    <tr><td>13:30</td><td>Run <code>/tech-design apple-pay-checkout</code></td><td>👤 Tech Lead</td></tr>
+    <tr><td>13:35</td><td>Generate TD draft: 3 opsi (A: extend gateway service · B: new dedicated apple-pay service · C: hybrid with shared tokenization)</td><td>🤖 Architect</td></tr>
+    <tr><td>14:00 - 15:00</td><td>Tech Lead pelajari trade-off matrix. Pilih Option A (extend gateway) karena minimal disruption + reversible. Tulis rationale di Decision section</td><td>👤 Tech Lead</td></tr>
+    <tr><td>15:00</td><td>Tag cross-tribe reviewer dari tribe 1 (auth service) untuk validate token flow</td><td>👤 Tech Lead</td></tr>
+    <tr><td>16:30</td><td>Cross-tribe reviewer komentar: "Token validation di endpoint kami punya 200ms p99 — kalian budget berapa di flow ini?"</td><td>👤 Cross-tribe reviewer</td></tr>
+    <tr><td>17:00</td><td>Tech Lead update Performance budget section + tambah trace span untuk token call</td><td>👤 Tech Lead</td></tr>
+    <tr><td>17:15</td><td>Cross-tribe reviewer <code>LGTM-TD</code>. Tech Lead <code>LGTM-TD</code>. Status → <code>SIGNED</code> · Gate 2 passed</td><td>—</td></tr>
+  </table>
+  <p><strong>Total waktu kalender:</strong> ~4 jam. <strong>Total waktu aktif Tech Lead:</strong> ~2 jam.</p>
+
+  <h2>Kalau Macet di Gate Ini</h2>
+  <div class="callout warn">
+    <strong>3 opsi semuanya sama-sama tidak meyakinkan.</strong> Sinyal: PRD belum cukup tajam, atau ada constraint yang belum ditangkap. Aksi: balik ke PM, tanya constraint apa yang belum jelas (regulasi? performa? budget?), update PRD, rerun /tech-design.
+  </div>
+  <div class="callout warn">
+    <strong>Cross-tribe reviewer tidak bisa di-find / nggak ada yang relevan.</strong> Aksi: skip dengan eksplisit (catat di TD) dan eskalasi ke forum tech lead untuk diskusi 15 menit. Jangan dipaksa lulus tanpa peer review.
+  </div>
+  <div class="callout danger">
+    <strong>Setelah TD signed, Dev ternyata menemukan asumsi yang salah.</strong> Aksi: <em>balik ke Gate 2</em>, jangan diam-diam ubah TD. Update TD, re-LGTM. Memang menyebalkan, tapi shortcut di sini akan membayar 5× di gate berikutnya.
+  </div>
+
+  <nav class="phase-nav">
+    <a href="1-grooming.html" class="prev">
+      <div class="nav-label">← Sebelumnya</div>
+      <div class="nav-title">Gate 1: Grooming &amp; PRD</div>
+    </a>
+    <a href="3-planning.html" class="next">
+      <div class="nav-label">Selanjutnya →</div>
+      <div class="nav-title">Gate 3: Planning</div>
+    </a>
+  </nav>
+
+</div>
+</body>
+</html>

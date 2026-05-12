@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gate 5 · Testing — Playbook v2</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="detail-page">
+
+  <div class="breadcrumb">
+    <a href="../index.html">← Playbook v2</a> · <a href="../index.html#workflow">Workflow 7 Gate</a> · <strong>Gate 5: Testing</strong>
+  </div>
+
+  <header class="detail-hero">
+    <div class="gate-badge">GATE 5</div>
+    <h1>Testing</h1>
+    <p class="lead">Test plan disiapkan <strong>paralel</strong> dengan development (mulai bersamaan Gate 3, bukan setelah Gate 4). Ini kunci kenapa testing tidak lagi blocker. Fokus: <em>matrix state × action, edge case yang AI-generated lalu QA tambahkan domain-specific, automation strategy per layer</em>.</p>
+
+    <div class="meta-grid">
+      <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">QA Engineer</div></div>
+      <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Tester</div></div>
+      <div class="meta-item"><div class="lbl">Input</div><div class="val">PRD + TD (AC + failure modes)</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>TEST-PLAN.md</code> + automated tests</div></div>
+      <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">Pass rate ≥95% · QA tag qa-greenlight</div></div>
+      <div class="meta-item"><div class="lbl">Mulai Kapan</div><div class="val">Bersamaan Gate 3 (paralel)</div></div>
+    </div>
+  </header>
+
+  <h2>Detailed Flow</h2>
+  <ol class="stepflow">
+    <li class="ai-step"><strong>QA run <code>/test-plan &lt;feature-slug&gt;</code></strong> setelah TD signed (Gate 2) — tidak menunggu dev selesai.</li>
+    <li class="ai-step"><strong>Tester Agent baca:</strong> PRD (AC sebagai sumber utama), TD (failure modes, edge cases), banned-field test existing, pattern test di service standard layout (<code>test/integration/</code>, <code>test/e2e/</code>) untuk konsistensi style.</li>
+    <li class="ai-step"><strong>Generate <code>TEST-PLAN.md</code></strong>: mapping AC → test case, test matrix state × action (wajib 5 state: default/loading/empty/error/success), 10+ edge case, automation strategy per layer, regression set.</li>
+    <li class="ai-step"><strong>Generate skeleton test file</strong> di <code>features/&lt;slug&gt;/tests/integration/</code> &amp; <code>features/&lt;slug&gt;/tests/e2e/</code> — struktur describe/it lengkap, assertion belum diisi. Tooling test (Go testcontainers, Playwright) di-config baca dari path feature folder ini.</li>
+    <li class="human-step"><strong>QA review &amp; tambahkan domain-specific.</strong> Yang AI sering miss: regulasi (PCI, GDPR), quirks integration partner, tribal knowledge soal user behavior.</li>
+    <li class="human-step"><strong>QA isi assertion di skeleton test</strong> (atau pair dengan Dev kalau test complex). Test plan = drafting Anchor; assertion implementasinya manual.</li>
+    <li class="human-step"><strong>QA execute test</strong> begitu Dev merge task yang relevan. Tidak menunggu semua task selesai — test berjalan inkremental.</li>
+    <li class="ai-step"><strong>Tester bantu triage failure</strong> (kategori: bug code · bug test · flaky · environment).</li>
+    <li class="gate-step"><strong>Gate 5: <code>qa-greenlight</code></strong>. Exit criteria: 100% TC executed, pass rate ≥95%, no P0/P1 open, P2 ≤3, banned-field test green, perf budget tidak terlewati. QA tag rilis &amp; sign-off.</li>
+  </ol>
+
+  <h2>Cara Kerja AI &amp; Cara Kerja Human</h2>
+
+  <div class="swim">
+    <div class="lane ai">
+      <h4 class="ai-h">🤖 Tester Agent</h4>
+      <ul>
+        <li>Baca PRD AC + TD failure modes sebagai sumber utama</li>
+        <li>Generate test matrix state × action — wajib 5 state</li>
+        <li>Generate 10+ edge case (boundary, format, concurrency, network, auth, data)</li>
+        <li>Automation strategy: tag layer mana (unit/integration/E2E/contract)</li>
+        <li>Generate <em>skeleton</em> test file (describe/it lengkap, assertion empty)</li>
+        <li>Identifikasi regression set (smoke test untuk tiap rilis)</li>
+        <li>Bantu triage saat failure: kategorikan + hipotesis root cause</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh:</strong></p>
+      <ul>
+        <li>Generate test yang assertion-nya implementation-specific (mock-heavy, fragile)</li>
+        <li>Skip sad path / edge case (happy-only never enough)</li>
+        <li>Mengasumsikan compliance scenario tanpa input QA</li>
+      </ul>
+      <p><strong>Prompt:</strong> <code>commands/test-plan.md</code></p>
+    </div>
+
+    <div class="lane human">
+      <h4 class="human-h">👤 QA Engineer</h4>
+      <ul>
+        <li>Review &amp; tambahkan edge case domain-specific (regulasi, tribal knowledge, integration quirks)</li>
+        <li>Isi assertion di skeleton test (atau pair dengan Dev)</li>
+        <li>Execute test inkremental — jangan menunggu semua task done</li>
+        <li>Identifikasi flaky test → buka ticket maintain test, jangan biarkan jadi noise</li>
+        <li>Sign-off dengan <code>qa-greenlight</code> hanya kalau exit criteria terpenuhi</li>
+        <li>Untuk feature high-risk (payment/auth/data deletion) — perketat exit criteria (P2 ≤1)</li>
+      </ul>
+      <p><strong>Yang TIDAK boleh:</strong></p>
+      <ul>
+        <li>Tunggu sampai dev selesai semua baru mulai test plan</li>
+        <li>Sign-off dengan defect P1 open</li>
+        <li>Manual test scenario yang sebenarnya bisa diautomasi</li>
+        <li>Skip exploratory testing (45 menit per rilis wajib)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Test Matrix yang Wajib</h2>
+  <table>
+    <tr><th>State \ Action</th><th>Action A</th><th>Action B</th><th>Action C</th></tr>
+    <tr><td><strong>Default</strong></td><td>TC-001</td><td>TC-004</td><td>TC-007</td></tr>
+    <tr><td><strong>Loading</strong></td><td>n/a</td><td>TC-005</td><td>TC-008</td></tr>
+    <tr><td><strong>Empty</strong></td><td>TC-002</td><td>n/a</td><td>TC-009</td></tr>
+    <tr><td><strong>Error (server)</strong></td><td>TC-003</td><td>TC-006</td><td>TC-010</td></tr>
+    <tr><td><strong>Success</strong></td><td>TC-001</td><td>TC-004</td><td>TC-007</td></tr>
+  </table>
+  <p>5+ state coverage wajib. Tester Agent generate awal; QA tambahkan kombinasi yang relevant ke domain.</p>
+
+  <h2>Edge Cases yang Selalu Dicek</h2>
+  <ul>
+    <li><strong>Boundary:</strong> input minimum/maximum (panjang, nilai, jumlah item)</li>
+    <li><strong>Format:</strong> locale, timezone, encoding (UTF-8, emoji), float precision</li>
+    <li><strong>Concurrency:</strong> 2 request bersamaan dengan Idempotency-Key sama</li>
+    <li><strong>Network:</strong> slow 3G, intermittent, offline, timeout di tengah request</li>
+    <li><strong>Auth:</strong> token expired, scope tidak cukup, cross-tenant access</li>
+    <li><strong>Data:</strong> NULL, empty string, very long string, special char, PII shape</li>
+    <li><strong>Compliance:</strong> banned-field test (PII tidak muncul di log)</li>
+  </ul>
+
+  <h2>Automation Strategy per Layer</h2>
+  <table>
+    <tr><th>Tipe</th><th>Tool</th><th>Coverage target</th></tr>
+    <tr><td>Unit (Go)</td><td><code>go test</code> + table-driven</td><td>≥80% line coverage di paket <code>usecase/</code></td></tr>
+    <tr><td>Integration (Go)</td><td>testcontainers + chi router test</td><td>Semua endpoint, semua failure mode dari TD</td></tr>
+    <tr><td>Unit (Vue)</td><td>Vitest</td><td>Komponen kritikal (form, state machine, kalkulasi)</td></tr>
+    <tr><td>E2E</td><td>Playwright</td><td>Happy path + 3 sad path utama</td></tr>
+    <tr><td>Contract</td><td>OpenAPI validator + <code>buf</code></td><td>Tiap PR yang sentuh <code>api/</code></td></tr>
+  </table>
+
+  <h2>Exit Criteria (Gate 5)</h2>
+  <div class="callout good">
+    <strong>QA bisa tag <code>qa-greenlight</code> hanya kalau (semuanya):</strong>
+    <ol>
+      <li>100% test case di matrix executed</li>
+      <li>Pass rate ≥ 95%</li>
+      <li>Zero P0/P1 defect open</li>
+      <li>P2 defect ≤ 3</li>
+      <li>Defect density ≤ &lt;X bug per 100 LOC changed&gt; (set per service)</li>
+      <li>Banned-field test green</li>
+      <li>Performance budget tidak terlewati</li>
+      <li><strong>Untuk feature high-risk:</strong> P2 ≤ 1, performance budget ketat (≤90% threshold)</li>
+    </ol>
+  </div>
+
+  <h2>Anti-pattern Khusus Gate 5</h2>
+  <ol>
+    <li><strong>Test plan dimulai setelah dev selesai.</strong> Itu polanya v1 — yang menyebabkan testing jadi blocker. Test plan WAJIB mulai bersamaan Gate 3.</li>
+    <li><strong>Happy path-only.</strong> Sad path &amp; edge case adalah inti. Happy-only never enough.</li>
+    <li><strong>Test E2E untuk semua hal.</strong> E2E mahal &amp; lambat. Pakai untuk happy + sad utama; sisanya integration / unit.</li>
+    <li><strong>Flaky test dibiarkan.</strong> Sekali flaky, harus diperbaiki atau di-quarantine. Flaky merusak trust ke suite.</li>
+    <li><strong>Skip exploratory testing.</strong> 45 menit eksplorasi per rilis sering nemu bug yang test automated miss.</li>
+    <li><strong>Manual test yang seharusnya bisa diautomasi.</strong> Ulang &gt;3× = wajib auto.</li>
+  </ol>
+
+  <h2>Example Walkthrough — "Apple Pay" Testing (paralel dengan dev)</h2>
+  <table>
+    <tr><th>Hari</th><th>Aksi</th><th>Pelaku</th></tr>
+    <tr><td>D+0 (gate 2 done)</td><td>Run <code>/test-plan apple-pay-checkout</code> begitu TD signed</td><td>👤 QA</td></tr>
+    <tr><td>D+0</td><td>Generate TEST-PLAN.md: 32 TC, 15 edge case, skeleton 8 integration test + 4 E2E spec</td><td>🤖 Tester</td></tr>
+    <tr><td>D+1</td><td>QA tambah 6 TC compliance (PCI) + 3 TC tribal knowledge (Apple device quirks)</td><td>👤 QA</td></tr>
+    <tr><td>D+2</td><td>QA isi assertion di 8 integration test sambil dev kerja paralel</td><td>👤 QA</td></tr>
+    <tr><td>D+3</td><td>Task T01-T03 merged. QA execute integration test → 12/15 pass, 3 fail (bug code)</td><td>👤 QA + 🤖 Tester</td></tr>
+    <tr><td>D+4</td><td>Dev fix 3 bug. Re-test. Semua T01-T03 hijau</td><td>👤 Dev + QA</td></tr>
+    <tr><td>D+5 (semua task done)</td><td>Full regression suite + exploratory 45 menit. 1 P2 ditemukan (UI quirk di Safari).</td><td>👤 QA</td></tr>
+    <tr><td>D+5</td><td>Dev fix. Re-test. P2 closed.</td><td>👤 Dev + QA</td></tr>
+    <tr><td>D+5</td><td>Pass rate 100%, P2 = 0, exit criteria terpenuhi. QA tag <code>qa-greenlight</code>.</td><td>👤 QA</td></tr>
+  </table>
+  <p><strong>Kunci:</strong> testing tidak lagi blocker karena sudah jalan dari D+0, paralel dengan dev sampai dev selesai. Final hardening day cuma 1 hari.</p>
+
+  <h2>Kalau Macet di Gate Ini</h2>
+  <div class="callout warn">
+    <strong>Defect terlalu banyak (P0/P1 tidak turun setelah 2 putaran fix).</strong> Sinyal: ada masalah arsitektur, bukan test issue. Aksi: stop, eskalasi ke Tech Lead, mungkin balik ke Gate 2 untuk re-think.
+  </div>
+  <div class="callout warn">
+    <strong>Flaky test merusak signal.</strong> Aksi: quarantine flaky test, buka ticket investigation. Jangan dipaksa pass dengan retry liar.
+  </div>
+
+  <nav class="phase-nav">
+    <a href="4-development.html" class="prev">
+      <div class="nav-label">← Sebelumnya</div>
+      <div class="nav-title">Gate 4: Development</div>
+    </a>
+    <a href="6-defects.html" class="next">
+      <div class="nav-label">Selanjutnya →</div>
+      <div class="nav-title">Gate 6: Defects &amp; Greenlight</div>
+    </a>
+  </nav>
+
+</div>
+</body>
+</html>
