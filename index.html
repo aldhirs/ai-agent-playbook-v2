@@ -93,6 +93,7 @@
 
     <h2>Bagian</h2>
     <a href="#overview">Overview</a>
+    <a href="#read-by-role">📖 Read by Role</a>
     <a href="#what-changed">Apa yang Berubah dari v1</a>
     <a href="#principles">1. Prinsip v2</a>
     <a href="#operating-model">2. Operating Model</a>
@@ -115,11 +116,41 @@
     <section id="overview" class="hero">
       <div class="pill">Playbook v2.1 · Team Edition</div>
       <h1>Cara Tim Bekerja dengan AI Agent</h1>
-      <p>Workflow untuk multi-tribe (1, 2, 3a, 3b, 3c) yang memangkas waktu di fase grooming, tech discussion, development, dan testing — dengan review &amp; approval tetap di tangan developer.</p>
-      <p style="margin-top:16px;"><strong>Tagline:</strong> <em>Contract first. Evidence always. AI proposes, human approves. Tribe shares, service owns. Analyze existing first. Sync repo &amp; branch.</em></p>
+      <p>Workflow multi-tribe yang pangkas lead time 40-60% di grooming, tech discussion, development, dan testing — dengan review &amp; approval tetap di tangan developer.</p>
+      <p style="margin-top:16px;"><strong>Tagline:</strong> <em>Contract first. Evidence always. AI proposes, human approves. Tribe shares, service owns.</em></p>
 
-      <div class="callout good" style="margin-top:20px;">
-        <strong>🎉 What's new in v2.1:</strong> Prinsip 19 (Analyze Existing First) + Prinsip 20 (Sync Repo &amp; Branch dari Slug) + Gate 1 approval 3-pihak (PM + Designer + FE Dev) + UI-Impact workflow + Gate-based file naming (G1-PRD.md, dst.) + project-level agents. Lihat <a href="README.md">README</a> untuk changelog lengkap.
+      <div class="callout" style="margin-top:20px; font-size:0.9rem;">
+        <strong>v2.1 (May 2026):</strong> Prinsip 19+20, UI-Impact workflow, hierarchical task→subtask, gate-based file naming. <a href="CHANGELOG.md">Lihat changelog lengkap →</a>
+      </div>
+    </section>
+
+    <section id="read-by-role">
+      <h2 style="border:none; margin-top:32px; font-size:1.3rem; color:var(--text-dim);">📖 Read by Role — Pilih Path Tercepat</h2>
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="label" style="color: var(--warn);">👤 PM / BA · ~30 min</div>
+          <p style="margin-top:8px;"><a href="phases/1-grooming.html">Gate 1 Grooming</a> · <a href="templates/PRD-template.md">PRD Template</a></p>
+        </div>
+        <div class="card">
+          <div class="label" style="color: var(--warn);">👤 Tech Lead · ~45 min</div>
+          <p style="margin-top:8px;"><a href="phases/2-tech-design.html">Gate 2 Tech Design</a> · <a href="#principles">Prinsip 19 Existing Analysis</a></p>
+        </div>
+        <div class="card">
+          <div class="label" style="color: var(--warn);">👤 Developer · ~1 hour</div>
+          <p style="margin-top:8px;"><a href="phases/4-development.html">Gate 4 Dev</a> · <a href="#principles">Prinsip 20 Git Hygiene</a> · <a href="commands/implement.md">/implement</a></p>
+        </div>
+        <div class="card">
+          <div class="label" style="color: var(--warn);">👤 Designer / FE Dev · ~30 min</div>
+          <p style="margin-top:8px;"><a href="templates/UI-Impact-template.md">UI-Impact Template</a> · <a href="phases/1-grooming.html">Gate 1 Pre-Dev</a></p>
+        </div>
+        <div class="card">
+          <div class="label" style="color: var(--warn);">👤 QA · ~30 min</div>
+          <p style="margin-top:8px;"><a href="phases/5-testing.html">Gate 5 Testing</a> · <a href="templates/TestPlan-template.md">Test Plan Template</a></p>
+        </div>
+        <div class="card">
+          <div class="label" style="color: var(--warn);">👤 SRE · ~30 min</div>
+          <p style="margin-top:8px;"><a href="phases/7-live.html">Gate 7 Live</a> · runbook structure</p>
+        </div>
       </div>
     </section>
 
@@ -176,14 +207,14 @@
           <p>Agent menghasilkan draft async (jalan di background). Manusia review batched (pagi/sore). Sync meeting hanya dipanggil saat <em>ada konflik desain</em>, bukan untuk ratifikasi yang AI sudah selesai.</p>
         </div>
         <div class="card" style="border-color: rgba(110,231,183,0.4);">
-          <div class="label" style="color: var(--accent);">Prinsip 19 ⭐ NEW v2.1</div>
+          <div class="label" style="color: var(--accent);">Prinsip 19 ⭐ Quality</div>
           <h3>Analyze Existing First, Propose Minimal Change</h3>
-          <p>Sebelum design solusi baru, agent WAJIB audit codebase existing. Tentukan magnitude: <strong>NO-CHANGE</strong> / <strong>EXTEND</strong> (default) / <strong>NEW-MODULE</strong> / <strong>REWRITE</strong>. Naik ke NEW-MODULE/REWRITE harus justify dengan ADR. Anti-over-engineering by design.</p>
+          <p>Sebelum design solusi baru, agent WAJIB audit codebase existing. Tentukan magnitude: <strong>NO-CHANGE</strong> / <strong>EXTEND</strong> (default) / <strong>NEW-MODULE</strong> / <strong>REWRITE</strong>. Naik harus justify dengan ADR.</p>
         </div>
         <div class="card" style="border-color: rgba(110,231,183,0.4);">
-          <div class="label" style="color: var(--accent);">Prinsip 20 ⭐ NEW v2.1</div>
+          <div class="label" style="color: var(--accent);">Prinsip 20 ⭐ Quality</div>
           <h3>Sync Repo &amp; Branch dari Slug</h3>
-          <p>Agent yang akan modify file di repo target WAJIB git hygiene 3-step: (1) cek working tree clean, (2) <code>git pull --ff-only</code> di base branch, (3) <code>git checkout -b feat/&lt;slug&gt;</code>. Berlaku per-repo kalau feature touch multi-repo.</p>
+          <p>Agent yang akan modify file di repo target WAJIB git hygiene 3-step: (1) cek working tree clean, (2) <code>git pull --ff-only</code> di base branch, (3) <code>git checkout -b feat/&lt;slug&gt;</code>. Berlaku per-repo.</p>
         </div>
       </div>
 
@@ -989,23 +1020,56 @@ make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
     </section>
 
     <section id="antipatterns">
-      <h2>10. Anti-pattern Khusus Tim</h2>
-      <ol>
-        <li><strong>"AI bilang begitu" sebagai justifikasi.</strong> Output AI tetap perlu reasoning manusia. Approval gate ada karena ini.</li>
-        <li><strong>Skip gate karena buru-buru.</strong> Skip 1 gate = utang yang dibayar 3× di gate berikutnya. Kalau benar-benar urgent, ada <em>emergency lane</em> yang punya retro wajib.</li>
-        <li><strong>Tribe fork CLAUDE.md.</strong> Kalau merasa override &gt;50%, hentikan — bahas di forum tech lead.</li>
-        <li><strong>Reviewer cross-tribe perfunctory.</strong> Reviewer cross-tribe minimal harus tulis 1 pertanyaan / saran spesifik; "LGTM" kosong tidak diterima.</li>
-        <li><strong>Slash command jadi black box.</strong> Tiap command harus punya doc 1 halaman: input, output, asumsi. Kalau tidak, hilangkan.</li>
-        <li><strong>Lesson loop mati.</strong> Kalau 1 bulan tidak ada lesson naik, owner playbook wajib facilitate retro mini.</li>
-        <li><strong>Approval pakai chat.</strong> Approval di Slack tidak terhitung. Harus di artefak yang bisa di-grep nanti.</li>
-        <li><strong>"Ini buat developer senior aja".</strong> Justru junior paling diuntungkan playbook. Pastikan onboarding masuk hari ke-2 dev baru.</li>
-      </ol>
+      <h2>10. Top 5 Anti-pattern (yang paling sering bikin tim macet)</h2>
+      <p>Daftar di-curate dari retro lintas-tribe. Lainnya ada di <a href="phases/6-defects.html">Gate 6 Defects &amp; Greenlight</a>.</p>
+
+      <div class="grid grid-2">
+        <div class="card" style="border-color: rgba(248,113,113,0.3);">
+          <div class="label" style="color: var(--danger);">#1 · Process failure</div>
+          <h3>Approval di chat</h3>
+          <p>Slack/DM/verbal <strong>tidak terhitung</strong>. Approval HARUS di artefak yang bisa di-grep nanti — comment <code>LGTM-PRD</code> di file PRD, bukan thumbs-up di chat.</p>
+        </div>
+        <div class="card" style="border-color: rgba(248,113,113,0.3);">
+          <div class="label" style="color: var(--danger);">#2 · Justification failure</div>
+          <h3>"AI bilang begitu"</h3>
+          <p>Output AI tetap butuh reasoning manusia. Approval gate ada karena ini. Reviewer wajib bisa jelaskan <em>kenapa</em> decision, bukan "agent yang bilang".</p>
+        </div>
+        <div class="card" style="border-color: rgba(248,113,113,0.3);">
+          <div class="label" style="color: var(--danger);">#3 · Velocity trap</div>
+          <h3>Skip gate karena buru-buru</h3>
+          <p>Skip 1 gate = utang dibayar 3× di gate berikutnya. Urgent banget? Ada <em>emergency lane</em> dengan retro wajib ≤72 jam — bukan ban gate.</p>
+        </div>
+        <div class="card" style="border-color: rgba(248,113,113,0.3);">
+          <div class="label" style="color: var(--danger);">#4 · Review failure</div>
+          <h3>Cross-tribe reviewer "LGTM" kosong</h3>
+          <p>Reviewer cross-tribe WAJIB tulis minimal 1 pertanyaan / saran spesifik. "LGTM" tanpa konteks ditolak — kalau tidak ada saran, dia belum baca.</p>
+        </div>
+        <div class="card" style="border-color: rgba(248,113,113,0.3);">
+          <div class="label" style="color: var(--danger);">#5 · Quality failure (v2.1)</div>
+          <h3>Skip § 0 Existing Analysis di Gate 2</h3>
+          <p>Loncat ke "3 options brainstorm" tanpa audit codebase = over-engineer. Default magnitude EXTEND, naik harus justify dengan ADR. Section 0 kosong = tech design ditolak.</p>
+        </div>
+        <div class="card" style="border-color: rgba(248,113,113,0.3);">
+          <div class="label" style="color: var(--danger);">#6 · Workflow failure (v2.1)</div>
+          <h3>Edit langsung di <code>main</code> tanpa branch</h3>
+          <p>Bypass code review + dirty git history. Prinsip 20: WAJIB <code>git checkout -b feat/&lt;slug&gt;</code> sebelum sentuh code. Branch naming ad-hoc juga ditolak.</p>
+        </div>
+      </div>
+
+      <details style="margin-top:24px;">
+        <summary style="cursor:pointer; color:var(--text-dim); font-size:0.95rem;">Anti-pattern lain (3 item lagi yang lebih jarang) →</summary>
+        <ol style="margin-top:12px;">
+          <li><strong>Tribe fork CLAUDE.md.</strong> Override &gt;50% = sinyal arsitektur tribe terlalu beda dari org. Bahas di forum tech lead, jangan fork diam-diam.</li>
+          <li><strong>Slash command jadi black box.</strong> Tiap command WAJIB punya doc 1 halaman: input, output, asumsi. Tanpa doc = hilangkan.</li>
+          <li><strong>Lesson loop mati.</strong> 1 bulan tanpa lesson naik = sinyal proses macet. Owner playbook facilitate retro mini.</li>
+        </ol>
+      </details>
     </section>
 
     <div class="footer">
-      Agent Playbook v2 — Team Edition · Disusun untuk tim multi-tribe yang ingin AI handle fase paling sakit (grooming, tech disc, dev, testing) dengan tetap menjaga keputusan di developer.<br>
-      Versi ini didasari Agent Playbook v1 (<a href="https://aldhirs.github.io/ai-agent-playbook/index.html">SafeTech</a>) — dengan tambahan 4 prinsip tim, 7 gate workflow, 3-layer tribe architecture, dan rollout 90 hari.<br>
-      Last updated: 2026-05-12.
+      Agent Playbook v2.1 — Team Edition · Disusun untuk tim multi-tribe yang ingin AI handle fase paling sakit (grooming, tech disc, dev, testing) dengan tetap menjaga keputusan di developer.<br>
+      Berbasis Agent Playbook v1 (<a href="https://aldhirs.github.io/ai-agent-playbook/index.html">SafeTech</a>) — dengan 6 prinsip operating+quality, 7 gate workflow, 3-layer tribe architecture, UI-Impact workflow, hierarchical task mode, dan rollout 90 hari.<br>
+      Last updated: 2026-05-21 · <a href="CHANGELOG.md">Changelog</a> · <a href="README.md">README</a> · <a href="https://github.com/aldhirs/ai-agent-playbook-v2">GitHub</a>
     </div>
 
   </main>
