@@ -22,7 +22,7 @@
       <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">QA Engineer</div></div>
       <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Tester</div></div>
       <div class="meta-item"><div class="lbl">Input</div><div class="val">PRD + TD (AC + failure modes)</div></div>
-      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>TEST-PLAN.md</code> + automated tests</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>G5-TEST-PLAN.md</code> + automated tests</div></div>
       <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">Pass rate ≥95% · QA tag qa-greenlight</div></div>
       <div class="meta-item"><div class="lbl">Mulai Kapan</div><div class="val">Bersamaan Gate 3 (paralel)</div></div>
     </div>
@@ -32,7 +32,7 @@
   <ol class="stepflow">
     <li class="ai-step"><strong>QA run <code>/test-plan &lt;feature-slug&gt;</code></strong> setelah TD signed (Gate 2) — tidak menunggu dev selesai.</li>
     <li class="ai-step"><strong>Tester Agent baca:</strong> PRD (AC sebagai sumber utama), TD (failure modes, edge cases), banned-field test existing, pattern test di service standard layout (<code>test/integration/</code>, <code>test/e2e/</code>) untuk konsistensi style.</li>
-    <li class="ai-step"><strong>Generate <code>TEST-PLAN.md</code></strong>: mapping AC → test case, test matrix state × action (wajib 5 state: default/loading/empty/error/success), 10+ edge case, automation strategy per layer, regression set.</li>
+    <li class="ai-step"><strong>Generate <code>G5-TEST-PLAN.md</code></strong>: mapping AC → test case, test matrix state × action (wajib 5 state: default/loading/empty/error/success), 10+ edge case, automation strategy per layer, regression set.</li>
     <li class="ai-step"><strong>Generate skeleton test file</strong> di <code>features/&lt;slug&gt;/tests/integration/</code> &amp; <code>features/&lt;slug&gt;/tests/e2e/</code> — struktur describe/it lengkap, assertion belum diisi. Tooling test (Go testcontainers, Playwright) di-config baca dari path feature folder ini.</li>
     <li class="human-step"><strong>QA review &amp; tambahkan domain-specific.</strong> Yang AI sering miss: regulasi (PCI, GDPR), quirks integration partner, tribal knowledge soal user behavior.</li>
     <li class="human-step"><strong>QA isi assertion di skeleton test</strong> (atau pair dengan Dev kalau test complex). Test plan = drafting Anchor; assertion implementasinya manual.</li>
@@ -145,7 +145,7 @@
   <table>
     <tr><th>Hari</th><th>Aksi</th><th>Pelaku</th></tr>
     <tr><td>D+0 (gate 2 done)</td><td>Run <code>/test-plan apple-pay-checkout</code> begitu TD signed</td><td>👤 QA</td></tr>
-    <tr><td>D+0</td><td>Generate TEST-PLAN.md: 32 TC, 15 edge case, skeleton 8 integration test + 4 E2E spec</td><td>🤖 Tester</td></tr>
+    <tr><td>D+0</td><td>Generate G5-TEST-PLAN.md: 32 TC, 15 edge case, skeleton 8 integration test + 4 E2E spec</td><td>🤖 Tester</td></tr>
     <tr><td>D+1</td><td>QA tambah 6 TC compliance (PCI) + 3 TC tribal knowledge (Apple device quirks)</td><td>👤 QA</td></tr>
     <tr><td>D+2</td><td>QA isi assertion di 8 integration test sambil dev kerja paralel</td><td>👤 QA</td></tr>
     <tr><td>D+3</td><td>Task T01-T03 merged. QA execute integration test → 12/15 pass, 3 fail (bug code)</td><td>👤 QA + 🤖 Tester</td></tr>

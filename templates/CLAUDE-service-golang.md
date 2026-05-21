@@ -41,7 +41,7 @@ test/
   integration/         # testcontainers-based — pattern shared cross-feature
 features/              # 1 folder per feature aktif — SUMBER KEBENARAN untuk seluruh output feature
   <slug>/              # PRD · TECH-DESIGN · IMPL-PLAN · TEST-PLAN · POST-LAUNCH-RETRO
-                       # contract/ · migrations/ · tests/ · runbook/ · evidence/ · code-manifest.md
+                       # contract/ · migrations/ · tests/ · runbook/ · evidence/ · G4-CODE-MANIFEST.md
                        # Detail: lihat playbook Section 5
 ```
 

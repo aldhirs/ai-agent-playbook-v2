@@ -113,10 +113,14 @@
   <main class="main">
 
     <section id="overview" class="hero">
-      <div class="pill">Playbook v2 · Team Edition</div>
+      <div class="pill">Playbook v2.1 · Team Edition</div>
       <h1>Cara Tim Bekerja dengan AI Agent</h1>
       <p>Workflow untuk multi-tribe (1, 2, 3a, 3b, 3c) yang memangkas waktu di fase grooming, tech discussion, development, dan testing — dengan review &amp; approval tetap di tangan developer.</p>
-      <p style="margin-top:16px;"><strong>Tagline:</strong> <em>Contract first. Evidence always. AI proposes, human approves. Tribe shares, service owns.</em></p>
+      <p style="margin-top:16px;"><strong>Tagline:</strong> <em>Contract first. Evidence always. AI proposes, human approves. Tribe shares, service owns. Analyze existing first. Sync repo &amp; branch.</em></p>
+
+      <div class="callout good" style="margin-top:20px;">
+        <strong>🎉 What's new in v2.1:</strong> Prinsip 19 (Analyze Existing First) + Prinsip 20 (Sync Repo &amp; Branch dari Slug) + Gate 1 approval 3-pihak (PM + Designer + FE Dev) + UI-Impact workflow + Gate-based file naming (G1-PRD.md, dst.) + project-level agents. Lihat <a href="README.md">README</a> untuk changelog lengkap.
+      </div>
     </section>
 
     <section id="what-changed">
@@ -147,8 +151,8 @@
     </section>
 
     <section id="principles">
-      <h2>1. Prinsip v2 — 4 Tambahan untuk Tim</h2>
-      <p>v1 punya 14 prinsip teknis. v2 menambahkan 4 prinsip <em>operating</em> khusus untuk tim:</p>
+      <h2>1. Prinsip v2 — 6 Tambahan untuk Tim</h2>
+      <p>v1 punya 14 prinsip teknis. v2 menambahkan 6 prinsip <em>operating + quality</em> khusus untuk tim:</p>
 
       <div class="grid grid-2">
         <div class="card">
@@ -171,10 +175,20 @@
           <h3>Async by Default, Sync on Conflict</h3>
           <p>Agent menghasilkan draft async (jalan di background). Manusia review batched (pagi/sore). Sync meeting hanya dipanggil saat <em>ada konflik desain</em>, bukan untuk ratifikasi yang AI sudah selesai.</p>
         </div>
+        <div class="card" style="border-color: rgba(110,231,183,0.4);">
+          <div class="label" style="color: var(--accent);">Prinsip 19 ⭐ NEW v2.1</div>
+          <h3>Analyze Existing First, Propose Minimal Change</h3>
+          <p>Sebelum design solusi baru, agent WAJIB audit codebase existing. Tentukan magnitude: <strong>NO-CHANGE</strong> / <strong>EXTEND</strong> (default) / <strong>NEW-MODULE</strong> / <strong>REWRITE</strong>. Naik ke NEW-MODULE/REWRITE harus justify dengan ADR. Anti-over-engineering by design.</p>
+        </div>
+        <div class="card" style="border-color: rgba(110,231,183,0.4);">
+          <div class="label" style="color: var(--accent);">Prinsip 20 ⭐ NEW v2.1</div>
+          <h3>Sync Repo &amp; Branch dari Slug</h3>
+          <p>Agent yang akan modify file di repo target WAJIB git hygiene 3-step: (1) cek working tree clean, (2) <code>git pull --ff-only</code> di base branch, (3) <code>git checkout -b feat/&lt;slug&gt;</code>. Berlaku per-repo kalau feature touch multi-repo.</p>
+        </div>
       </div>
 
       <div class="callout good">
-        <strong>Kenapa 4 prinsip ini cukup?</strong> Mereka menutup 4 mode kegagalan tim: keputusan ambigu (15), reinventing the wheel (16), context drift (17), dan rapat tak perlu (18).
+        <strong>Kenapa 6 prinsip ini cukup?</strong> Mereka menutup 6 mode kegagalan tim: keputusan ambigu (15), reinventing the wheel (16), context drift (17), rapat tak perlu (18), over-engineering (19), dan stale code / branch chaos (20).
       </div>
     </section>
 
@@ -368,12 +382,12 @@
       <div class="phase">
         <div class="phase-num">1</div>
         <div class="phase-body">
-          <h3>Grooming &amp; PRD</h3>
-          <p><strong>Input:</strong> Epic mentah dari Jira/Linear (1-3 paragraf). <strong>AI:</strong> Groomer Agent baca epic + repo context + lessons relevan, lalu drafting PRD pakai template + munculkan daftar <em>open questions</em> (apa yang belum jelas). <strong>Human:</strong> PM jawab open questions, iterate 1-2 putaran, lalu Tech Lead review high-level feasibility.</p>
+          <h3>Grooming &amp; PRD + UI-Impact Pre-Dev <span style="color:var(--accent);font-size:0.7em;">(v2.1)</span></h3>
+          <p><strong>Input:</strong> Epic mentah dari Jira/Linear (1-3 paragraf). <strong>AI:</strong> Groomer Agent baca epic + repo context + lessons + design system catalog (lewat <code>ui-impact-analyst</code>), lalu drafting PRD + UI-IMPACT Pre-Dev (existing page DIFF + reuse plan + 5-state) + open questions. <strong>Human:</strong> PM jawab open questions, iterate 1-2 putaran. Designer + FE Dev review UI vision. Tech Lead consulted untuk feasibility.</p>
           <div class="phase-meta">
-            <span class="chip human">Owner: PM</span>
-            <span class="chip ai">Agent: Groomer</span>
-            <span class="chip gate">Gate 1: PRD signed</span>
+            <span class="chip human">Owner: PM + Designer + FE Dev</span>
+            <span class="chip ai">Agent: Groomer + UI-Impact-Analyst</span>
+            <span class="chip gate">Gate 1: LGTM-PRD ×3 (TL consulted)</span>
             <span class="chip">~2-4 jam (vs. 2-3 hari)</span>
           </div>
         </div>
@@ -382,12 +396,12 @@
       <div class="phase">
         <div class="phase-num">2</div>
         <div class="phase-body">
-          <h3>Tech Discussion</h3>
-          <p><strong>Input:</strong> PRD yang sudah signed. <strong>AI:</strong> Architect Agent baca PRD + service map + existing API contract, drafting: tech design doc, OpenAPI / proto contract, sequence diagram, data model, alternatif (3 opsi minimal), dan risk register. <strong>Human:</strong> Tech Lead pilih opsi, tribe peer review (1 reviewer dari tribe lain WAJIB untuk cross-pollination), lalu sign.</p>
+          <h3>Tech Discussion <span style="color:var(--accent);font-size:0.7em;">(+ § 0 Existing Analysis v2.1)</span></h3>
+          <p><strong>Input:</strong> PRD signed (termasuk G1-UI-IMPACT.md Section 1). <strong>AI:</strong> Architect Agent <strong>WAJIB</strong> isi § 0 Existing Analysis dulu (codebase audit + magnitude pick: NO-CHANGE/EXTEND/NEW-MODULE/REWRITE per Prinsip 19), baru drafting tech design + OpenAPI/proto + sequence diagram + 3 opsi + risk register. <strong>Human:</strong> Tech Lead pilih opsi, cross-tribe reviewer challenge magnitude.</p>
           <div class="phase-meta">
             <span class="chip human">Owner: Tech Lead</span>
             <span class="chip ai">Agent: Architect</span>
-            <span class="chip gate">Gate 2: Tech Design signed</span>
+            <span class="chip gate">Gate 2: LGTM-TD + § 0 filled</span>
             <span class="chip">~4-6 jam (vs. 2-3 hari)</span>
           </div>
         </div>
@@ -410,12 +424,12 @@
       <div class="phase">
         <div class="phase-num">4</div>
         <div class="phase-body">
-          <h3>Development</h3>
-          <p><strong>Input:</strong> Task dari impl plan. <strong>AI:</strong> Coder Agent implement task pakai CLAUDE.md service-level + skill go-microservice / vue-frontend. Wajib generate: code + unit test + evidence (curl.txt, test.log, screenshots/) + self-review checklist. Reviewer Agent jalankan static check + checklist sebelum dev push. <strong>Human:</strong> Dev review hasil agent, iterate, lalu open PR. Peer dev review fokus ke <em>kelogisan keputusan</em>, bukan style (style sudah dihandle linter).</p>
+          <h3>Development <span style="color:var(--accent);font-size:0.7em;">(+ Git Hygiene &amp; UI-Impact Post-Dev v2.1)</span></h3>
+          <p><strong>Input:</strong> Task dari impl plan. <strong>Step 0 — Git Hygiene (Prinsip 20):</strong> cek working tree clean, <code>git pull --ff-only</code>, <code>git checkout -b feat/&lt;slug&gt;</code> di SETIAP repo target. <strong>AI:</strong> Coder Agent implement pakai CLAUDE.md + skill stack-specific. Wajib generate: code + unit test + evidence (curl.txt, test.log, screenshots/) + self-review checklist + isi UI-IMPACT.md Section 2 (kalau ada UI change) + invoke <code>ui-impact-analyst</code> Mode B untuk Section 3 (Agent Analysis). <strong>Human:</strong> Dev review hasil agent, iterate, open PR.</p>
           <div class="phase-meta">
             <span class="chip human">Owner: Dev</span>
-            <span class="chip ai">Agent: Coder + Reviewer</span>
-            <span class="chip gate">Gate 4: PR + evidence</span>
+            <span class="chip ai">Agent: Coder + Reviewer + UI-Impact-Analyst</span>
+            <span class="chip gate">Gate 4: PR (branch feat/&lt;slug&gt;) + evidence</span>
             <span class="chip">~40-60% lebih cepat</span>
           </div>
         </div>
@@ -618,10 +632,10 @@
         ├── CLAUDE.md        # quirk &amp; convention service
         ├── features/
         │   └── &lt;feature-slug&gt;/
-        │       ├── PRD.md
-        │       ├── TECH-DESIGN.md
-        │       ├── IMPL-PLAN.md
-        │       ├── TEST-PLAN.md
+        │       ├── G1-PRD.md
+        │       ├── G2-TECH-DESIGN.md
+        │       ├── G3-IMPL-PLAN.md
+        │       ├── G5-TEST-PLAN.md
         │       └── evidence/
         └── ...
 </code></pre>
@@ -656,14 +670,17 @@
       <h2>5. Feature Folder — Struktur Output Kanonik</h2>
       <p>Aturan emas (Prinsip 17): <strong>1 feature = 1 folder = semua output di sana</strong>. Tidak ada artefak yang tercecer di Slack, DM, root repo, atau wiki terpisah. Kalau seseorang ingin tahu apa pun tentang feature X, mereka buka <code>features/&lt;slug&gt;/</code> dan menemukan semuanya — dari PRD sampai runbook produksi.</p>
 
-      <h3>5.1 Struktur Folder Lengkap</h3>
+      <h3>5.1 Struktur Folder Lengkap (v2.1 — Gate-based naming)</h3>
 <pre><code>features/&lt;slug&gt;/
 ├── README.md                    ← Auto-generated index, link ke semua artefak
-├── PRD.md                       ← Gate 1 · Problem + user stories + AC
-├── TECH-DESIGN.md               ← Gate 2 · Decision + sequence diagram + risk
-├── IMPL-PLAN.md                 ← Gate 3 · Task list + dependency graph
-├── TEST-PLAN.md                 ← Gate 5 (mulai Gate 3) · Test matrix + edge case
-├── POST-LAUNCH-RETRO.md         ← Gate 7 · T+7 retro + lessons extracted
+├── manifest.yaml                ← target_repos + sync map + has_ui_impact flag (NEW v2.1)
+├── G1-PRD.md                       ← Gate 1 · Problem + user stories + AC + § 5 UI Vision
+├── G1-UI-IMPACT.md                 ← Gate 1 (Pre-Dev) + Gate 4 (Post-Dev) + agent analysis (NEW v2.1)
+├── G2-TECH-DESIGN.md               ← Gate 2 · § 0 Existing Analysis + Decision + sequence + risk
+├── G3-IMPL-PLAN.md                 ← Gate 3 · Task list + dependency graph
+├── G5-TEST-PLAN.md                 ← Gate 5 (mulai Gate 3) · Test matrix + edge case
+├── G7-POST-LAUNCH-RETRO.md         ← Gate 7 · T+7 retro + lessons extracted
+├── PUSHBACK-TO-PRODUCT.md          ← Opsional · gap analysis kalau adopt PRD eksternal (NEW v2.1)
 │
 ├── decisions/                   ← ADR per keputusan besar (pisah dari TD kalau perlu)
 │   └── ADR-001-&lt;judul&gt;.md
@@ -693,25 +710,25 @@
 │       ├── test.log             ← Output test run
 │       └── screenshots/         ← Min. 3 kalau UI change
 │
-└── code-manifest.md             ← Pointer ke file CODE di service layout
+└── G4-CODE-MANIFEST.md             ← Pointer ke file CODE di service layout
                                     (karena Go module butuh standard layout)
 </code></pre>
 
       <h3>5.2 Mapping Artefak per Gate</h3>
       <table>
         <tr><th>Gate</th><th>Artefak yang dihasilkan</th><th>Lokasi di feature folder</th></tr>
-        <tr><td>1 Grooming</td><td>PRD</td><td><code>PRD.md</code></td></tr>
-        <tr><td>2 Tech Disc.</td><td>Tech design, ADR, API contract, migration plan</td><td><code>TECH-DESIGN.md</code> · <code>decisions/</code> · <code>contract/</code> · <code>migrations/</code></td></tr>
-        <tr><td>3 Planning</td><td>Impl plan, task breakdown</td><td><code>IMPL-PLAN.md</code></td></tr>
-        <tr><td>4 Development</td><td>Evidence per task</td><td><code>evidence/&lt;task-id&gt;/</code> + update <code>code-manifest.md</code></td></tr>
-        <tr><td>5 Testing</td><td>Test plan, test files</td><td><code>TEST-PLAN.md</code> · <code>tests/</code></td></tr>
+        <tr><td>1 Grooming</td><td>PRD + <strong>UI Impact Pre-Dev (v2.1)</strong></td><td><code>G1-PRD.md</code> + <code>G1-UI-IMPACT.md</code></td></tr>
+        <tr><td>2 Tech Disc.</td><td>Tech design (+ <strong>§ 0 Existing Analysis</strong>), ADR, API contract, migration plan</td><td><code>G2-TECH-DESIGN.md</code> · <code>decisions/</code> · <code>contract/</code> · <code>migrations/</code></td></tr>
+        <tr><td>3 Planning</td><td>Impl plan, task breakdown</td><td><code>G3-IMPL-PLAN.md</code></td></tr>
+        <tr><td>4 Development</td><td>Evidence per task + <strong>UI Impact Post-Dev (v2.1)</strong></td><td><code>evidence/&lt;task-id&gt;/</code> + update <code>G4-CODE-MANIFEST.md</code> + <code>G1-UI-IMPACT.md</code> Section 2-3</td></tr>
+        <tr><td>5 Testing</td><td>Test plan, test files</td><td><code>G5-TEST-PLAN.md</code> · <code>tests/</code></td></tr>
         <tr><td>6 Defects</td><td>Regression test, lesson candidate</td><td><code>tests/</code> + (lesson di <code>tribes/&lt;id&gt;/LESSONS.md</code>)</td></tr>
-        <tr><td>7 Live</td><td>Runbook, alerts, retro</td><td><code>runbook/</code> · <code>POST-LAUNCH-RETRO.md</code></td></tr>
+        <tr><td>7 Live</td><td>Runbook, alerts, retro</td><td><code>runbook/</code> · <code>G7-POST-LAUNCH-RETRO.md</code></td></tr>
       </table>
 
       <h3>5.3 Code Manifest — Kenapa Ada?</h3>
       <p>Code (Go handler/usecase/repo, Vue component) tetap harus di standard service layout — bukan di feature folder — karena Go module &amp; bundler perlu layout standar. Tapi tetap harus bisa ditemukan dari feature folder.</p>
-      <p><strong>Solusi:</strong> <code>features/&lt;slug&gt;/code-manifest.md</code> mencatat semua file code yang disentuh feature ini:</p>
+      <p><strong>Solusi:</strong> <code>features/&lt;slug&gt;/G4-CODE-MANIFEST.md</code> mencatat semua file code yang disentuh feature ini:</p>
 <pre><code># Code Manifest — apple-pay-checkout
 
 ## Files added
@@ -741,7 +758,7 @@ make feature-apply FEATURE=apple-pay-checkout
 # 2. Copy features/&lt;slug&gt;/migrations/* → migrations/ (dengan timestamp)
 # 3. Copy features/&lt;slug&gt;/runbook/alerts.yaml → monitoring/alerts/&lt;slug&gt;.yaml
 # 4. Copy features/&lt;slug&gt;/runbook/failure-modes.md → runbooks/&lt;service&gt;/&lt;slug&gt;.md
-# 5. Update code-manifest.md dengan timestamp
+# 5. Update G4-CODE-MANIFEST.md dengan timestamp
 
 # Saat perlu rollback feature:
 make feature-rollback FEATURE=apple-pay-checkout
@@ -929,7 +946,7 @@ make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
       <h3>8.4 Approval Mekanisme Konkret</h3>
       <table>
         <tr><th>Gate</th><th>Bentuk Approval</th></tr>
-        <tr><td>1 (PRD)</td><td>Comment "LGTM-PRD" oleh PM + Tech Lead di file PRD.md di PR; CI cek file ada</td></tr>
+        <tr><td>1 (PRD)</td><td>Comment "LGTM-PRD" oleh PM + Tech Lead di file G1-PRD.md di PR; CI cek file ada</td></tr>
         <tr><td>2 (Tech Design)</td><td>Comment "LGTM-TD" oleh Tech Lead + cross-tribe reviewer di PR</td></tr>
         <tr><td>3 (Plan)</td><td>Tech Lead merge plan PR; auto-create task di Jira/Linear</td></tr>
         <tr><td>4 (Dev PR)</td><td>Peer review approve + CI hijau + evidence folder tidak kosong</td></tr>

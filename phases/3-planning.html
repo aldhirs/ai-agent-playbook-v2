@@ -22,7 +22,7 @@
       <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">Tech Lead + Dev</div></div>
       <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Planner</div></div>
       <div class="meta-item"><div class="lbl">Input</div><div class="val">Tech Design signed</div></div>
-      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>IMPL-PLAN.md</code> + task di Jira</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>G3-IMPL-PLAN.md</code> + task di Jira</div></div>
       <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">Tech Lead merge plan PR</div></div>
       <div class="meta-item"><div class="lbl">Target Durasi</div><div class="val">1-2 jam</div></div>
     </div>
@@ -32,7 +32,7 @@
   <ol class="stepflow">
     <li class="ai-step"><strong>Run <code>/plan &lt;feature-slug&gt;</code></strong> setelah TD signed.</li>
     <li class="ai-step"><strong>Planner Agent baca TD &amp; existing code.</strong> Identifikasi: file yang harus diubah, file baru, endpoint baru, migration, observability hook, test scaffold.</li>
-    <li class="ai-step"><strong>Generate <code>IMPL-PLAN.md</code></strong> dengan topological task list. Setiap task: ID, judul, estimate (T-shirt XS/S/M/L), dependency, parallelizable y/n, risk flag (red/yellow/green).</li>
+    <li class="ai-step"><strong>Generate <code>G3-IMPL-PLAN.md</code></strong> dengan topological task list. Setiap task: ID, judul, estimate (T-shirt XS/S/M/L), dependency, parallelizable y/n, risk flag (red/yellow/green).</li>
     <li class="ai-step"><strong>Dependency graph</strong> di-render Mermaid. Critical path diidentifikasi eksplisit.</li>
     <li class="ai-step"><strong>Wajib include task pertama:</strong> "Setup feature flag + folder evidence/". <strong>Task terakhir:</strong> "Cleanup feature flag + post-launch retro draft". <strong>Paralel:</strong> "Tester Agent generate test plan" dimulai bersamaan dengan task implementasi pertama.</li>
     <li class="human-step"><strong>Tech Lead validate breakdown.</strong> Cek granularity: 1 task = 1 PR yang bisa di-review &lt;30 menit. Kalau ada task L, paksa pecah.</li>
@@ -47,7 +47,7 @@
     <div class="lane ai">
       <h4 class="ai-h">🤖 Planner Agent</h4>
       <ul>
-        <li>Baca TECH-DESIGN.md + existing code untuk identifikasi file yang berubah</li>
+        <li>Baca G2-TECH-DESIGN.md + existing code untuk identifikasi file yang berubah</li>
         <li>Generate task list urut topologis dengan dependency graph (Mermaid)</li>
         <li>Estimate T-shirt (XS/S/M/L) — bukan jam (jam selalu salah)</li>
         <li>Risk flag: red (perlu spike), yellow (perlu pair), green (straightforward)</li>
@@ -85,7 +85,7 @@
   <h2>Output yang Dihasilkan</h2>
   <table>
     <tr><th>Artefak</th><th>Lokasi</th><th>Konten</th></tr>
-    <tr><td><code>IMPL-PLAN.md</code></td><td><code>features/&lt;slug&gt;/</code></td><td>Topological task list · dependency graph (Mermaid) · critical path · risk flags</td></tr>
+    <tr><td><code>G3-IMPL-PLAN.md</code></td><td><code>features/&lt;slug&gt;/</code></td><td>Topological task list · dependency graph (Mermaid) · critical path · risk flags</td></tr>
     <tr><td>Task di tracker</td><td>Jira / Linear</td><td>1 task per item di IMPL-PLAN, ter-tag dengan label sesuai (backend/frontend/dll.)</td></tr>
     <tr><td>Spike doc (kalau ada task red)</td><td><code>features/&lt;slug&gt;/spikes/&lt;name&gt;.md</code></td><td>Investigation result sebelum task red dimulai</td></tr>
   </table>

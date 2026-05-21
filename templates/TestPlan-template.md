@@ -4,8 +4,8 @@
 |---|---|
 | **Status** | DRAFT / IN-REVIEW / **GREEN** |
 | **Owner (QA)** | <nama> |
-| **PRD** | `features/<slug>/PRD.md` |
-| **Tech Design** | `features/<slug>/TECH-DESIGN.md` |
+| **PRD** | `features/<slug>/G1-PRD.md` |
+| **Tech Design** | `features/<slug>/G2-TECH-DESIGN.md` |
 | **Disiapkan paralel dengan dev?** | Ya / Tidak (target: YA) |
 
 ---

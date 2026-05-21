@@ -5,8 +5,49 @@
 | **Status** | DRAFT / IN-REVIEW / **SIGNED** |
 | **Owner (Tech Lead)** | <nama> |
 | **Cross-tribe Reviewer** | <nama, tribe X> |
-| **PRD link** | `features/<slug>/PRD.md` |
+| **PRD link** | `features/<slug>/G1-PRD.md` |
 | **Signed at Gate 2** | YYYY-MM-DD |
+| **Change Magnitude** | NO-CHANGE / **EXTEND** (default) / NEW-MODULE / REWRITE |
+
+---
+
+## 0. Existing Analysis (WAJIB — diisi SEBELUM Section 3 Options)
+
+> **Prinsip 19:** Analyze Existing First, Propose Minimal Change.
+> Section ini WAJIB diisi sebelum brainstorm opsi. Tanpa ini, design ditolak di review.
+
+### 0.1 Codebase Audit
+
+| Area | Path / Reference | Status di Codebase |
+|---|---|---|
+| Feature serupa yang sudah ada | (mis. `service-X/internal/usecase/<name>`) | sudah ada / belum ada / partial |
+| Utility / helper yang bisa di-reuse | (mis. `shared/<pkg>`) | sudah ada / belum ada |
+| Pattern serupa di tribe ini / tribe lain | (mis. ADR-NNN di tribe Y) | ada / tidak |
+| Database table / schema yang relevan | (mis. `tabel_X`) | sudah ada (schema attach) / belum |
+| API endpoint serupa | (mis. `POST /v1/<resource>`) | sudah ada / belum |
+| FE komponen / page existing (kalau ada UI change) | → lihat `G1-UI-IMPACT.md` Section 1.1 | — |
+
+### 0.2 Change Magnitude — Pilih SATU
+
+- [ ] **NO-CHANGE** — solusi sudah ada; cuma butuh dokumentasi / onboarding / config flag flip
+- [x] **EXTEND** — tambah parameter / field / branch ke kode existing. **Default. Prefer ini.**
+- [ ] **NEW-MODULE** — modul baru, tapi reuse infrastructure / utility / pattern existing
+- [ ] **REWRITE** — perlu redesign signifikan, harus ADR justify + alternative comparison
+
+### 0.3 Justification (kalau magnitude > EXTEND)
+
+> Wajib kalau pilih NEW-MODULE atau REWRITE. Skip kalau NO-CHANGE / EXTEND.
+
+- **Kenapa tidak cukup EXTEND?** (jelaskan kendala konkret: limitasi pattern existing, regression risk, dll)
+- **Komponen existing apa saja yang dipakai ulang?** (jangan REWRITE 100% — masih ada bagian yang reuse)
+- **Reversibility:** kalau magnitude besar, bagaimana cara rollback?
+
+### 0.4 Reuse Plan
+
+> List file/utility/komponen existing yang akan dipakai (bukan dibikin baru). Path konkret.
+
+- (mis. `shared/response/Response` — pakai untuk wrapping output)
+- (mis. `service-X/internal/repository/<base>` — extend dengan method baru)
 
 ---
 
@@ -22,6 +63,10 @@
   - ...
 
 ## 3. Options Considered (Minimal 3)
+
+> Disesuaikan dengan magnitude di Section 0.2:
+> - **Magnitude EXTEND:** options fokus ke variasi cara extend (mis. add field di table A vs B, sync vs async). SKIP option yang loncat ke "rewrite arsitektur".
+> - **Magnitude NEW-MODULE / REWRITE:** options boleh variatif. Tapi **WAJIB ada 1 option "minimal extend"** sebagai control.
 
 ### Option A — <judul>
 
@@ -98,7 +143,7 @@ CREATE TABLE ...
 
 ```mermaid
 sequenceDiagram
-  participant FE as Vue FE
+  participant FE as Frontend
   participant API as Service A (REST)
   participant SVC as Service B (gRPC)
   participant DB

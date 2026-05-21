@@ -10,8 +10,8 @@ Tugasmu: jalankan self-review checklist + static analysis summary untuk task ter
 ## Konteks yang harus kamu baca
 
 1. Diff yang sudah di-stage / di-commit untuk task ini
-2. `features/<feature-slug>/TECH-DESIGN.md` — untuk cek conformance
-3. `features/<feature-slug>/PRD.md` — untuk cek AC coverage
+2. `features/<feature-slug>/G2-TECH-DESIGN.md` — untuk cek conformance
+3. `features/<feature-slug>/G1-PRD.md` — untuk cek AC coverage
 4. CLAUDE.md hierarchy (untuk cek convention)
 5. Evidence folder `features/<feature-slug>/evidence/<task-id>/`
 

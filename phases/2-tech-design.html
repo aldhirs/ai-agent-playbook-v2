@@ -22,7 +22,7 @@
       <div class="meta-item"><div class="lbl">Human Owner</div><div class="val">Tech Lead</div></div>
       <div class="meta-item"><div class="lbl">AI Agent</div><div class="val">Architect</div></div>
       <div class="meta-item"><div class="lbl">Input</div><div class="val">PRD signed</div></div>
-      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>TECH-DESIGN.md</code> + ADR + contract</div></div>
+      <div class="meta-item"><div class="lbl">Output</div><div class="val"><code>G2-TECH-DESIGN.md</code> + ADR + contract</div></div>
       <div class="meta-item"><div class="lbl">Exit Gate</div><div class="val">LGTM-TD + cross-tribe reviewer</div></div>
       <div class="meta-item"><div class="lbl">Target Durasi</div><div class="val">4-6 jam</div></div>
     </div>
@@ -30,7 +30,7 @@
 
   <h2>Detailed Flow</h2>
   <ol class="stepflow">
-    <li class="human-step"><strong>Tech Lead validate prasyarat:</strong> PRD harus berstatus <code>SIGNED</code>. Cek di <code>features/&lt;slug&gt;/PRD.md</code>.</li>
+    <li class="human-step"><strong>Tech Lead validate prasyarat:</strong> PRD harus berstatus <code>SIGNED</code>. Cek di <code>features/&lt;slug&gt;/G1-PRD.md</code>.</li>
     <li class="ai-step"><strong>Tech Lead run <code>/tech-design &lt;feature-slug&gt;</code></strong>. Architect Agent membaca PRD, CLAUDE.md hierarchy, OpenAPI/proto existing, dan service map.</li>
     <li class="ai-step"><strong>Architect generate minimal 3 opsi.</strong> Wajib: 1 opsi konservatif (paling sedikit mengubah arsitektur), 1 opsi agresif (membuka kapabilitas baru), 1 di tengah. Tiap opsi: cara kerja, pros, cons, effort (S/M/L), risk (L/M/H).</li>
     <li class="ai-step"><strong>Trade-off matrix.</strong> Bandingkan 5 aspek minimum: latency, effort, operational complexity, regression risk, reversibility.</li>
@@ -39,7 +39,7 @@
     <li class="human-step"><strong>Tag cross-tribe reviewer.</strong> Wajib minimal 1 reviewer dari tribe lain (dari daftar buddy di <code>tribes/&lt;id&gt;/CLAUDE.md</code>). Tujuan: cross-pollination, bukan permission.</li>
     <li class="human-step"><strong>Cross-tribe reviewer kasih ≥1 pertanyaan/saran spesifik</strong> (≤24 jam SLA; lewat itu auto-skip — tidak block). "LGTM" kosong tidak diterima.</li>
     <li class="human-step"><strong>Tech Lead iterate kalau perlu</strong> (biasanya 0-1 putaran kecil). Open Items di TD harus tuntas; maks 5, kalau lebih = design belum matang.</li>
-    <li class="gate-step"><strong>Gate 2: LGTM-TD ×2.</strong> Tech Lead + cross-tribe reviewer tag <code>LGTM-TD</code> di TECH-DESIGN.md. Status → <code>SIGNED</code>. Lanjut ke Gate 3.</li>
+    <li class="gate-step"><strong>Gate 2: LGTM-TD ×2.</strong> Tech Lead + cross-tribe reviewer tag <code>LGTM-TD</code> di G2-TECH-DESIGN.md. Status → <code>SIGNED</code>. Lanjut ke Gate 3.</li>
   </ol>
 
   <h2>Cara Kerja AI &amp; Cara Kerja Human</h2>
@@ -95,17 +95,17 @@
   <h2>Output yang Dihasilkan</h2>
   <table>
     <tr><th>Artefak</th><th>Lokasi</th><th>Konten</th></tr>
-    <tr><td><code>TECH-DESIGN.md</code></td><td><code>features/&lt;slug&gt;/</code></td><td>Status <code>SIGNED</code> · 3 opsi + matrix + Decision dengan rationale · sequence diagram · failure modes · observability plan · rollout plan</td></tr>
+    <tr><td><code>G2-TECH-DESIGN.md</code></td><td><code>features/&lt;slug&gt;/</code></td><td>Status <code>SIGNED</code> · 3 opsi + matrix + Decision dengan rationale · sequence diagram · failure modes · observability plan · rollout plan</td></tr>
     <tr><td>API contract</td><td><code>features/&lt;slug&gt;/contract/openapi.yaml</code> dan/atau <code>features/&lt;slug&gt;/contract/proto/&lt;name&gt;.proto</code></td><td>Snippet baru atau modifikasi (additive only). Di-merge ke <code>api/openapi.yaml</code> standard saat <code>make feature-apply</code>.</td></tr>
     <tr><td>Migration files</td><td><code>features/&lt;slug&gt;/migrations/001-&lt;name&gt;.{up,down}.sql</code></td><td>Backward-compatible. Wajib ada down.sql. Di-copy ke <code>migrations/</code> standard saat <code>make feature-apply</code>.</td></tr>
-    <tr><td>Risk register</td><td>Section di TECH-DESIGN.md</td><td>Likelihood × impact × mitigation untuk top risk</td></tr>
+    <tr><td>Risk register</td><td>Section di G2-TECH-DESIGN.md</td><td>Likelihood × impact × mitigation untuk top risk</td></tr>
   </table>
 
   <h2>Approval Mekanisme</h2>
   <div class="callout">
     <strong>Gate 2 ditutup oleh:</strong>
     <ol>
-      <li><code>LGTM-TD</code> dari Tech Lead di file TECH-DESIGN.md.</li>
+      <li><code>LGTM-TD</code> dari Tech Lead di file G2-TECH-DESIGN.md.</li>
       <li><code>LGTM-TD</code> dari cross-tribe reviewer (dari daftar buddy di CLAUDE.md tribe).</li>
       <li>CI check: file ada, semua section template terisi, mermaid syntax valid, OpenAPI/proto lint pass.</li>
       <li>PR merged → status feature → <em>"Ready for Planning"</em>.</li>

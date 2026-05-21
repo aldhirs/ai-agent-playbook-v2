@@ -9,15 +9,15 @@ Tugasmu: generate test plan komprehensif + skeleton test automation. Dijalankan 
 
 ## Konteks yang harus kamu baca
 
-1. `features/$ARGUMENTS/PRD.md` (acceptance criteria — sumber utama)
-2. `features/$ARGUMENTS/TECH-DESIGN.md` (failure modes, edge cases)
+1. `features/$ARGUMENTS/G1-PRD.md` (acceptance criteria — sumber utama)
+2. `features/$ARGUMENTS/G2-TECH-DESIGN.md` (failure modes, edge cases)
 3. `templates/TestPlan-template.md`
 4. Existing test pattern (di service standard layout, untuk konsistensi style saja): `test/integration/`, `test/e2e/`, `vitest.config.ts`. **Test file BARU untuk feature ini disimpan di `features/<feature-slug>/tests/`**, BUKAN di `test/` root.
 5. Banned-field test existing
 
 ## Aksi
 
-1. **Buat** `features/$ARGUMENTS/TEST-PLAN.md` dari template.
+1. **Buat** `features/$ARGUMENTS/G5-TEST-PLAN.md` dari template.
 
 2. **Mapping AC → test case.** Setiap AC di PRD minimal 1 test case. Tulis tabelnya di section 1.
 
@@ -50,6 +50,6 @@ Tugasmu: generate test plan komprehensif + skeleton test automation. Dijalankan 
 
 ## Definition of Done
 
-- `TEST-PLAN.md` ada, semua section template terisi.
+- `G5-TEST-PLAN.md` ada, semua section template terisi.
 - Skeleton test file ter-generate di `features/<feature-slug>/tests/integration/` dan/atau `features/<feature-slug>/tests/e2e/`.
 - Output ringkas: jumlah TC, jumlah edge case, dan high-risk TC yang QA harus prioritas.

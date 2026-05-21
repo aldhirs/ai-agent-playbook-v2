@@ -9,11 +9,11 @@ Tugasmu: dari tech design signed, hasilkan implementation plan + task breakdown 
 
 ## Prasyarat
 
-- `features/$ARGUMENTS/TECH-DESIGN.md` berstatus `SIGNED`.
+- `features/$ARGUMENTS/G2-TECH-DESIGN.md` berstatus `SIGNED`.
 
 ## Aksi
 
-1. **Buat** `features/$ARGUMENTS/IMPL-PLAN.md`.
+1. **Buat** `features/$ARGUMENTS/G3-IMPL-PLAN.md`.
 
 2. **Struktur:**
    - **Topological task list** — urut dependency. Format: `[ID] Judul (estimate, dependency, parallelizable y/n, risk flag)`
@@ -41,6 +41,6 @@ Tugasmu: dari tech design signed, hasilkan implementation plan + task breakdown 
 
 ## Definition of Done
 
-- `IMPL-PLAN.md` ada, list task lengkap, dependency graph render valid.
+- `G3-IMPL-PLAN.md` ada, list task lengkap, dependency graph render valid.
 - Critical path & paralel-track jelas (test paralel dengan dev).
 - Output ringkas ke chat: jumlah task, critical path length, dan task red yang perlu spike.
