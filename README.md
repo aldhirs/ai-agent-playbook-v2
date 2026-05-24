@@ -1,20 +1,22 @@
-# Agent Playbook v2.1 — Team Edition
+# Agent Playbook v3.0 — Team Edition
 
-Workflow AI-augmented untuk tim engineering multi-tribe. **Pangkas lead time 40-60%** di grooming, tech discussion, development, dan testing — dengan review & approval tetap di tangan developer manusia.
+Workflow AI-augmented untuk tim engineering multi-tribe. **Pangkas lead time 60-70%** di phase pra-development — dengan review & approval tetap di tangan developer manusia di **1 checkpoint** (bukan 3 gate terpisah).
 
-> **Tagline:** *Contract first. Evidence always. AI proposes, human approves. Tribe shares, service owns.*
+> **Tagline:** *Contract first. Evidence always. AI proposes, human approves. 2 spec files + wireframe HTML — bukan 5 artefak terpisah.*
 
 ---
 
 ## TL;DR
 
-- **6 prinsip operating + quality** (15–20) — apa yang dipegang teguh
-- **7 gate workflow** — setiap gate ditutup approval eksplisit di artefak
-- **1 feature folder** — semua artefak dari PRD sampai retro di satu tempat
-- **7 slash command** — `/groom`, `/tech-design`, `/plan`, `/implement`, `/test-plan`, `/code-review`, `/ui-impact-analysis`
-- **AI proposes, human approves** — agent kerja background, manusia decide di gate
+- **3 phase workflow** (Spec → Dev → Live), bukan 7 gate granular
+- **1 checkpoint pra-dev** (review consolidated SPEC-BE + SPEC-FE), bukan 3 approval terpisah
+- **Wireframe HTML preview** untuk FE (Tailwind CDN, no build) — eliminate handoff guesswork
+- **2 PR per feature** (BE chunk + FE chunk dengan paralel work), bukan task-by-task granular
+- **Push-back capability** — agent STOP + tanya kalau ambiguity (cap 2 round)
+- **6 prinsip operating + quality** (15–20) tetap dipegang
+- **AI proposes, human approves** — approval grep-able di file, bukan Slack
 
-📖 Detail lengkap → **[index.html](index.html)** · 📅 Changelog → **[CHANGELOG.md](CHANGELOG.md)**
+📖 Detail lengkap → **[index.html](index.html)** · 📅 Changelog → **[CHANGELOG.md](CHANGELOG.md)** · 🚚 Migrate v2.x → **[MIGRATION-v2-to-v3.md](MIGRATION-v2-to-v3.md)**
 
 ---
 
@@ -38,7 +40,7 @@ cp templates/CLAUDE-tribe.md <your-project>/tribes/<X>/CLAUDE.md
 # - Untuk domain-expert: copy domain-expert-elearning-payment.md → rename + ganti konten sesuai domain
 ```
 
-Lalu run `/groom <epic-id>` di Claude Code untuk feature pertama.
+Lalu run **`/spec <epic-id>`** di Claude Code untuk feature pertama. Output: `features/<slug>/SPEC-BE.md` + `SPEC-FE.md` + `wireframes/*.html`. Review 2 file + buka wireframe di browser → tulis LGTM-SPEC. Lalu `/implement <slug>/be` dan `/implement <slug>/fe`.
 
 ---
 
@@ -57,13 +59,41 @@ Pilih persona Anda untuk path bacaan tercepat:
 
 ---
 
+## Workflow v3.0 — 3 Phase
+
+```
+[Epic mentah]
+    ↓
+🤖 PHASE 1 — SPEC (AI autonomous, ZERO human approval per gate)
+   /spec <epic>
+    ├── pm: problem + JTBD + scope + AC + push-back
+    ├── solution-architect: existing audit + BE approach + [BE-CONTRACT-FROZEN] marker
+    └── ui-impact-analyst: UI DIFF + WIREFRAME HTML + 5-state plan
+    
+   Output: SPEC-BE.md + SPEC-FE.md + wireframes/*.html
+    ↓
+👤 CHECKPOINT (1x, bukan 3x)
+   BE Dev + TL → LGTM-SPEC-BE
+   Designer + FE Dev → LGTM-SPEC-FE (buka wireframe HTML di browser dulu)
+    ↓
+🤖 PHASE 2 — DEV (paralel BE & FE setelah BE-CONTRACT-FROZEN)
+   /implement <slug>/be   (1 PR, soft cap 500 lines)
+   /implement <slug>/fe   (1 PR, soft cap 500 lines)
+    ↓
+👤 PHASE 3 — TEST & LIVE (retain v2.x Gate 5-7)
+   QA test plan + greenlight · Defect close + lesson · SRE runbook + retro
+```
+
 ## Struktur Repo Ini
 
-- **`commands/`** — slash command untuk Claude Code (7 file: `/groom`, `/tech-design`, `/plan`, `/implement`, `/code-review`, `/test-plan`, `/ui-impact-analysis`)
+- **`commands/`** — slash command untuk Claude Code (5 file: `/spec`, `/implement`, `/code-review`, `/test-plan`, `/ui-impact-analysis`)
 - **`agents/`** — subagent project-level (11 file) — lihat tabel di bawah
-- **`templates/`** — skeleton PRD, TechDesign, TestPlan, UI-Impact, PUSHBACK, CLAUDE-tribe
-- **`phases/`** — detail per gate (1-7) dalam HTML
+- **`templates/`** — skeleton SPEC-BE, SPEC-FE, wireframe HTML, TestPlan, PUSHBACK, CLAUDE-tribe
+- **`templates/_archived-v2/`** — v2.x templates (PRD, TechDesign, UI-Impact) — backward compat reference
+- **`commands/_archived-v2/`** — v2.x commands (`/groom`, `/tech-design`, `/plan`) — backward compat reference
+- **`phases/`** — detail per phase dalam HTML
 - **`index.html`** — playbook lengkap (single-page reference)
+- **`MIGRATION-v2-to-v3.md`** — guide untuk migrate dari v2.x ke v3.0
 
 ### Subagents Tersedia (11 file di `agents/`)
 

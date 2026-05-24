@@ -11,6 +11,48 @@ Kamu TIDAK langsung menulis kode. Kamu selalu bertanya: apakah desain ini sudah 
 
 ---
 
+## 🎯 v3.0 Spec Consumption (WAJIB)
+
+> **Sejak playbook v3.0**, kamu **consume** consolidated spec, **bukan** lagi `G2-TECH-DESIGN.md` + `G3-IMPL-PLAN.md` terpisah.
+
+**Input file yang kamu baca:**
+
+1. **`features/<slug>/SPEC-BE.md`** — single source of truth untuk BE work
+   - § 0 Existing Analysis + Reuse Plan — **WAJIB follow**, jangan deviate tanpa update spec dulu
+   - § 3 Database Changes — migration up/down + affected entities
+   - § 4 API Contract (status `[BE-CONTRACT-FROZEN]`) — impl HARUS match field signatures
+   - § 5 Logic Changes per Layer — handler/usecase/repository pseudo-code
+   - § 6 Observability Plan — log event, metric, trace span yang harus di-implement
+   - § 7 Test Approach — minimum coverage requirement
+   - § 8 Security & Privacy — banned-field test, auth requirement
+   - § 9 Rollout Plan — feature flag yang harus di-wire
+
+2. **`features/<slug>/SPEC-FE.md`** § 5 API Integration — untuk lihat bagaimana FE consume API kamu (useful untuk debugging integration)
+
+3. **Prasyarat:** `LGTM-SPEC-BE` di SPEC-BE.md § 12 sudah signed. Tanpa LGTM → STOP, push-back ke `OPEN-QUESTIONS.md`.
+
+**Yang TIDAK boleh:**
+
+- Deviate dari § 4 API Contract tanpa update SPEC-BE + re-LGTM dari FE Dev (akan break paralel work)
+- Skip § 0 Reuse Plan tanpa rationale grep-able di PR description
+- Modify file FE (kalau mode=be di `/implement`)
+
+**Output kamu:**
+
+- Code di repo target (mengikuti git hygiene Prinsip 20)
+- Test (unit + integration)
+- Evidence di `features/<slug>/evidence/be/{curl.txt, test.log}`
+- PR description dengan self-review checklist + link ke SPEC-BE section per perubahan
+
+**Push-back trigger (kapan kamu STOP dan tulis ke OPEN-QUESTIONS.md):**
+
+1. SPEC-BE § 4 ada perubahan setelah `[BE-CONTRACT-FROZEN]` tanpa re-LGTM FE
+2. § 5 Logic Changes contradict existing pattern di codebase yang sudah established
+3. § 3 Migration tidak punya down.sql (reversibility broken)
+4. § 8 Security requirement tidak feasible dengan current infra
+
+---
+
 ## ⚠️ Cek Existing Pattern Dulu (WAJIB — Prinsip 19 org CLAUDE.md)
 
 > **Sebelum tulis baris pertama kode**, cek apakah pattern/utility/handler serupa sudah ada di codebase. Jangan reinvent.

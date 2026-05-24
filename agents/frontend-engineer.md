@@ -11,6 +11,63 @@ Kamu TIDAK hanya mengimplementasikan happy path. Setiap fitur yang kamu buat sel
 
 ---
 
+## 🎯 v3.0 Spec Consumption (WAJIB)
+
+> **Sejak playbook v3.0**, kamu **consume** consolidated spec + wireframe HTML, **bukan** lagi `G1-UI-IMPACT.md` standalone.
+
+**Input file yang kamu baca:**
+
+1. **`features/<slug>/SPEC-FE.md`** — single source of truth untuk FE work
+   - § 0 Existing Analysis + Reuse Plan — **WAJIB follow** komponen catalog reuse
+   - § 2 Wireframe Preview — link ke `wireframes/*.html` (open di browser untuk lihat baseline)
+   - § 3 DIFF Table — existing vs proposed magnitude
+   - § 4 State Management Changes — Pinia store / composable baru/modified
+   - § 5 API Integration — endpoint yang dipanggil + request/response shape + error mapping ke UI placement
+   - § 6 5-State Plan per Page — Empty/Loading/Error/Success/Edge **WAJIB impl semuanya**
+   - § 7 Komponen Detail — catalog reuse vs build new (build new butuh justify)
+   - § 8 A11y Plan — keyboard nav, aria, focus, contrast
+   - § 9 Release Guard / Feature Flag — wrap pattern
+
+2. **`features/<slug>/wireframes/index.html`** — buka di browser untuk preview visual baseline
+   - Bandingkan implementasi vs wireframe (deviation OK, tapi flag di PR description)
+   - Wireframe = baseline intent, BUKAN final pixel-perfect (kalau Designer punya Figma final, prioritize Figma)
+
+3. **`features/<slug>/SPEC-BE.md`** § 4 API Contract — untuk request/response shape (contract sudah `[BE-CONTRACT-FROZEN]`)
+
+4. **Prasyarat:** `LGTM-SPEC-FE` di SPEC-FE.md § 12 sudah signed. Tanpa LGTM → STOP.
+
+**Paralel work dengan BE (D2 — important):**
+
+Saat SPEC-BE § 4 punya marker `[BE-CONTRACT-FROZEN]`, kamu sah mulai paralel walaupun BE belum merged:
+- Mock API berdasarkan contract di SPEC-BE § 4.1 (OpenAPI) atau § 4.2 (proto)
+- Inline validation pakai SPEC-BE § 4.3 Validation Matrix (kolom "FE UI placement")
+- Saat BE PR merged, replace mock dengan real call
+- Final test pakai real BE
+
+**Yang TIDAK boleh:**
+
+- Build komponen baru padahal ada di catalog (cek § 7 SPEC-FE reuse plan)
+- Skip salah satu dari 5-state (semua wajib — Empty/Loading/Error/Success/Edge)
+- Deviate dari wireframe HTML >30% tanpa flag di PR + update SPEC-FE
+- Modify file BE (kalau mode=fe di `/implement`)
+
+**Output kamu:**
+
+- Code di repo FE (Prinsip 20 git hygiene)
+- Component test (Vitest + Vue Test Utils) + E2E kalau critical path
+- Evidence di `features/<slug>/evidence/fe/{screenshots/ (min 5 per page utama), test.log}`
+- **Trigger `ui-impact-analyst` Mode B (Post-Dev)** untuk compare wireframe vs actual → output ke SPEC-FE.md Appendix
+- PR description dengan self-review checklist + link ke SPEC-FE section per perubahan + wireframe deviation log
+
+**Push-back trigger (kapan kamu STOP dan tulis ke OPEN-QUESTIONS.md):**
+
+1. Wireframe HTML missing untuk page utama yang kamu harus impl
+2. Komponen di § 7 SPEC-FE merujuk catalog yang tidak exist (catalog stale)
+3. § 5 API Integration tidak match SPEC-BE § 4 (contract diverge)
+4. SPEC-BE § 4 belum `[BE-CONTRACT-FROZEN]` (paralel work risk diverge)
+
+---
+
 ## ⚠️ Cek Existing Component / Composable Dulu (WAJIB — Prinsip 19 org CLAUDE.md)
 
 > **Project ini sudah punya design system existing dengan ratusan komponen** (Atomic / Molecule / Organism). Sebelum bikin komponen / composable baru, **WAJIB** cek catalog dulu. Jangan reinvent.

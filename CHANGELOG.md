@@ -1,4 +1,82 @@
-# Changelog — Agent Playbook v2
+# Changelog — Agent Playbook
+
+## v3.0 — 2026-05-24 ⚠️ BREAKING CHANGE
+
+Workflow restructure berdasarkan feedback adopter: **proses pra-dev terlalu lama, artefak terlalu banyak, FE handoff masih suffer**. v3.0 collapse 3 gate pra-dev (PRD, TechDesign, Plan) jadi 1 Phase dengan single checkpoint.
+
+> **Breaking change.** Feature folder yang sudah pakai v2.x (`G1-PRD.md`, `G2-TECH-DESIGN.md`, dll) tetap valid — finish dengan struktur lama. Feature baru pakai v3.0 default. Lihat `MIGRATION-v2-to-v3.md`.
+
+### Why v3.0
+
+3 pain points dari pilot v2.1:
+
+1. **Proses terlalu lama** — 3 approval gate pra-dev (LGTM-PRD, LGTM-TD, LGTM-PLAN) jadi bottleneck. Tim harus run satu-persatu, koordinasi berat.
+2. **Plan buram, scan 5+ file** — artefak tersebar di `G1-PRD.md`, `G1-UI-IMPACT.md`, `G2-TECH-DESIGN.md`, `decisions/`, `G3-IMPL-PLAN.md`. Developer harus grep banyak file untuk grasp full picture.
+3. **FE handoff suffer** — UI vision di markdown table + Figma link. Designer + FE Dev masih tebak intent, Figma-MCP output meleset.
+
+### Workflow Change
+
+| | v2.x (7-gate) | v3.0 (3-phase) |
+|---|---|---|
+| Pra-dev approvals | 3× (PRD, TD, Plan) | **1× checkpoint** (split BE+FE LGTM) |
+| Artefak pra-dev | 5+ file | **2 file** (SPEC-BE + SPEC-FE) + wireframe HTML |
+| UI vision format | Markdown + Figma link | **+ Wireframe HTML interactive** (Tailwind CDN) |
+| Task breakdown | Hierarchical task→subtask | **2 chunk** (BE PR + FE PR, soft cap 500 lines) |
+| Push-back | Implicit (Open Questions) | **Explicit** (OPEN-QUESTIONS.md, cap 2 round) |
+| BE-FE paralel work | Manual coordination | **`[BE-CONTRACT-FROZEN]` marker** = explicit signal |
+| Phase 3 (Test/Defect/Live) | Gate 5-7 separate | **Retain Gate 5-7** (QA + SRE own this) |
+
+### Added
+
+- **`commands/spec.md`** — single command yang invoke `pm` + `solution-architect` + `ui-impact-analyst` sequential. Output consolidated.
+- **`templates/SPEC-BE-template.md`** — consolidated BE spec (12 section: existing analysis, problem, AC, DB, contract, logic, observability, security, rollout, risk, open Q, approval).
+- **`templates/SPEC-FE-template.md`** — consolidated FE spec (12 section: existing analysis, problem, wireframe preview, DIFF, state mgmt, API integration, 5-state per page, komponen, A11y, release guard, test, approval).
+- **`templates/wireframe-template.html`** — Tailwind CDN starter dengan 3-page demo + 5-state interactive button.
+- **`[BE-CONTRACT-FROZEN]` marker convention** — di SPEC-BE.md § 4. Signal eksplisit untuk FE Dev paralel work.
+- **OPEN-QUESTIONS.md push-back protocol** — agent STOP + tulis pertanyaan kalau ambiguity. Cap 2 round, round 3 escalate.
+- **v3.0 Output Targets** section di 5 agent (pm, solution-architect, ui-impact-analyst, backend-engineer, frontend-engineer) — override legacy output destinations ke SPEC-BE/SPEC-FE consolidated.
+- **v3.0 Additional Checks** di `verification-gatekeeper.md` — verify § 0 lengkap, `[BE-CONTRACT-FROZEN]` marker present, wireframe HTML exists, LGTM grep-able.
+
+### Changed
+
+- **`commands/implement.md`** — argument changed dari `<slug>/<task-id>` ke `<slug>/be` atau `<slug>/fe`. Output: 1 PR per chunk (soft cap 500 lines, split kalau lebih).
+- **`commands/ui-impact-analysis.md`** — Pre-Dev mode WAJIB generate wireframe HTML (bukan optional). Post-Dev mode compare wireframe vs actual screenshots.
+- **README.md** — workflow section restructure + new Quick Start dengan `/spec`.
+
+### Deprecated (moved to `_archived-v2/`)
+
+- `templates/PRD-template.md` → replaced by `SPEC-FE.md § 1-2` + `SPEC-BE.md § 1-2`
+- `templates/TechDesign-template.md` → replaced by `SPEC-BE.md § 3-9`
+- `templates/UI-Impact-template.md` → replaced by `SPEC-FE.md § 0-8` + `wireframe-template.html`
+- `commands/groom.md` → replaced by `/spec`
+- `commands/tech-design.md` → folded into `/spec`
+- `commands/plan.md` → folded into `/spec` (no more separate planning phase)
+
+### Retained
+
+- Prinsip 19 (Analyze Existing First) — § 0 WAJIB di SPEC-BE/FE
+- Prinsip 20 (Git Hygiene) — Phase 2 tetap apply 3-step
+- AI Proposes, Human Approves — approval grep-able di file (`LGTM-SPEC-BE`, `LGTM-SPEC-FE`)
+- Evidence Gate — 3 artefak (curl.txt, test.log, screenshots/) per PR
+- Phase 3 (Test/Defect/Live) — retain Gate 5-7 dengan QA + SRE owner
+- 11 subagent (file count sama)
+- `PUSHBACK-TO-PRODUCT-template.md` — untuk adopt PRD eksternal (masih relevan)
+- `code-review.md`, `test-plan.md` commands — unchanged
+
+### Decision Log (D1-D8)
+
+8 keputusan yang membentuk v3.0:
+
+- **D1:** Phase 3 (Gate 5-7) tetap multi-gate, BUKAN di-simplify (test/defect/live punya stakeholder beda)
+- **D2:** LGTM dipisah BE+FE, ada `[BE-CONTRACT-FROZEN]` marker untuk paralel work
+- **D3:** Wireframe = AI generate baseline, Designer override boleh di Phase 2
+- **D4:** Naming `SPEC-BE.md` + `SPEC-FE.md` (alphabetical, single-purpose)
+- **D5:** Backward compat — feature folder existing tetap pakai v2.x scheme
+- **D6:** Push-back max 2 round, round 3 escalate ke meeting
+- **D7:** PR size soft cap 500 lines (warning + suggest split, bukan hard block)
+- **D8:** Push-back trigger 4 condition (requirement vs ADR, magnitude ambiguous, AC contradictory, Figma missing)
+
+---
 
 ## v2.1.1 — 2026-05-22
 

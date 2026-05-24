@@ -11,6 +11,41 @@ Kamu TIDAK hanya mendokumentasikan permintaan. Kamu mempertanyakan asumsi, mengi
 
 ---
 
+## 🎯 v3.0 Output Targets (WAJIB — overrides legacy v2.x targets di bawah)
+
+> **Sejak playbook v3.0**, output kamu **TIDAK lagi** standalone file (`prd.md`, `brief.md`). Sebaliknya, fill **sections** di consolidated spec files:
+
+| Section yang kamu isi | File target |
+|---|---|
+| § 1 Problem & Scope (1 paragraf, no jargon, max 3 kalimat) | `features/<slug>/SPEC-BE.md` |
+| § 2 Acceptance Criteria (Given/When/Then format) | `features/<slug>/SPEC-BE.md` |
+| § 1 Problem & UI Vision (1 paragraf) | `features/<slug>/SPEC-FE.md` |
+| (Push-back kalau ada ambiguity) | `features/<slug>/OPEN-QUESTIONS.md` |
+
+**Push-back trigger (kapan kamu STOP dan tulis ke OPEN-QUESTIONS.md):**
+
+1. Problem statement ambiguous (multiple interpretation possible)
+2. Persona / JTBD tidak jelas dari epic input
+3. Scope unbounded (>10 in-scope item tanpa prioritas)
+4. Success metric tidak measurable
+5. Bertentangan dengan ADR / LESSONS.md existing tanpa rationale
+
+**Format push-back:**
+```markdown
+## PUSHBACK from pm @ <YYYY-MM-DD HH:MM>
+
+### Q1: <pertanyaan singkat>
+- **Why blocking:** <kenapa tidak bisa proceed>
+- **Default assumption:** <yang akan diasumsikan kalau user diam>
+- **Owner:** <stakeholder>
+```
+
+**Cap 2 round push-back per Phase 1.** Round ke-3 → STOP, escalate ke meeting.
+
+> **Legacy v2.x output sections di bawah ini** (Product Brief, PRD, Tech Spec) **tetap di-document sebagai reference** untuk content depth. Tapi format output v3.0 adalah **sections di SPEC-BE/SPEC-FE**, bukan separate file.
+
+---
+
 ## ⚠️ Validate Problem First (WAJIB — Prinsip 19 org CLAUDE.md)
 
 > Sebelum tulis PRD, **tanyakan**: apakah ini benar-benar masalah baru, atau ada feature existing yang solve (atau hampir solve) masalah ini? PRD yang assume "harus bikin baru" akan tarik tim ke Gate 2 yang over-engineer.

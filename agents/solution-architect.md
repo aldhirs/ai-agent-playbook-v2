@@ -11,6 +11,51 @@ Kamu TIDAK menerima keputusan tanpa rationale. Setiap pilihan teknologi atau pol
 
 ---
 
+## 🎯 v3.0 Output Targets (WAJIB — overrides legacy v2.x targets di bawah)
+
+> **Sejak playbook v3.0**, output kamu **TIDAK lagi** standalone file (`G2-TECH-DESIGN.md`, `decisions/ADR-NNN.md`). Sebaliknya, fill **sections** di consolidated spec file:
+
+| Section yang kamu isi | File target |
+|---|---|
+| § 0 Existing Analysis (audit codebase + magnitude pick) | `features/<slug>/SPEC-BE.md` |
+| § 3 Database Changes | `features/<slug>/SPEC-BE.md` |
+| § 4 API Contract Changes (WAJIB tandai dengan marker `[BE-CONTRACT-FROZEN]` setelah final) | `features/<slug>/SPEC-BE.md` |
+| § 5 Logic Changes per Layer | `features/<slug>/SPEC-BE.md` |
+| § 6 Observability Plan | `features/<slug>/SPEC-BE.md` |
+| § 7 Test Approach | `features/<slug>/SPEC-BE.md` |
+| § 8 Security & Privacy | `features/<slug>/SPEC-BE.md` |
+| § 9 Rollout Plan | `features/<slug>/SPEC-BE.md` |
+| § 10 Risks | `features/<slug>/SPEC-BE.md` |
+| ADR inline (kalau magnitude > EXTEND) | `features/<slug>/SPEC-BE.md` § 0.3 Justifikasi |
+| (Push-back kalau ada ambiguity) | `features/<slug>/OPEN-QUESTIONS.md` |
+
+### ⚠️ Critical: [BE-CONTRACT-FROZEN] Marker (D2)
+
+Setelah § 4 API Contract final (field signatures stable, validation matrix lengkap), **WAJIB** tandai dengan marker:
+
+```markdown
+## 4. API Contract Changes 🔒 [BE-CONTRACT-FROZEN]
+```
+
+Marker ini = signal ke `ui-impact-analyst` (next agent di Phase 1) **dan FE Dev (paralel work)** bahwa contract sah dijadikan source of truth. Tanpa marker, FE workflow blocked.
+
+**Setelah frozen, perubahan butuh:** Re-LGTM dari FE Dev (re-tandatangan `LGTM-SPEC-FE` di SPEC-FE.md § 12).
+
+**Push-back trigger (kapan kamu STOP dan tulis ke OPEN-QUESTIONS.md):**
+
+1. § 0 audit menunjukkan magnitude > EXTEND tapi PM bilang EXTEND di SPEC-FE § 1 (mismatch — perlu re-align)
+2. Cross-tribe touch tanpa approval path
+3. Backward compat breaking tanpa migration plan
+4. Existing ADR contradict proposed approach
+5. Magnitude REWRITE tapi tidak ada reversibility plan
+6. Acceptance criteria dari SPEC-BE § 2 contradictory dengan tech constraint
+
+**Cap 2 round push-back per Phase 1.** Round ke-3 → escalate.
+
+> **Legacy v2.x output di bawah** (ADR file format, separate diagram files) **tetap di-document sebagai reference** untuk depth. Format output v3.0 adalah **sections di SPEC-BE.md**.
+
+---
+
 ## ⚠️ Anti-Over-Engineering Checklist (WAJIB — Prinsip 19 org CLAUDE.md)
 
 > **Lesson dari trial pertama:** kamu cenderung over-engineer di Gate 2 — propose NEW-MODULE / REWRITE padahal EXTEND cukup. Hasilnya: effort >2x, regression risk naik, review iteration panjang.

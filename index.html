@@ -114,13 +114,13 @@
   <main class="main">
 
     <section id="overview" class="hero">
-      <div class="pill">Playbook v2.1 · Team Edition</div>
+      <div class="pill">Playbook v3.0 · Team Edition</div>
       <h1>Cara Tim Bekerja dengan AI Agent</h1>
-      <p>Workflow multi-tribe yang pangkas lead time 40-60% di grooming, tech discussion, development, dan testing — dengan review &amp; approval tetap di tangan developer.</p>
-      <p style="margin-top:16px;"><strong>Tagline:</strong> <em>Contract first. Evidence always. AI proposes, human approves. Tribe shares, service owns.</em></p>
+      <p>Workflow multi-tribe yang pangkas lead time 60-70% di phase pra-development — dengan 1 checkpoint approval (bukan 3 gate granular). 2 spec file consolidated + wireframe HTML preview.</p>
+      <p style="margin-top:16px;"><strong>Tagline:</strong> <em>Contract first. Evidence always. AI proposes, human approves. 2 spec files + wireframe HTML — bukan 5 artefak terpisah.</em></p>
 
-      <div class="callout" style="margin-top:20px; font-size:0.9rem;">
-        <strong>v2.1 (May 2026):</strong> Prinsip 19+20, UI-Impact workflow, hierarchical task→subtask, gate-based file naming. <a href="CHANGELOG.md">Lihat changelog lengkap →</a>
+      <div class="callout" style="margin-top:20px; font-size:0.9rem; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.06);">
+        <strong>⚠️ v3.0 (May 2026) — BREAKING CHANGE:</strong> Collapse 3 gate pra-dev (PRD/TD/Plan) jadi 1 Phase Spec dengan single checkpoint. Wireframe HTML untuk FE handoff. BE-FE paralel work via <code>[BE-CONTRACT-FROZEN]</code> marker. Backward-compatible — feature folder v2.x tetap valid. <a href="MIGRATION-v2-to-v3.md">Migration guide →</a> · <a href="CHANGELOG.md">Changelog →</a>
       </div>
     </section>
 
@@ -1126,7 +1126,7 @@ make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
     <div class="footer">
       Agent Playbook v2.1 — Team Edition · Disusun untuk tim multi-tribe yang ingin AI handle fase paling sakit (grooming, tech disc, dev, testing) dengan tetap menjaga keputusan di developer.<br>
       Berbasis Agent Playbook v1 (<a href="https://aldhirs.github.io/ai-agent-playbook/index.html">SafeTech</a>) — dengan 6 prinsip operating+quality, 7 gate workflow, 3-layer tribe architecture, UI-Impact workflow, hierarchical task mode, dan rollout 90 hari.<br>
-      Last updated: 2026-05-22 · <a href="CHANGELOG.md">Changelog</a> · <a href="README.md">README</a> · <a href="https://github.com/aldhirs/ai-agent-playbook-v2">GitHub</a>
+      Last updated: 2026-05-24 · v3.0 · <a href="CHANGELOG.md">Changelog</a> · <a href="README.md">README</a> · <a href="MIGRATION-v2-to-v3.md">Migration v2→v3</a> · <a href="https://github.com/aldhirs/ai-agent-playbook-v2">GitHub</a>
     </div>
 
   </main>

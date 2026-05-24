@@ -16,6 +16,79 @@ Kamu **hanya** verifikasi 3 hal:
 
 ---
 
+## 🎯 v3.0 Additional Checks (WAJIB)
+
+> **Sejak playbook v3.0**, tambah check di bawah ini sebelum approve "DONE":
+
+### Check A: § 0 Existing Analysis tidak boleh "TBD"
+
+Verify SPEC-BE.md § 0 dan SPEC-FE.md § 0 (kalau ada) **terisi konkret**, bukan cuma "TBD" atau placeholder generic. Audit area minimal terisi:
+
+- Service / Repo target identified
+- Reuse plan listed (atau eksplisit "no reuse opportunity + rationale")
+- Magnitude pick eksplisit (NO-CHANGE / EXTEND / NEW-MODULE / REWRITE)
+- Kalau magnitude > EXTEND, justifikasi ada
+
+Kalau § 0 cuma TBD/placeholder → **REJECT**:
+```
+❌ NOT DONE — § 0 Existing Analysis tidak lengkap di SPEC-BE.md (line N)
+Required: audit codebase result, reuse plan, magnitude pick
+How to fix: re-run /spec <slug> dan jawab push-back dari solution-architect
+```
+
+### Check B: [BE-CONTRACT-FROZEN] marker present
+
+Verify SPEC-BE.md § 4 punya marker `[BE-CONTRACT-FROZEN]` di heading. Tanpa marker → ada risiko BE/FE diverge di paralel work.
+
+Kalau marker missing → **REJECT**:
+```
+❌ NOT DONE — [BE-CONTRACT-FROZEN] marker missing di SPEC-BE.md § 4
+Required: marker di heading § 4 setelah field signatures final
+How to fix: edit SPEC-BE.md § 4, change heading jadi "## 4. API Contract Changes 🔒 [BE-CONTRACT-FROZEN]"
+```
+
+### Check C: Wireframe HTML exists (kalau has_ui_impact=true)
+
+Verify `features/<slug>/wireframes/` folder ada dan minimal punya:
+- `index.html` (navigation hub)
+- 1+ page HTML file untuk page utama
+
+Skip check ini kalau `manifest.yaml` punya `has_ui_impact: false`.
+
+Kalau wireframe missing tapi has_ui_impact=true → **REJECT**:
+```
+❌ NOT DONE — Wireframe HTML missing di features/<slug>/wireframes/
+Required: index.html + page HTML (per SPEC-FE § 2)
+How to fix: re-invoke ui-impact-analyst Pre-Dev mode (D2 mitigation untuk FE handoff)
+```
+
+### Check D: LGTM grep-able
+
+Verify approval di SPEC-BE.md § 12 dan SPEC-FE.md § 12 (kalau ada):
+- Format valid: `LGTM-SPEC-BE by <nama> on YYYY-MM-DD` (atau `LGTM-SPEC-FE ...`)
+- Minimal 1 LGTM per spec file (BE: BE Dev + TL; FE: Designer + FE Dev — sesuai role)
+
+Kalau LGTM missing → **REJECT**:
+```
+❌ NOT DONE — LGTM-SPEC missing di SPEC-BE.md § 12 (atau SPEC-FE.md § 12)
+Required: minimal 1 LGTM per spec file dari role yang ditunjuk
+How to fix: dev yang approve harus edit tabel § 12 + commit ke repo
+```
+
+### Check E: Post-Dev wireframe verification (FE PR only)
+
+Kalau task adalah FE chunk (mode=fe), verify Appendix "Post-Dev Verification" di SPEC-FE.md sudah terisi:
+- ui-impact-analyst Mode B sudah di-invoke
+- Deviation wireframe vs actual sudah logged (atau eksplisit "no deviation")
+
+Kalau missing → **REJECT** dengan instruksi invoke ui-impact-analyst Mode B.
+
+---
+
+> **Legacy v2.x checks (3 artefak + verify-feature + precheck) tetap apply.** Check A-E di atas adalah ADDITIONAL untuk v3.0 spec format.
+
+---
+
 ## Workflow Kamu
 
 Saat di-invoke dengan feature name:
