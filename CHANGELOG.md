@@ -1,5 +1,39 @@
 # Changelog — Agent Playbook v2
 
+## v2.1.1 — 2026-05-22
+
+Sync release. Bring playbook up to date dengan adopter project yang sudah jalan v2.1 di pilot.
+
+### Added
+
+- **10 subagent file baru** di `agents/` (sebelumnya cuma `ui-impact-analyst`):
+  - `pm` — Product Manager (Gate 1 grooming)
+  - `solution-architect` — System design + ADR (Gate 2)
+  - `backend-engineer` — Go backend impl (Gate 4)
+  - `frontend-engineer` — Vue 3 / Nuxt impl (Gate 4)
+  - `product-designer` — UX research + design system principles (cross-cutting)
+  - `qa-engineer` — Test strategy + automated test + code review (Gate 5)
+  - `security-engineer` — Threat modeling + IDOR + privacy (Gate 4 mandatory untuk PII/payment)
+  - `sre` — Infrastructure + runbook + observability (Gate 7)
+  - `verification-gatekeeper` — Strict check 3 artefak evidence (cross-cutting)
+  - `domain-expert-elearning-payment` — **Worked example** untuk domain-expert pattern (Indonesian e-learning + payment). Copy + rename + adapt ke domain Anda.
+- **Conceptual role → subagent file mapping** di `index.html` § 2 Operating Model (tabel baru).
+- **Subagents tabel** di `README.md` § Struktur Repo Ini dengan peran + gate utama per agent.
+- **Genericization placeholder convention** di subagent: `<your-shared-lib>`, `<your-fe-monorepo>`, `<your-app>` — replace saat adopt ke project.
+
+### Changed
+
+- **`agents/ui-impact-analyst.md`** di-upgrade dari versi short (132 lines) ke versi full (198 lines) dengan: detail Mode A/B/C output spec, 10 strict rules, 5-state plan template, pitfall awareness — sebelumnya skeleton, sekarang ready-to-use.
+- **`commands/tech-design.md`**: tambah Prinsip 19 (v2.1) note di Prasyarat + `G1-UI-IMPACT.md` sebagai konteks wajib baca #2.
+- **`templates/TechDesign-template.md`**: tambah magnitude-aware options guidance setelah `## 3. Options Considered` (EXTEND fokus extend variation, NEW-MODULE/REWRITE wajib include 1 "minimal extend" control).
+
+### Notes
+
+- Subagents `domain-expert-*` dipublish sebagai **worked example**, bukan template kosong. Pola: copy → rename ke domain Anda → ganti konten regulasi + istilah industri + anti-pattern komunikasi.
+- Genericization tidak universal: agent yang generic by nature (`pm`, `product-designer`, `qa-engineer`, `sre`, `verification-gatekeeper`) di-copy verbatim. Agent yang heavy SID-specific di-strip ke placeholder.
+
+---
+
 ## v2.1 — 2026-05-21
 
 Major upgrade berdasarkan lesson dari tim yang adopt v2.0 di project besar dengan design system existing.

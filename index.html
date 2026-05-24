@@ -279,7 +279,64 @@
       </table>
 
       <div class="callout">
-        <strong>Catatan:</strong> "Agent" di sini bukan harus jadi entitas teknis terpisah. Praktiknya: 1 Claude Code session + 1 slash command spesifik per fase (lihat Bagian 5). Bisa juga jadi sub-agent terpisah kalau kamu mau strict isolation.
+        <strong>Catatan:</strong> "Agent" di sini bukan harus jadi entitas teknis terpisah. Praktiknya: 1 Claude Code session + 1 slash command spesifik per fase (lihat Bagian 5). Untuk strict isolation, playbook menyediakan <strong>11 subagent file</strong> di <code>agents/</code> yang bisa di-invoke via Claude Code <code>Agent</code> tool — mapping ke conceptual role di tabel atas:
+      </div>
+
+      <table>
+        <tr>
+          <th>Conceptual role (tabel atas)</th>
+          <th>Subagent file di <code>agents/</code></th>
+          <th>Catatan</th>
+        </tr>
+        <tr>
+          <td>Groomer Agent</td>
+          <td><code>pm</code> + <code>ui-impact-analyst</code></td>
+          <td>PM drafting PRD; UI-Impact Analyst drafting G1-UI-IMPACT.md Pre-Dev section</td>
+        </tr>
+        <tr>
+          <td>Architect Agent</td>
+          <td><code>solution-architect</code></td>
+          <td>System design + ADR + magnitude analysis (Prinsip 19)</td>
+        </tr>
+        <tr>
+          <td>Planner Agent</td>
+          <td><code>solution-architect</code> (planner mode)</td>
+          <td>Atau dedicated planner sub-agent kalau project butuh isolation</td>
+        </tr>
+        <tr>
+          <td>Coder Agent</td>
+          <td><code>backend-engineer</code> + <code>frontend-engineer</code></td>
+          <td>Split BE (Go) vs FE (Vue/Nuxt); customize per stack project</td>
+        </tr>
+        <tr>
+          <td>Reviewer Agent</td>
+          <td><code>qa-engineer</code> + <code>security-engineer</code></td>
+          <td>QA review + security review (mandatory untuk payment/PII/legal)</td>
+        </tr>
+        <tr>
+          <td>Tester Agent</td>
+          <td><code>qa-engineer</code></td>
+          <td>Test plan + automated test + regression matrix</td>
+        </tr>
+        <tr>
+          <td>Triage Agent</td>
+          <td><code>qa-engineer</code> (triage mode) + <code>verification-gatekeeper</code></td>
+          <td>QA triage defect; Verification Gatekeeper enforce "no done without evidence"</td>
+        </tr>
+        <tr>
+          <td>Reliability Agent</td>
+          <td><code>sre</code></td>
+          <td>Infrastructure + runbook + observability + capacity</td>
+        </tr>
+        <tr>
+          <td>Support (cross-cutting)</td>
+          <td><code>product-designer</code>, <code>ui-impact-analyst</code> (Post-Dev), <code>domain-expert-*</code></td>
+          <td>UX principles, UI verification post-impl, domain context (worked example: <code>domain-expert-elearning-payment</code> untuk e-learning + payment Indonesia)</td>
+        </tr>
+      </table>
+
+      <div class="callout">
+        <strong>Konvensi naming:</strong> <code>&lt;role&gt;</code> untuk generic (<code>pm</code>, <code>qa-engineer</code>), <code>&lt;role&gt;-&lt;specialty&gt;</code> untuk spesialisasi (<code>backend-engineer</code> spesifik Go), <code>domain-expert-&lt;domain&gt;</code> untuk worked example domain spesifik. Lihat README.md untuk tabel lengkap + genericization note.
       </div>
     </section>
 
@@ -1069,7 +1126,7 @@ make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
     <div class="footer">
       Agent Playbook v2.1 — Team Edition · Disusun untuk tim multi-tribe yang ingin AI handle fase paling sakit (grooming, tech disc, dev, testing) dengan tetap menjaga keputusan di developer.<br>
       Berbasis Agent Playbook v1 (<a href="https://aldhirs.github.io/ai-agent-playbook/index.html">SafeTech</a>) — dengan 6 prinsip operating+quality, 7 gate workflow, 3-layer tribe architecture, UI-Impact workflow, hierarchical task mode, dan rollout 90 hari.<br>
-      Last updated: 2026-05-21 · <a href="CHANGELOG.md">Changelog</a> · <a href="README.md">README</a> · <a href="https://github.com/aldhirs/ai-agent-playbook-v2">GitHub</a>
+      Last updated: 2026-05-22 · <a href="CHANGELOG.md">Changelog</a> · <a href="README.md">README</a> · <a href="https://github.com/aldhirs/ai-agent-playbook-v2">GitHub</a>
     </div>
 
   </main>

@@ -29,8 +29,13 @@ cp -r templates/ <your-project>/templates/
 # 2. Setup tribe-level CLAUDE.md (isi 5 do/don't + domain glossary + scope boundary)
 cp templates/CLAUDE-tribe.md <your-project>/tribes/<X>/CLAUDE.md
 
-# 3. Provide catalog design system project untuk agent ui-impact-analyst
+# 3. Provide catalog design system project untuk agent `ui-impact-analyst`
 # (sediakan sendiri sesuai stack: design-system-context.md atau equivalent)
+
+# 4. (Optional) Customize agents/ untuk konteks project Anda
+# - Replace `<your-shared-lib>` placeholder di backend-engineer.md / solution-architect.md
+# - Replace `<your-fe-monorepo>` / `<your-app>` di frontend-engineer.md / ui-impact-analyst.md
+# - Untuk domain-expert: copy domain-expert-elearning-payment.md → rename + ganti konten sesuai domain
 ```
 
 Lalu run `/groom <epic-id>` di Claude Code untuk feature pertama.
@@ -54,11 +59,31 @@ Pilih persona Anda untuk path bacaan tercepat:
 
 ## Struktur Repo Ini
 
-- **`commands/`** — slash command untuk Claude Code (7 file)
-- **`agents/`** — subagent project-level (`ui-impact-analyst`)
+- **`commands/`** — slash command untuk Claude Code (7 file: `/groom`, `/tech-design`, `/plan`, `/implement`, `/code-review`, `/test-plan`, `/ui-impact-analysis`)
+- **`agents/`** — subagent project-level (11 file) — lihat tabel di bawah
 - **`templates/`** — skeleton PRD, TechDesign, TestPlan, UI-Impact, PUSHBACK, CLAUDE-tribe
 - **`phases/`** — detail per gate (1-7) dalam HTML
 - **`index.html`** — playbook lengkap (single-page reference)
+
+### Subagents Tersedia (11 file di `agents/`)
+
+| Agent | Peran | Gate utama |
+|---|---|---|
+| `pm` | Product Manager — PRD + tech spec + user stories + JTBD framework | Gate 1 |
+| `solution-architect` | System design, ADR, service boundary, integration, magnitude analysis | Gate 2 |
+| `backend-engineer` | Go backend impl (REST/gRPC, DB, observability, security) | Gate 4 |
+| `frontend-engineer` | Vue 3 / Nuxt impl (komponen, state, performance, a11y) | Gate 4 |
+| `product-designer` | UX research, interaction design, prinsip kognitif, design system | Cross-cutting |
+| `ui-impact-analyst` | DIFF analyzer untuk UI — catalog-first reuse + 5-state plan | Gate 1 Pre-Dev + Gate 4 Post-Dev |
+| `qa-engineer` | Test strategy + automated test + code review + security testing | Gate 5 |
+| `security-engineer` | Threat modeling, IDOR detect, secrets, privacy compliance | Gate 4 (wajib payment/PII/legal) |
+| `sre` | Infrastructure, observability, runbook, capacity planning, IR | Gate 7 |
+| `verification-gatekeeper` | Strict check 3 artefak evidence sebelum klaim "done" | Cross-cutting |
+| `domain-expert-elearning-payment` | **Worked example** — domain-expert pattern untuk Indonesian e-learning marketplace + payment aggregator. **Copy + rename + adapt** ke domain project Anda. | Optional, project-specific |
+
+> **Konvensi naming**: `<role>` untuk role generic (`pm`, `qa-engineer`), `<role>-<specialty>` kalau perlu spesialisasi (`backend-engineer` spesifik Go). Untuk **domain-expert**, gunakan suffix domain (mis. `domain-expert-fintech-lending`, `domain-expert-logistics`).
+>
+> **Genericization note**: 4 agent (`backend-engineer`, `frontend-engineer`, `solution-architect`, `security-engineer`) pakai placeholder `<your-shared-lib>` / `<your-fe-monorepo>` / `<your-app>` — replace dengan path actual project saat adopt. Lihat note di tiap file.
 
 ---
 
