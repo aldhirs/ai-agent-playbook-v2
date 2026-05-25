@@ -1,5 +1,83 @@
 # Changelog — Agent Playbook
 
+## v3.1 — 2026-05-25
+
+Address 2 gap dari v3.0 trial: **timeline hilang** + **`new-feature.sh` masih v2.x scheme**.
+
+### Added
+
+- **`templates/IMPL-PLAN-template.md`** (NEW) — lightweight timeline artifact untuk sprint planning.
+  - Chunk-level effort estimate (T-shirt + estimated days, paralel vs sequential)
+  - Sub-items per chunk (3-7 per chunk) dengan dependency intra + cross-chunk
+  - Critical path ASCII gantt (visualize paralel work value)
+  - Cross-chunk dependency notes (`[BE-CONTRACT-FROZEN]` produces, BE PR merge unlocks)
+  - Sprint planning section (target sprint, demo readiness, risk triggers)
+  - Burndown skeleton (per-chunk status tracking)
+  - Optional LGTM-PLAN approval (PM + TL)
+  - Change log untuk track scope change
+
+- **`/spec` Step 4 aggregator** — auto-generate `IMPL-PLAN.md` dari estimate output `solution-architect` (§ 11.6 BE) + `ui-impact-analyst` (§ 11.6 FE).
+  - Read sub-items + dependency dari kedua spec
+  - Compute critical path (BE chain vs FE chain dengan paralel start)
+  - Render ASCII gantt dengan `[BE-CONTRACT-FROZEN]` marker + cross-chunk dep arrow
+  - Output total estimate dalam range (mis. "5-7 hari karena T-shirt range")
+
+- **`§ 11.6 BE Implementation Estimate`** di SPEC-BE — raw estimate input untuk aggregator.
+  - Format: table sub-item × T-shirt × depends-on × blocks × notes
+  - Mandatory cross-chunk reference (minimal 1 BE blocks FE-last)
+  - Marker `[BE-CONTRACT-FROZEN]` produced-at sub-item explicit
+
+- **`§ 11.6 FE Implementation Estimate`** di SPEC-FE — raw estimate input untuk aggregator.
+  - Format same as BE
+  - Mandatory: minimal 1 FE depends on `[BE-CONTRACT-FROZEN]` + 1 FE depends on BE PR merged
+  - Paralel start window captured (FE-1 + FE-2 paralel dengan BE-1 + BE-2)
+
+- **`scripts/new-feature.sh` rewrite (di hub project)** — v3.0 default scaffold + `--legacy-v2` flag.
+  - Default scaffold SPEC-BE.md + SPEC-FE.md + wireframes/index.html + IMPL-PLAN.md (skeleton)
+  - `--no-ui` flag skip FE artifacts
+  - `--legacy-v2` flag untuk backward-compat (scaffold G1-PRD + G1-UI-IMPACT + G2/G3 scheme dari `templates/_archived-v2/`)
+  - Auto-generate README per scheme dengan checklist artifact
+
+### Changed
+
+- **`commands/spec.md`**: tambah Step 4 aggregator description + update Exit Criteria + Final output ke chat sekarang include estimate summary
+- **Output folder structure**: tambah `IMPL-PLAN.md` di root feature folder
+- **`agents/solution-architect.md`** + **`agents/ui-impact-analyst.md`**: instruction tambah "after fill section, append § 11.6 dengan format table sub-items + estimate + dependency"
+
+### Why v3.1 (Pain Diagnosed dari v3.0 Trial)
+
+**Trial dengan `/spec assessment-bo-per-item_2` reveal 2 gap:**
+
+1. **Timeline hilang.** v3.0 collapse G3-IMPL-PLAN ke "2 PR chunk" tanpa breakdown. Tim masih perlu tahu "kapan selesai", "apa critical path", "sub-item ordering dalam chunk". Pure 2 PR approach = overcorrection.
+
+2. **`scripts/new-feature.sh` masih v2.x.** Saat user run `make new-feature`, dapat G1-PRD + G2-TECH-DESIGN dst — bukan SPEC-BE/SPEC-FE. Discrepancy dengan workflow v3.0 yang sudah jalan via `/spec`.
+
+### How — Lightweight, Not Heavy v2.x
+
+IMPL-PLAN.md ≠ v2.x G3-IMPL-PLAN.md (yang heavy task-by-task):
+
+- ✅ Chunk-level estimate (2 chunk: BE + FE)
+- ✅ 3-7 sub-items per chunk (bukan 10-15 task granular)
+- ✅ ASCII gantt 1-screen (no mermaid library)
+- ✅ Separate file (cross-chunk audience: PM + TL + devs)
+- ✅ Auto-generated (not manual fill)
+- ✅ Updateable mid-sprint (burndown column)
+
+**Effort tim:** baca IMPL-PLAN ~2 menit (vs v2.x G3-IMPL-PLAN ~10 menit).
+
+### Decision Log (v3.1 spesifik)
+
+- **D9 (user):** Timeline as separate file, bukan inline di SPEC. Reason: cross-chunk artifact + sprint planning audience + clean diff saat update mid-sprint.
+- **D10 (user):** `new-feature.sh` default v3.0, backward-compat via `--legacy-v2` flag.
+
+### Backward Compatibility
+
+- Feature folder existing pakai v2.x scheme tetap valid — finish dengan struktur lama
+- Feature baru via `/spec` atau `bash scripts/new-feature.sh` → v3.0 default + IMPL-PLAN
+- Untuk feature baru yang harus pakai v2.x scheme (special case): `bash scripts/new-feature.sh <slug> <tribe> --legacy-v2`
+
+---
+
 ## v3.0 — 2026-05-24 ⚠️ BREAKING CHANGE
 
 Workflow restructure berdasarkan feedback adopter: **proses pra-dev terlalu lama, artefak terlalu banyak, FE handoff masih suffer**. v3.0 collapse 3 gate pra-dev (PRD, TechDesign, Plan) jadi 1 Phase dengan single checkpoint.

@@ -76,6 +76,10 @@ Pilih persona Anda untuk path bacaan tercepat:
    BE Dev + TL → LGTM-SPEC-BE
    Designer + FE Dev → LGTM-SPEC-FE (buka wireframe HTML di browser dulu)
     ↓
+🤖 PHASE 1 Step 4 — IMPL-PLAN AGGREGATOR (v3.1 — NEW)
+   Read § 11.6 dari SPEC-BE + SPEC-FE → generate IMPL-PLAN.md dengan
+   chunk estimate + critical path ASCII gantt + sprint planning skeleton
+    ↓
 🤖 PHASE 2 — DEV (paralel BE & FE setelah BE-CONTRACT-FROZEN)
    /implement <slug>/be   (1 PR, soft cap 500 lines)
    /implement <slug>/fe   (1 PR, soft cap 500 lines)
@@ -88,7 +92,7 @@ Pilih persona Anda untuk path bacaan tercepat:
 
 - **`commands/`** — slash command untuk Claude Code (5 file: `/spec`, `/implement`, `/code-review`, `/test-plan`, `/ui-impact-analysis`)
 - **`agents/`** — subagent project-level (11 file) — lihat tabel di bawah
-- **`templates/`** — skeleton SPEC-BE, SPEC-FE, wireframe HTML, TestPlan, PUSHBACK, CLAUDE-tribe
+- **`templates/`** — skeleton SPEC-BE, SPEC-FE, wireframe HTML, IMPL-PLAN (v3.1), TestPlan, PUSHBACK, CLAUDE-tribe
 - **`templates/_archived-v2/`** — v2.x templates (PRD, TechDesign, UI-Impact) — backward compat reference
 - **`commands/_archived-v2/`** — v2.x commands (`/groom`, `/tech-design`, `/plan`) — backward compat reference
 - **`phases/`** — detail per phase dalam HTML

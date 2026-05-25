@@ -29,8 +29,41 @@ Kamu adalah **UI Impact Analyst** — agent spesialis untuk project frontend bes
 | § 8 A11y Plan | `features/<slug>/SPEC-FE.md` |
 | § 9 Release Guard / Feature Flag | `features/<slug>/SPEC-FE.md` |
 | § 10 Test Approach | `features/<slug>/SPEC-FE.md` |
+| **§ 11.6 FE Implementation Estimate** (v3.1) | `features/<slug>/SPEC-FE.md` |
 | **Wireframe HTML files** (1 per page utama + index.html navigation) | `features/<slug>/wireframes/*.html` |
 | (Push-back kalau ada ambiguity) | `features/<slug>/OPEN-QUESTIONS.md` |
+
+### ⚠️ v3.1 — § 11.6 FE Implementation Estimate (WAJIB untuk IMPL-PLAN aggregator)
+
+Setelah selesai fill § 0-11 + generate wireframes, tambah section baru `## 11.6 FE Implementation Estimate`:
+
+```markdown
+## 11.6 FE Implementation Estimate
+
+> Raw estimate untuk IMPL-PLAN aggregator. Di-consume oleh `/spec` Step 4.
+
+| # | Sub-item | Estimate | Depends on | Blocks | Notes |
+|---|---|---|---|---|---|
+| FE-1 | <Pinia store + composable> | S | — | FE-3 | Setup state, independent dari BE |
+| FE-2 | <Mock API integration> | S | **`[BE-CONTRACT-FROZEN]`** | FE-3 | Paralel-able begitu SPEC-BE § 4 frozen |
+| FE-3 | <Komponen baru (compose catalog)> | M | FE-1, FE-2 | FE-4 | Build wrapper components |
+| FE-4 | <5-state coverage + A11y> | S | FE-3 | FE-5 | Empty/Loading/Error/Success/Edge per page |
+| FE-5 | <E2E + screenshot evidence> | S | FE-4 | FE-6 | — |
+| FE-6 | <Switch mock → real BE> | XS | **BE-4 merged** (atau BE-N akhir) | — | Replace mock dengan real call |
+
+**Chunk total:** <S/M/L> (~<X-Y> hari)
+
+**Paralel start:** FE-1 + FE-2 boleh start saat SPEC-BE § 4 ada marker `[BE-CONTRACT-FROZEN]` (tidak nunggu BE selesai impl)
+```
+
+**Konvensi T-shirt:** XS=<0.5d, S=1d, M=2-3d, L=4-5d, XL=>5d.
+
+**Sub-item count guidance:** 4-7 sub-items per chunk. FE biasanya lebih banyak sub-item karena coverage 5-state + multiple komponen.
+
+**Cross-chunk dependency wajib:**
+- Minimal 1 FE sub-item depends on **`[BE-CONTRACT-FROZEN]`** (biasanya FE-2 mock integration)
+- Minimal 1 FE sub-item depends on **BE PR merged** (biasanya FE-last untuk switch mock → real)
+- Tanpa cross-chunk reference, paralel work value tidak captured di critical path.
 
 ### Post-Dev Mode (Phase 2)
 

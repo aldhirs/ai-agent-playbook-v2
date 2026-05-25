@@ -44,7 +44,7 @@
 | `G1-UI-IMPACT.md` | `SPEC-FE.md § 0, 3-11` + `wireframes/*.html` |
 | `G2-TECH-DESIGN.md` | `SPEC-BE.md § 0, 3-11` |
 | `decisions/ADR-NNN.md` | `SPEC-BE.md § 0.3 Justifikasi` (untuk magnitude > EXTEND) |
-| `G3-IMPL-PLAN.md` | (no equivalent — task breakdown otomatis 2 chunk BE + FE) |
+| `G3-IMPL-PLAN.md` | **v3.1:** `IMPL-PLAN.md` (lightweight timeline + critical path, auto-aggregated dari SPEC § 11.6) |
 | `G4-CODE-MANIFEST.md` | PR description (link ke SPEC section per perubahan) |
 | `G5-TEST-PLAN.md` | (retain — Phase 3 unchanged) |
 | `G7-POST-LAUNCH-RETRO.md` | (retain — Phase 3 unchanged) |

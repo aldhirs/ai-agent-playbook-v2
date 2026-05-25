@@ -56,7 +56,7 @@ Invoke `ui-impact-analyst` subagent dengan input:
 - Repo FE (kalau ada page existing)
 
 Output target:
-- **`features/<slug>/SPEC-FE.md`** § 0 Existing Analysis, § 2-11 (wireframe ref, DIFF, state mgmt, API integration, 5-state, komponen, A11y, release guard, test, open questions)
+- **`features/<slug>/SPEC-FE.md`** § 0 Existing Analysis, § 2-11 (wireframe ref, DIFF, state mgmt, API integration, 5-state, komponen, A11y, release guard, test, open questions) + **§ 11.6 FE Implementation Estimate** (sub-items + effort + dependency — input untuk IMPL-PLAN aggregator)
 - **`features/<slug>/wireframes/*.html`** — generate 1 HTML per page utama, pakai Tailwind CDN, embed 5-state interactive demo (refer ke `templates/wireframe-template.html` sebagai starter)
 
 Push-back trigger:
@@ -64,21 +64,53 @@ Push-back trigger:
 - Komponen catalog tidak tersedia (project belum sediakan `design-system-context.md` atau equivalent)
 - AC dari SPEC-BE require UI behavior yang tidak ada precedent di catalog
 
+### Step 4: IMPL-PLAN aggregator (v3.1 — NEW)
+
+**No agent invocation — `/spec` command sendiri yang aggregate.**
+
+Tugas:
+1. **Read** estimate output dari 2 agent:
+   - SPEC-BE.md § 11.6 BE Implementation Estimate (sub-items + T-shirt + dependency)
+   - SPEC-FE.md § 11.6 FE Implementation Estimate (sub-items + T-shirt + dependency)
+2. **Scaffold** `features/<slug>/IMPL-PLAN.md` dari `templates/IMPL-PLAN-template.md`
+3. **Fill sections:**
+   - § 1 Effort Estimate (chunk level) — sum dari sub-items per chunk
+   - § 2 Sub-items per Chunk — copy table dari SPEC-BE § 11.6 + SPEC-FE § 11.6
+   - § 3 Critical Path (ASCII Gantt) — compute critical path dari dependency graph:
+     - Identify BE sub-item yang produce `[BE-CONTRACT-FROZEN]` (biasanya BE-1 atau BE-2 setelah migration + entity)
+     - FE sub-items yang depend on `[BE-CONTRACT-FROZEN]` → mark sebagai "paralel-able"
+     - FE sub-items yang depend on "BE PR merged" (biasanya FE-last) → mark sebagai "blocked-by-BE-merge"
+     - Render ASCII gantt: BE chain di atas, FE chain di bawah, dependency arrow
+   - § 4 Cross-Chunk Dependency Notes — extract dari sub-item "Depends on" yang refer cross-chunk
+   - § 5 Sprint Planning — default fill: target sprint placeholder, risk triggers standar
+   - § 6 Burndown — empty table dari sub-items (status: pending)
+   - § 8 Change Log — initial entry "Initial generation by /spec aggregator @ <timestamp>"
+
+**Heuristik critical path (simple):**
+- Critical path = max(BE chain length, FE chain length adjusted untuk paralel start)
+- Paralel start: FE-1 + FE-2 jalan paralel dengan BE-1 + BE-2 (setelah `[BE-CONTRACT-FROZEN]` marker post BE-2)
+- Output total estimate dalam range (mis. "5-7 hari" karena T-shirt range)
+
+**Skip Step 4 kalau:**
+- `--be-only` atau `--no-ui` → no FE estimate untuk aggregate. Tetap generate IMPL-PLAN.md tapi cuma BE section.
+- Push-back masih open di previous step → IMPL-PLAN tidak generate (block sampai SPEC frozen).
+
 ## Output Folder Structure
 
 ```
 features/<slug>/
-├── SPEC-BE.md
-├── SPEC-FE.md (skip kalau --no-ui)
+├── SPEC-BE.md           ← consolidated BE spec (12 section + § 11.6 estimate)
+├── SPEC-FE.md           ← consolidated FE spec (skip kalau --no-ui)
+├── IMPL-PLAN.md         ← v3.1 — aggregated timeline (chunk estimate + critical path)
 ├── wireframes/
-│   ├── index.html (navigation hub ke semua page)
+│   ├── index.html       ← navigation hub
 │   ├── <page1>.html
 │   └── <page2>.html
-├── OPEN-QUESTIONS.md (di-create kalau ada push-back)
+├── OPEN-QUESTIONS.md    ← created kalau push-back
 ├── contract/
-│   ├── openapi.yaml (snippet dari SPEC-BE § 4.1)
+│   ├── openapi.yaml     ← extracted dari SPEC-BE § 4.1
 │   └── proto/<name>.proto (kalau applicable)
-└── migrations/ (kalau ada DB change)
+└── migrations/          ← kalau ada DB change
     ├── NNN-<name>.up.sql
     └── NNN-<name>.down.sql
 ```
@@ -125,21 +157,31 @@ Kalau ada agent yang trigger push-back:
 
 5. **Invoke Step 3 (ui-impact-analyst)** kalau has_ui_impact → wait → check push-back.
 
-6. **Sync contract files** dari SPEC-BE § 4 ke `features/<slug>/contract/` (extract OpenAPI/proto snippet ke file terpisah untuk linting).
+6. **Step 4 IMPL-PLAN aggregator (v3.1)** — read estimate dari SPEC-BE § 11.6 + SPEC-FE § 11.6, scaffold `IMPL-PLAN.md`, fill section 1-6 + 8 (critical path + cross-chunk dep + sprint planning + burndown skeleton + initial change log).
 
-7. **Final output ke chat:**
+7. **Sync contract files** dari SPEC-BE § 4 ke `features/<slug>/contract/` (extract OpenAPI/proto snippet ke file terpisah untuk linting).
+
+8. **Final output ke chat:**
    ```
    ✅ Phase 1 Spec selesai untuk <slug>:
    - features/<slug>/SPEC-BE.md (<N> sections)
    - features/<slug>/SPEC-FE.md (<N> sections) [kalau has_ui_impact]
+   - features/<slug>/IMPL-PLAN.md (chunk estimate + critical path)
    - features/<slug>/wireframes/ (<N> page) [kalau has_ui_impact]
    - features/<slug>/contract/ (OpenAPI + proto)
    - features/<slug>/migrations/ (<N> migration) [kalau ada DB change]
    
+   📊 Estimate summary (dari IMPL-PLAN.md):
+   - BE: <T-shirt> (~<X-Y> hari)
+   - FE: <T-shirt> (~<X-Y> hari)
+   - Sequential: ~<sum> hari · Paralel: ~<critical-path> hari
+   - Critical path: <BE atau FE>
+   
    👉 Next: 
    1. BE Dev + TL review SPEC-BE.md → tulis LGTM-SPEC-BE di § 12
    2. Designer + FE Dev review SPEC-FE.md + buka wireframes/index.html → tulis LGTM-SPEC-FE di § 12
-   3. Setelah 2 LGTM ada, run /implement <slug>/be ATAU /implement <slug>/fe untuk Phase 2
+   3. (Optional) TL + PM review IMPL-PLAN.md → adjust target sprint + tulis LGTM-PLAN di § 7
+   4. Setelah LGTM ada, run /implement <slug>/be ATAU /implement <slug>/fe untuk Phase 2
    ```
 
 ## Aturan Strict
@@ -155,8 +197,9 @@ Kalau ada agent yang trigger push-back:
 - 2 file SPEC (atau 1 kalau BE-only) ada, semua section terisi (tidak ada "TBD" di section wajib).
 - `[BE-CONTRACT-FROZEN]` marker present di SPEC-BE § 4.
 - Wireframe HTML generated (kalau has_ui_impact) dengan minimal 5-state demo untuk core page.
+- **IMPL-PLAN.md ter-generate** dengan chunk estimate + sub-items + critical path (v3.1).
 - OPEN-QUESTIONS.md kosong (atau berisi RESOLVED only).
-- Output chat ringkas: file path + next step.
+- Output chat ringkas: file path + estimate summary + next step.
 
 ## Example Usage
 

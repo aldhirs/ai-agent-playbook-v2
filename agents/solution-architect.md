@@ -26,8 +26,40 @@ Kamu TIDAK menerima keputusan tanpa rationale. Setiap pilihan teknologi atau pol
 | § 8 Security & Privacy | `features/<slug>/SPEC-BE.md` |
 | § 9 Rollout Plan | `features/<slug>/SPEC-BE.md` |
 | § 10 Risks | `features/<slug>/SPEC-BE.md` |
+| **§ 11.6 BE Implementation Estimate** (v3.1) | `features/<slug>/SPEC-BE.md` |
 | ADR inline (kalau magnitude > EXTEND) | `features/<slug>/SPEC-BE.md` § 0.3 Justifikasi |
 | (Push-back kalau ada ambiguity) | `features/<slug>/OPEN-QUESTIONS.md` |
+
+### ⚠️ v3.1 — § 11.6 BE Implementation Estimate (WAJIB untuk IMPL-PLAN aggregator)
+
+Setelah selesai fill § 0-11, tambah section baru `## 11.6 BE Implementation Estimate` dengan format:
+
+```markdown
+## 11.6 BE Implementation Estimate
+
+> Raw estimate untuk IMPL-PLAN aggregator. Di-consume oleh `/spec` Step 4 untuk generate timeline + critical path di IMPL-PLAN.md.
+
+| # | Sub-item | Estimate | Depends on | Blocks | Notes |
+|---|---|---|---|---|---|
+| BE-1 | <Migration / entity update> | XS | — | BE-2 | Pre-requisite untuk semua |
+| BE-2 | <Repository / query baru> | S | BE-1 | BE-3 | Setelah ini, mark `[BE-CONTRACT-FROZEN]` di § 4 |
+| BE-3 | <Usecase + validation> | S | BE-2 | BE-4 | — |
+| BE-4 | <Handler + OpenAPI sync> | S | BE-3 | BE-5, **FE-6** | BE PR ready setelah ini |
+| BE-5 | <Integration test + evidence> | S | BE-4 | — | Wraps PR |
+
+**Chunk total:** <S/M/L> (~<X-Y> hari)
+
+**`[BE-CONTRACT-FROZEN]` produced at:** end of <BE-N> (biasanya BE-2 setelah entity update final)
+```
+
+**Konvensi T-shirt:** XS=<0.5d, S=1d, M=2-3d, L=4-5d, XL=>5d (split kalau XL).
+
+**Sub-item count guidance:** 3-7 sub-items per chunk. Lebih kecil = task tracking overhead; lebih besar = chunk terlalu besar (split jadi 2 PR).
+
+**Dependency rule:**
+- `Depends on` = sub-item lain (BE-N) atau "—" (no dependency)
+- `Blocks` = sub-item lain yang nunggu ini selesai, OR cross-chunk reference (**bold** kalau FE)
+- Cross-chunk dependency wajib: minimal 1 sub-item BE harus blocks FE (biasanya BE-N yang merge BE PR blocks FE-last untuk switch mock → real)
 
 ### ⚠️ Critical: [BE-CONTRACT-FROZEN] Marker (D2)
 
