@@ -94,10 +94,10 @@
     <h2>Bagian</h2>
     <a href="#overview">Overview</a>
     <a href="#read-by-role">📖 Read by Role</a>
-    <a href="#what-changed">Apa yang Berubah dari v1</a>
-    <a href="#principles">1. Prinsip v2</a>
-    <a href="#operating-model">2. Operating Model</a>
-    <a href="#workflow">3. Workflow 7 Gate</a>
+    <a href="#what-changed">Evolusi v1 → v2 → v3</a>
+    <a href="#principles">1. Prinsip Operating (15-20)</a>
+    <a href="#operating-model">2. Operating Model (3 Phase)</a>
+    <a href="#workflow">3. Workflow 3 Phase</a>
     <a href="#tribe-arch">4. Tribe Architecture</a>
     <a href="#feature-folder">5. Feature Folder Structure</a>
     <a href="#tooling">6. Tooling &amp; Setup</a>
@@ -160,35 +160,38 @@
     </section>
 
     <section id="what-changed">
-      <h2>Apa yang Berubah dari v1</h2>
-      <p>Playbook v1 sudah solid sebagai <em>solo-operator setup</em>: prinsip ketat, 12+ agent specialist, evidence gate, dan lessons loop. Tapi saat dipakai tim (4-8 dev × 5 tribe), muncul 4 gap yang harus ditutup:</p>
+      <h2>Evolusi: v1 → v2 → v3</h2>
+      <p>Playbook ini sudah lewat 2 major iteration. Setiap iterasi address pain dari iterasi sebelumnya tanpa membuang yang sudah jalan.</p>
 
       <table>
-        <tr><th>Gap di v1</th><th>Solusi di v2</th></tr>
+        <tr><th>Versi</th><th>Pain yang Di-address</th><th>Yang Di-introduce</th></tr>
         <tr>
-          <td><strong>Solo-oriented.</strong> Asumsi satu human orchestrasi semua agent.</td>
-          <td><strong>Operating Model dengan role split.</strong> 5 human role × 5 AI agent counterpart. Setiap fase punya pemilik manusia + agent pendamping.</td>
+          <td><strong>v1</strong> (SafeTech)</td>
+          <td>Solo operator butuh prinsip ketat untuk consistency lintas project.</td>
+          <td>14 prinsip teknis · Evidence Gate (3 artifact + <code>make verify-feature</code>) · Lessons Loop · 12+ agent specialist · CLAUDE.md per service</td>
         </tr>
         <tr>
-          <td><strong>Tidak ada handoff antar-human.</strong> Konteks hilang saat PM hand-off ke Dev, Dev hand-off ke QA.</td>
-          <td><strong>Feature Folder.</strong> Satu folder per feature membawa PRD → tech design → impl plan → test plan → evidence. Dipakai semua peran.</td>
+          <td><strong>v2</strong> (Team Edition)</td>
+          <td>Tim 4-8 dev × 5 tribe: konteks hilang antar handoff, no tribe governance, grooming/testing tipis.</td>
+          <td>Operating Model 5 role × 5 agent · 7-Gate workflow dengan approval eksplisit · Feature Folder (1 folder = semua artefak) · CLAUDE.md hierarchy 3 layer (org → tribe → service) · Prinsip 15-20 (operating + quality)</td>
         </tr>
-        <tr>
-          <td><strong>Tidak ada tribe-level governance.</strong> Tribe 3a/3b/3c share context tapi v1 tidak punya cara share principle.</td>
-          <td><strong>CLAUDE.md hierarchy 3 layer:</strong> org → tribe → service. Tribe 3 punya CLAUDE.md sendiri yang inherit dari org dan di-override di service.</td>
-        </tr>
-        <tr>
-          <td><strong>Grooming/PRD &amp; Testing tipis.</strong> v1 fokus engineering. Padahal 2 fase ini paling sakit (per Aldhi).</td>
-          <td><strong>Groomer Agent &amp; Tester Agent</strong> jadi first-class. Lengkap dengan template PRD, ADR, dan test plan generator.</td>
+        <tr style="background: rgba(96,165,250,0.06);">
+          <td><strong>v3</strong> (Streamlined) ⭐ <em>current</em></td>
+          <td>v2 7-gate granular jadi bottleneck: 3 approval pra-dev terpisah, 5+ artefak per feature, FE handoff masih suffer, task breakdown overhead.</td>
+          <td><strong>3 Phase workflow</strong> (Spec → Dev → Live) dengan 1 checkpoint pra-dev · <strong>2-3 file consolidated</strong> (SPEC-BE + SPEC-FE + IMPL-PLAN) · <strong>Wireframe HTML</strong> preview (Tailwind CDN, 5-state interactive) · <strong><code>[BE-CONTRACT-FROZEN]</code> marker</strong> untuk paralel BE-FE work · <strong>Push-back protocol</strong> eksplisit (cap 2 round) · <strong>v3.1:</strong> auto-generate <strong>IMPL-PLAN.md</strong> timeline + critical path</td>
         </tr>
       </table>
 
-      <p style="margin-top:24px;"><strong>Yang dipertahankan utuh dari v1:</strong> Evidence Gate (3 artifact + <code>make verify-feature</code>), Lessons Loop, dan 14 Principles (CLAUDE.md). Itu sudah benar — kita tinggal tambah lapisan tim di atasnya.</p>
+      <p style="margin-top:24px;"><strong>Yang dipertahankan dari v1+v2:</strong> 14 prinsip teknis · Evidence Gate · Lessons Loop · 11 subagent file · CLAUDE.md hierarchy · Prinsip 15-20 (semua retain). Phase 3 (Test/Defect/Live) tetap pakai Gate 5-7 v2.x dengan QA + SRE owner.</p>
+
+      <div class="callout">
+        <strong>Migration path:</strong> Feature folder existing pakai v2.x scheme tetap valid — finish dengan struktur lama. Feature baru: <code>/spec</code> atau <code>bash scripts/new-feature.sh</code> → v3 default. Detail mapping artifact di <a href="MIGRATION-v2-to-v3.md">MIGRATION-v2-to-v3.md</a>.
+      </div>
     </section>
 
     <section id="principles">
-      <h2>1. Prinsip v2 — 6 Tambahan untuk Tim</h2>
-      <p>v1 punya 14 prinsip teknis. v2 menambahkan 6 prinsip <em>operating + quality</em> khusus untuk tim:</p>
+      <h2>1. Prinsip Operating + Quality (15-20)</h2>
+      <p>v1 punya 14 prinsip teknis (contract first, no over-claim, validation by default, dll — retain di v3). v2 tambah 6 prinsip <em>operating + quality</em> untuk tim — semua tetap apply di v3:</p>
 
       <div class="grid grid-2">
         <div class="card">
@@ -229,259 +232,142 @@
     </section>
 
     <section id="operating-model">
-      <h2>2. Operating Model — Human × AI</h2>
-      <p>Setiap fase punya <em>satu</em> pemilik manusia dan <em>satu</em> agent utama. Boleh dipanggil sub-agent lain, tapi yang accountable jelas.</p>
+      <h2>2. Operating Model — 3 Phase × Subagent</h2>
+      <p>v3 collapse 7-gate granular jadi <strong>3 phase</strong>. Phase 1 = autonomous AI spec generation, Phase 2 = paralel BE/FE dev, Phase 3 = test/defect/live (retain v2 Gate 5-7).</p>
 
       <table>
         <tr>
-          <th>Fase</th>
+          <th>Phase</th>
           <th>Human Owner</th>
-          <th>AI Counterpart</th>
+          <th>AI Agent</th>
+          <th>Output</th>
+          <th>Approval</th>
+        </tr>
+        <tr>
+          <td><strong>1. Spec</strong> (autonomous)</td>
+          <td>PM (consulted)</td>
+          <td><code>pm</code> + <code>solution-architect</code> + <code>ui-impact-analyst</code> (sequential via <code>/spec</code>)</td>
+          <td>SPEC-BE.md · SPEC-FE.md · IMPL-PLAN.md · wireframes/*.html · contract/ · migrations/</td>
+          <td>— (no per-gate approval)</td>
+        </tr>
+        <tr style="background: rgba(251,191,36,0.06);">
+          <td><strong>1.5 Checkpoint</strong></td>
+          <td>BE Dev + TL · Designer + FE Dev</td>
+          <td>—</td>
+          <td>Grep-able LGTM di SPEC § 12</td>
+          <td><code>LGTM-SPEC-BE</code> + <code>LGTM-SPEC-FE</code></td>
+        </tr>
+        <tr>
+          <td><strong>2. Dev</strong> (paralel)</td>
+          <td>BE Dev + FE Dev</td>
+          <td><code>backend-engineer</code> (<code>/implement &lt;slug&gt;/be</code>) + <code>frontend-engineer</code> (<code>/implement &lt;slug&gt;/fe</code>) + <code>ui-impact-analyst</code> Post-Dev</td>
+          <td>2 PR (soft cap 500 lines) + evidence per chunk + post-dev wireframe verify</td>
+          <td>peer review + CI hijau + evidence</td>
+        </tr>
+        <tr>
+          <td><strong>3. Testing</strong></td>
+          <td>QA Engineer</td>
+          <td><code>qa-engineer</code></td>
+          <td>Test plan, automated tests, regression matrix</td>
+          <td><code>qa-greenlight</code></td>
+        </tr>
+        <tr>
+          <td><strong>3. Defects &amp; Greenlight</strong></td>
+          <td>QA + Tech Lead</td>
+          <td><code>qa-engineer</code> (triage)</td>
+          <td>Defect classification, root-cause, lesson candidate</td>
+          <td>defect closed + lesson linked</td>
+        </tr>
+        <tr>
+          <td><strong>3. Live / Post-launch</strong></td>
+          <td>SRE / Tech Lead</td>
+          <td><code>sre</code></td>
+          <td>Runbook, alert config, dashboard, post-launch retro</td>
+          <td>SRE checklist + retro committed</td>
+        </tr>
+      </table>
+
+      <div class="callout">
+        <strong>Command sequence (v3 happy path):</strong>
+        <pre style="background:transparent; padding:8px 0; margin:8px 0; font-size:0.85rem;">/spec &lt;epic&gt;                    → Phase 1 autonomous (3 agent sequential)
+LGTM-SPEC-BE + LGTM-SPEC-FE     → Phase 1.5 checkpoint (grep-able di SPEC § 12)
+/implement &lt;slug&gt;/be (+ /fe)    → Phase 2 dev (paralel via [BE-CONTRACT-FROZEN])
+qa-greenlight + sre runbook     → Phase 3 unchanged dari v2.x</pre>
+      </div>
+
+      <h3 style="margin-top:32px;">Cross-Cutting Agents (invoked on-demand)</h3>
+
+      <table>
+        <tr>
+          <th>Subagent file</th>
+          <th>Kapan invoke</th>
           <th>Output</th>
         </tr>
         <tr>
-          <td>Grooming / Discovery</td>
-          <td>PM / BA</td>
-          <td><strong>Groomer Agent</strong></td>
-          <td>PRD draft, user stories, acceptance criteria, open questions</td>
+          <td><code>product-designer</code></td>
+          <td>Saat butuh prinsip umum UX (Hick's, Fitts's, cognitive load)</td>
+          <td>UX brief + design principles</td>
         </tr>
         <tr>
-          <td>Tech Discussion</td>
-          <td>Tech Lead</td>
-          <td><strong>Architect Agent</strong></td>
-          <td>Tech design, ADR, OpenAPI/proto contract, sequence diagram, risk register</td>
+          <td><code>security-engineer</code></td>
+          <td>Phase 2 — wajib untuk feature payment / PII / legal</td>
+          <td>Threat model + secure code review</td>
         </tr>
         <tr>
-          <td>Planning</td>
-          <td>Tech Lead + Dev</td>
-          <td><strong>Planner Agent</strong></td>
-          <td>Implementation plan, task breakdown dengan estimate &amp; dependency</td>
+          <td><code>domain-expert-elearning-payment</code></td>
+          <td>Saat butuh konteks regulasi / istilah industri (BI/OJK, settlement, MDR)</td>
+          <td>Worked example pattern — copy + rename + adapt ke domain Anda</td>
         </tr>
         <tr>
-          <td>Development</td>
-          <td>Developer</td>
-          <td><strong>Coder Agent</strong> + <strong>Reviewer Agent</strong></td>
-          <td>Code, unit test, evidence artifact per task, self-review checklist</td>
-        </tr>
-        <tr>
-          <td>Testing</td>
-          <td>QA Engineer</td>
-          <td><strong>Tester Agent</strong></td>
-          <td>Test plan, automated test suite, regression matrix</td>
-        </tr>
-        <tr>
-          <td>Defects &amp; Greenlight</td>
-          <td>QA + Tech Lead</td>
-          <td><strong>Triage Agent</strong></td>
-          <td>Defect classification, root-cause analysis, lesson candidate</td>
-        </tr>
-        <tr>
-          <td>Live / Post-launch</td>
-          <td>SRE / Tech Lead</td>
-          <td><strong>Reliability Agent</strong></td>
-          <td>Runbook, alert config, dashboard link, post-launch retrospective</td>
+          <td><code>verification-gatekeeper</code></td>
+          <td>Sebelum klaim "done" — strict check evidence + § 0 lengkap + <code>[BE-CONTRACT-FROZEN]</code> + wireframe HTML + LGTM</td>
+          <td>✅ DONE / ❌ NOT DONE (no caveat)</td>
         </tr>
       </table>
-
-      <div class="callout">
-        <strong>Catatan:</strong> "Agent" di sini bukan harus jadi entitas teknis terpisah. Praktiknya: 1 Claude Code session + 1 slash command spesifik per fase (lihat Bagian 5). Untuk strict isolation, playbook menyediakan <strong>11 subagent file</strong> di <code>agents/</code> yang bisa di-invoke via Claude Code <code>Agent</code> tool — mapping ke conceptual role di tabel atas:
-      </div>
-
-      <table>
-        <tr>
-          <th>Conceptual role (tabel atas)</th>
-          <th>Subagent file di <code>agents/</code></th>
-          <th>Catatan</th>
-        </tr>
-        <tr>
-          <td>Groomer Agent</td>
-          <td><code>pm</code> + <code>ui-impact-analyst</code></td>
-          <td>PM drafting PRD; UI-Impact Analyst drafting G1-UI-IMPACT.md Pre-Dev section</td>
-        </tr>
-        <tr>
-          <td>Architect Agent</td>
-          <td><code>solution-architect</code></td>
-          <td>System design + ADR + magnitude analysis (Prinsip 19)</td>
-        </tr>
-        <tr>
-          <td>Planner Agent</td>
-          <td><code>solution-architect</code> (planner mode)</td>
-          <td>Atau dedicated planner sub-agent kalau project butuh isolation</td>
-        </tr>
-        <tr>
-          <td>Coder Agent</td>
-          <td><code>backend-engineer</code> + <code>frontend-engineer</code></td>
-          <td>Split BE (Go) vs FE (Vue/Nuxt); customize per stack project</td>
-        </tr>
-        <tr>
-          <td>Reviewer Agent</td>
-          <td><code>qa-engineer</code> + <code>security-engineer</code></td>
-          <td>QA review + security review (mandatory untuk payment/PII/legal)</td>
-        </tr>
-        <tr>
-          <td>Tester Agent</td>
-          <td><code>qa-engineer</code></td>
-          <td>Test plan + automated test + regression matrix</td>
-        </tr>
-        <tr>
-          <td>Triage Agent</td>
-          <td><code>qa-engineer</code> (triage mode) + <code>verification-gatekeeper</code></td>
-          <td>QA triage defect; Verification Gatekeeper enforce "no done without evidence"</td>
-        </tr>
-        <tr>
-          <td>Reliability Agent</td>
-          <td><code>sre</code></td>
-          <td>Infrastructure + runbook + observability + capacity</td>
-        </tr>
-        <tr>
-          <td>Support (cross-cutting)</td>
-          <td><code>product-designer</code>, <code>ui-impact-analyst</code> (Post-Dev), <code>domain-expert-*</code></td>
-          <td>UX principles, UI verification post-impl, domain context (worked example: <code>domain-expert-elearning-payment</code> untuk e-learning + payment Indonesia)</td>
-        </tr>
-      </table>
-
-      <div class="callout">
-        <strong>Konvensi naming:</strong> <code>&lt;role&gt;</code> untuk generic (<code>pm</code>, <code>qa-engineer</code>), <code>&lt;role&gt;-&lt;specialty&gt;</code> untuk spesialisasi (<code>backend-engineer</code> spesifik Go), <code>domain-expert-&lt;domain&gt;</code> untuk worked example domain spesifik. Lihat README.md untuk tabel lengkap + genericization note.
+      <div class="callout" style="margin-top:20px;">
+        <strong>Konvensi naming subagent:</strong> <code>&lt;role&gt;</code> untuk generic (<code>pm</code>, <code>qa-engineer</code>), <code>&lt;role&gt;-&lt;specialty&gt;</code> untuk spesialisasi (<code>backend-engineer</code> spesifik Go), <code>domain-expert-&lt;domain&gt;</code> untuk worked example domain spesifik. Lihat README.md untuk tabel lengkap + genericization note placeholder (<code>&lt;your-shared-lib&gt;</code>, <code>&lt;your-fe-monorepo&gt;</code>).
       </div>
     </section>
 
     <section id="workflow">
-      <h2>3. Workflow 7 Gate — Dari Ide ke Live</h2>
-      <p>Tiap gate punya <strong>input</strong>, <strong>aksi AI</strong>, <strong>aksi human</strong>, <strong>exit criteria</strong>, dan <strong>artefak</strong>. Tidak lulus gate = tidak boleh lanjut. Tidak ada "skip karena buru-buru".</p>
+      <h2>3. Workflow 3 Phase — Dari Ide ke Live (v3.x)</h2>
+      <p>v3 collapse 7-gate granular jadi <strong>3 phase</strong> dengan <strong>1 checkpoint pra-dev</strong>. Phase 1 autonomous (AI generate consolidated spec), Phase 2 paralel BE/FE dev, Phase 3 retain Gate 5-7 v2.x (QA + SRE owner).</p>
 
-      <div class="diagram">
-        <svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
-          <title>Playbook v2 — Workflow 7 Gate</title>
-          <desc>Alur 7 fase development dari grooming sampai live. Phase 4 (Development) dan Phase 5 (Testing) berjalan paralel. Setiap fase punya pemilik manusia dan AI agent.</desc>
-          <defs>
-            <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#60a5fa"/></marker>
-            <marker id="arrParallel" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a78bfa"/></marker>
-          </defs>
-          <text x="500" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#e6e9ef">Workflow 7 Gate · Playbook v2</text>
-          <text x="500" y="56" text-anchor="middle" font-size="13" fill="#9aa3b2">AI proposes, human approves · Setiap gate ditutup approval eksplisit di artefak</text>
-          <line x1="80" y1="260" x2="920" y2="260" stroke="#2a2f3f" stroke-width="1" stroke-dasharray="3,4"/>
-
-          <a href="phases/1-grooming.html"><g transform="translate(60,200)">
-            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#2a2f3f" stroke-width="1"/>
-            <rect width="130" height="24" rx="10" fill="#60a5fa"/><rect y="14" width="130" height="10" fill="#60a5fa"/>
-            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 1</text>
-            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Grooming</text>
-            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">&amp; PRD</text>
-            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 PM / BA</text>
-            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Groomer</text>
-          </g></a>
-
-          <a href="phases/2-tech-design.html"><g transform="translate(210,200)">
-            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#2a2f3f"/>
-            <rect width="130" height="24" rx="10" fill="#60a5fa"/><rect y="14" width="130" height="10" fill="#60a5fa"/>
-            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 2</text>
-            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Tech Disc.</text>
-            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ ADR + API</text>
-            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 Tech Lead</text>
-            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Architect</text>
-          </g></a>
-
-          <a href="phases/3-planning.html"><g transform="translate(360,200)">
-            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#2a2f3f"/>
-            <rect width="130" height="24" rx="10" fill="#60a5fa"/><rect y="14" width="130" height="10" fill="#60a5fa"/>
-            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 3</text>
-            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Planning</text>
-            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ Task breakdown</text>
-            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 TL + Dev</text>
-            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Planner</text>
-          </g></a>
-
-          <a href="phases/4-development.html"><g transform="translate(510,130)">
-            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#a78bfa" stroke-width="1.5"/>
-            <rect width="130" height="24" rx="10" fill="#a78bfa"/><rect y="14" width="130" height="10" fill="#a78bfa"/>
-            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 4</text>
-            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Development</text>
-            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ Evidence</text>
-            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 Developer</text>
-            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Coder + Rvw</text>
-          </g></a>
-
-          <a href="phases/5-testing.html"><g transform="translate(510,290)">
-            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#a78bfa" stroke-width="1.5"/>
-            <rect width="130" height="24" rx="10" fill="#a78bfa"/><rect y="14" width="130" height="10" fill="#a78bfa"/>
-            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 5</text>
-            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Testing</text>
-            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ Test plan</text>
-            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 QA</text>
-            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Tester</text>
-          </g></a>
-
-          <g transform="translate(575,255)">
-            <rect x="-42" y="-11" width="84" height="22" rx="11" fill="#0f1115" stroke="#a78bfa" stroke-width="1"/>
-            <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#a78bfa">PARALLEL</text>
-          </g>
-
-          <a href="phases/6-defects.html"><g transform="translate(660,200)">
-            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#2a2f3f"/>
-            <rect width="130" height="24" rx="10" fill="#60a5fa"/><rect y="14" width="130" height="10" fill="#60a5fa"/>
-            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 6</text>
-            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Defects &amp;</text>
-            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">Greenlight</text>
-            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 QA + TL</text>
-            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Triage</text>
-          </g></a>
-
-          <a href="phases/7-live.html"><g transform="translate(810,200)">
-            <rect width="130" height="120" rx="10" fill="#1c2030" stroke="#6ee7b7" stroke-width="1.5"/>
-            <rect width="130" height="24" rx="10" fill="#6ee7b7"/><rect y="14" width="130" height="10" fill="#6ee7b7"/>
-            <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="700" fill="#0f1115">GATE 7</text>
-            <text x="65" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#e6e9ef">Live</text>
-            <text x="65" y="60" text-anchor="middle" font-size="10" fill="#9aa3b2">+ Post-launch retro</text>
-            <rect x="8" y="68" width="114" height="20" rx="4" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.35)"/><text x="14" y="82" font-size="10" fill="#fbbf24">👤 SRE / TL</text>
-            <rect x="8" y="92" width="114" height="20" rx="4" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.35)"/><text x="14" y="106" font-size="10" fill="#6ee7b7">🤖 Reliability</text>
-          </g></a>
-
-          <line x1="190" y1="260" x2="208" y2="260" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
-          <line x1="340" y1="260" x2="358" y2="260" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
-          <path d="M 490 260 C 500 260, 500 190, 508 190" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrParallel)"/>
-          <path d="M 490 260 C 500 260, 500 350, 508 350" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrParallel)"/>
-          <path d="M 640 190 C 650 190, 650 260, 658 260" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrParallel)"/>
-          <path d="M 640 350 C 650 350, 650 260, 658 260" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrParallel)"/>
-          <line x1="790" y1="260" x2="808" y2="260" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
-
-          <g font-size="9" fill="#6b7280" text-anchor="middle">
-            <text x="125" y="340">~2-4 jam</text>
-            <text x="275" y="340">~4-6 jam</text>
-            <text x="425" y="340">~1-2 jam</text>
-            <text x="575" y="440">running paralel</text>
-            <text x="725" y="340">on defect</text>
-            <text x="875" y="340">+ T+7 retro</text>
-          </g>
-
-          <g transform="translate(60,475)">
-            <text x="0" y="0" font-size="11" font-weight="700" fill="#9aa3b2">LEGEND</text>
-            <rect x="0" y="14" width="14" height="14" rx="3" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.4)"/><text x="20" y="25" font-size="11" fill="#e6e9ef">Human owner (accountable)</text>
-            <rect x="200" y="14" width="14" height="14" rx="3" fill="rgba(110,231,183,0.10)" stroke="rgba(110,231,183,0.4)"/><text x="220" y="25" font-size="11" fill="#e6e9ef">AI agent (drafts &amp; checks)</text>
-            <rect x="400" y="14" width="14" height="14" rx="3" fill="#60a5fa"/><text x="420" y="25" font-size="11" fill="#e6e9ef">Approval gate</text>
-            <rect x="540" y="14" width="14" height="14" rx="3" fill="#a78bfa"/><text x="560" y="25" font-size="11" fill="#e6e9ef">Parallel track (Dev || Test)</text>
-            <rect x="740" y="14" width="14" height="14" rx="3" fill="#6ee7b7"/><text x="760" y="25" font-size="11" fill="#e6e9ef">Production</text>
-          </g>
-
-          <g transform="translate(60,520)">
-            <rect width="880" height="30" rx="6" fill="rgba(110,231,183,0.08)" stroke="rgba(110,231,183,0.3)"/>
-            <text x="14" y="20" font-size="12" fill="#6ee7b7" font-weight="600">⚡ Kunci pemangkasan waktu:</text>
-            <text x="195" y="20" font-size="12" fill="#e6e9ef">Gate 1+2 yang biasanya 4-6 hari → 1-1.5 hari. Testing tidak lagi blocker (paralel dengan dev).</text>
-          </g>
-        </svg>
-        <div class="caption">Diagram 1 · Workflow 7 Gate end-to-end. Dev + Test paralel; sisanya sekuensial dengan approval gate eksplisit.</div>
-        <div class="click-hint">👆 Klik tiap gate untuk lihat detail flow, cara kerja AI &amp; Dev, dan output yang dihasilkan.</div>
+      <div class="callout">
+        <strong>Command sequence (happy path):</strong>
+        <pre style="background:transparent; padding:8px 0; margin:8px 0; font-size:0.85rem; color:var(--text);">/spec &lt;epic&gt;                    → Phase 1 autonomous (3 agent sequential + IMPL-PLAN aggregator)
+LGTM-SPEC-BE + LGTM-SPEC-FE     → Phase 1.5 checkpoint (grep-able di SPEC § 12)
+/implement &lt;slug&gt;/be (+ /fe)    → Phase 2 dev (paralel via [BE-CONTRACT-FROZEN])
+qa-greenlight + sre runbook     → Phase 3 (retain v2.x Gate 5-7)</pre>
       </div>
 
       <div class="phase">
         <div class="phase-num">1</div>
         <div class="phase-body">
-          <h3>Grooming &amp; PRD + UI-Impact Pre-Dev <span style="color:var(--accent);font-size:0.7em;">(v2.1)</span></h3>
-          <p><strong>Input:</strong> Epic mentah dari Jira/Linear (1-3 paragraf). <strong>AI:</strong> Groomer Agent baca epic + repo context + lessons + design system catalog (lewat <code>ui-impact-analyst</code>), lalu drafting PRD + UI-IMPACT Pre-Dev (existing page DIFF + reuse plan + 5-state) + open questions. <strong>Human:</strong> PM jawab open questions, iterate 1-2 putaran. Designer + FE Dev review UI vision. Tech Lead consulted untuk feasibility.</p>
+          <h3>Spec (autonomous) <span style="color:var(--accent);font-size:0.7em;">v3.0</span></h3>
+          <p><strong>Input:</strong> Epic mentah (Jira/Linear link atau deskripsi 1-3 paragraf). <strong>AI:</strong> <code>/spec</code> command invoke 3 agent sequential — (1) <code>pm</code> fill SPEC-BE § 1-2 + SPEC-FE § 1, (2) <code>solution-architect</code> fill SPEC-BE § 0, 3-11 + MARK <code>🔒 [BE-CONTRACT-FROZEN]</code> di § 4, (3) <code>ui-impact-analyst</code> fill SPEC-FE § 0, 2-11 + generate <strong>wireframes/*.html</strong> (Tailwind CDN interactive 5-state). <strong>v3.1:</strong> Step 4 aggregator generate <strong>IMPL-PLAN.md</strong> dengan timeline + critical path ASCII gantt.</p>
+          <p style="margin-top:8px;"><strong>Push-back protocol:</strong> kalau ada ambiguity, agent tulis ke <code>OPEN-QUESTIONS.md</code> dengan format pertanyaan + why-blocking + default-assumption. Cap 2 round, round 3 escalate ke meeting.</p>
           <div class="phase-meta">
-            <span class="chip human">Owner: PM + Designer + FE Dev</span>
-            <span class="chip ai">Agent: Groomer + UI-Impact-Analyst</span>
-            <span class="chip gate">Gate 1: LGTM-PRD ×3 (TL consulted)</span>
-            <span class="chip">~2-4 jam (vs. 2-3 hari)</span>
+            <span class="chip human">Owner: PM (consulted)</span>
+            <span class="chip ai">Agent: pm + solution-architect + ui-impact-analyst</span>
+            <span class="chip">Output: 2-3 file SPEC + wireframes + contract</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase" style="border-left-color: var(--warn);">
+        <div class="phase-num" style="background: var(--warn);">1.5</div>
+        <div class="phase-body">
+          <h3>Checkpoint — Single Human Approval (split BE+FE)</h3>
+          <p><strong>Bukan 3 approval terpisah seperti v2 (LGTM-PRD, LGTM-TD, LGTM-PLAN)</strong> — sekarang cuma 1 checkpoint dengan 2 LGTM paralel:</p>
+          <ul>
+            <li><strong>BE Dev + TL</strong> review <code>SPEC-BE.md</code> → tulis <code>LGTM-SPEC-BE by &lt;nama&gt; on YYYY-MM-DD</code> di § 12</li>
+            <li><strong>Designer + FE Dev</strong> review <code>SPEC-FE.md</code> + buka <code>wireframes/index.html</code> di browser → tulis <code>LGTM-SPEC-FE</code> di § 12</li>
+            <li><em>Optional:</em> <strong>PM + TL</strong> review <code>IMPL-PLAN.md</code> untuk adjust target sprint → tulis <code>LGTM-PLAN</code> di § 7</li>
+          </ul>
+          <div class="phase-meta">
+            <span class="chip human">Owner: BE Dev + TL · Designer + FE Dev</span>
+            <span class="chip gate">Approval: LGTM-SPEC-BE + LGTM-SPEC-FE (grep-able)</span>
           </div>
         </div>
       </div>
@@ -489,89 +375,39 @@
       <div class="phase">
         <div class="phase-num">2</div>
         <div class="phase-body">
-          <h3>Tech Discussion <span style="color:var(--accent);font-size:0.7em;">(+ § 0 Existing Analysis v2.1)</span></h3>
-          <p><strong>Input:</strong> PRD signed (termasuk G1-UI-IMPACT.md Section 1). <strong>AI:</strong> Architect Agent <strong>WAJIB</strong> isi § 0 Existing Analysis dulu (codebase audit + magnitude pick: NO-CHANGE/EXTEND/NEW-MODULE/REWRITE per Prinsip 19), baru drafting tech design + OpenAPI/proto + sequence diagram + 3 opsi + risk register. <strong>Human:</strong> Tech Lead pilih opsi, cross-tribe reviewer challenge magnitude.</p>
+          <h3>Dev (paralel BE+FE)</h3>
+          <p><strong>Input:</strong> SPEC dengan LGTM. <strong>Step 0 — Git Hygiene (Prinsip 20):</strong> cek working tree clean, <code>git pull --ff-only</code>, <code>git checkout -b feat/&lt;slug&gt;-&lt;chunk&gt;</code>. <strong>AI:</strong> 2 agent invoke paralel — <code>backend-engineer</code> via <code>/implement &lt;slug&gt;/be</code> + <code>frontend-engineer</code> via <code>/implement &lt;slug&gt;/fe</code>. Saat <code>[BE-CONTRACT-FROZEN]</code> marker ada, FE Dev sah mulai paralel work (mock API berdasarkan SPEC-BE § 4, switch ke real saat BE PR merged). <strong>Output per chunk:</strong> 1 PR (soft cap 500 lines) + 3 artefak evidence (curl.txt, test.log, screenshots/) + post-dev wireframe verification via <code>ui-impact-analyst</code> Mode B.</p>
           <div class="phase-meta">
-            <span class="chip human">Owner: Tech Lead</span>
-            <span class="chip ai">Agent: Architect</span>
-            <span class="chip gate">Gate 2: LGTM-TD + § 0 filled</span>
-            <span class="chip">~4-6 jam (vs. 2-3 hari)</span>
+            <span class="chip human">Owner: BE Dev + FE Dev</span>
+            <span class="chip ai">Agent: backend-engineer + frontend-engineer</span>
+            <span class="chip gate">Exit: peer review + CI hijau + evidence + <code>make verify-feature</code> exit 0</span>
           </div>
         </div>
       </div>
 
-      <div class="phase">
-        <div class="phase-num">3</div>
+      <div class="phase" style="border-left-color: var(--accent);">
+        <div class="phase-num" style="background: var(--accent); color: var(--bg);">3</div>
         <div class="phase-body">
-          <h3>Planning &amp; Task Breakdown</h3>
-          <p><strong>Input:</strong> Tech design yang sudah signed. <strong>AI:</strong> Planner Agent generate impl plan: list task urut topologis, dependency graph, estimasi (T-shirt), parallelizable ya/tidak, risk flag. <strong>Human:</strong> Tech Lead validate breakdown, Dev claim task (auto-assigned di Jira).</p>
+          <h3>Test &amp; Live (retain Gate 5-7 v2.x)</h3>
+          <p>Phase 3 <strong>tidak collapse</strong> — Gate 5 (Testing), Gate 6 (Defects &amp; Greenlight), Gate 7 (Live &amp; Post-launch) tetap pakai workflow v2.x dengan QA + SRE sebagai owner. Reasoning: stakeholder beda, lifecycle beda, value collapse rendah.</p>
+          <ul>
+            <li><strong>Gate 5 Testing:</strong> <code>qa-engineer</code> via <code>/test-plan</code> → AC mapping + 5-state matrix + 10+ edge case → <code>qa-greenlight</code></li>
+            <li><strong>Gate 6 Defects:</strong> defect classification + root-cause + lesson candidate → defect closed + lesson linked</li>
+            <li><strong>Gate 7 Live:</strong> <code>sre</code> generate runbook + alert + dashboard. T+7 retro post-launch → lesson baru</li>
+          </ul>
           <div class="phase-meta">
-            <span class="chip human">Owner: Tech Lead + Dev</span>
-            <span class="chip ai">Agent: Planner</span>
-            <span class="chip gate">Gate 3: Plan signed</span>
-            <span class="chip">~1-2 jam</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="phase">
-        <div class="phase-num">4</div>
-        <div class="phase-body">
-          <h3>Development <span style="color:var(--accent);font-size:0.7em;">(+ Git Hygiene &amp; UI-Impact Post-Dev v2.1)</span></h3>
-          <p><strong>Input:</strong> Task dari impl plan. <strong>Step 0 — Git Hygiene (Prinsip 20):</strong> cek working tree clean, <code>git pull --ff-only</code>, <code>git checkout -b feat/&lt;slug&gt;</code> di SETIAP repo target. <strong>AI:</strong> Coder Agent implement pakai CLAUDE.md + skill stack-specific. Wajib generate: code + unit test + evidence (curl.txt, test.log, screenshots/) + self-review checklist + isi UI-IMPACT.md Section 2 (kalau ada UI change) + invoke <code>ui-impact-analyst</code> Mode B untuk Section 3 (Agent Analysis). <strong>Human:</strong> Dev review hasil agent, iterate, open PR.</p>
-          <div class="phase-meta">
-            <span class="chip human">Owner: Dev</span>
-            <span class="chip ai">Agent: Coder + Reviewer + UI-Impact-Analyst</span>
-            <span class="chip gate">Gate 4: PR (branch feat/&lt;slug&gt;) + evidence</span>
-            <span class="chip">~40-60% lebih cepat</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="phase">
-        <div class="phase-num">5</div>
-        <div class="phase-body">
-          <h3>Testing</h3>
-          <p><strong>Input:</strong> PRD + tech design + acceptance criteria. <strong>AI:</strong> Tester Agent generate test plan (functional matrix, edge case, regression, perf hot-spot), drafting E2E test script (Playwright untuk Vue, integration test untuk Go). <strong>Human:</strong> QA review &amp; supplement (yang AI bisa miss: domain quirks, regulasi). QA jalankan, agent bantu triase failure. <em>Kunci: test plan disiapkan paralel dengan development, bukan setelah</em>.</p>
-          <div class="phase-meta">
-            <span class="chip human">Owner: QA</span>
-            <span class="chip ai">Agent: Tester</span>
-            <span class="chip gate">Gate 5: Test plan green</span>
-            <span class="chip">Bukan blocker lagi</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="phase">
-        <div class="phase-num">6</div>
-        <div class="phase-body">
-          <h3>Defects &amp; QA Greenlight</h3>
-          <p><strong>Input:</strong> Bug report dari Gate 5. <strong>AI:</strong> Triage Agent classify (P0-P3, area, root-cause hypothesis), cek apakah ini lesson candidate. <strong>Human:</strong> Tech Lead &amp; QA approve fix, tag lesson kalau pattern recurring.</p>
-          <div class="phase-meta">
-            <span class="chip human">Owner: QA + Tech Lead</span>
-            <span class="chip ai">Agent: Triage</span>
-            <span class="chip gate">Gate 6: QA sign-off</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="phase">
-        <div class="phase-num">7</div>
-        <div class="phase-body">
-          <h3>Live &amp; Post-launch</h3>
-          <p><strong>Input:</strong> Build yang sudah QA-green. <strong>AI:</strong> Reliability Agent generate runbook, alert config, dashboard. Post-launch (T+7 hari) agent generate post-launch retrospective draft dari log + metrics + incident. <strong>Human:</strong> SRE / Tech Lead validate runbook, sign-off rilis. Setelah 7 hari, retro singkat → lesson baru.</p>
-          <div class="phase-meta">
-            <span class="chip human">Owner: SRE / Tech Lead</span>
-            <span class="chip ai">Agent: Reliability</span>
-            <span class="chip gate">Gate 7: Retro + lesson</span>
+            <span class="chip human">Owner: QA · SRE / TL</span>
+            <span class="chip ai">Agent: qa-engineer + sre</span>
+            <span class="chip gate">Approval: qa-greenlight + SRE checklist + retro committed</span>
           </div>
         </div>
       </div>
 
       <div class="callout good">
-        <strong>Estimasi pemangkasan waktu:</strong> Grooming + Tech Disc yang biasanya 4-6 hari kalender → bisa jadi 1-1.5 hari kalender (dengan AI draft + 1-2 putaran review). Testing yang sering 3-5 hari blocker → paralel dengan development. Total: <em>feature lead time turun 40-60% untuk feature medium</em>.
+        <strong>Estimasi pemangkasan waktu (v2 → v3):</strong> Pra-dev (Grooming + Tech Disc + Planning) yang v2 perlu 4-6 hari + 3 approval → v3 jadi <strong>~1 hari + 1 checkpoint</strong> (autonomous spec generation + paralel BE/FE review). FE handoff suffer (Tanisa Konsul case) diaddress via wireframe HTML preview. BE-FE paralel work via <code>[BE-CONTRACT-FROZEN]</code> save 30-50% wall-clock di Phase 2. <strong>Total feature lead time: turun 60-70%</strong> untuk feature medium dibanding v2.
       </div>
     </section>
+
 
     <section id="tribe-arch">
       <h2>4. Tribe Architecture — Berbagi Tanpa Coupling</h2>
