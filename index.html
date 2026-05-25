@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Playbook v2 — Team Edition</title>
+<title>Agent Playbook v3.1 — Team Edition</title>
 <link rel="stylesheet" href="styles.css">
 <style>
   /* Page-specific tweaks (basic vars kept as fallback if styles.css not loaded) */
@@ -88,7 +88,7 @@
 <body>
 <div class="layout">
   <aside class="sidebar">
-    <div class="brand">Agent Playbook v2</div>
+    <div class="brand">Agent Playbook v3.1</div>
     <div class="tagline">Team Edition · Multi-tribe</div>
 
     <h2>Bagian</h2>
@@ -114,13 +114,17 @@
   <main class="main">
 
     <section id="overview" class="hero">
-      <div class="pill">Playbook v3.0 · Team Edition</div>
+      <div class="pill">Playbook v3.1 · Team Edition</div>
       <h1>Cara Tim Bekerja dengan AI Agent</h1>
-      <p>Workflow multi-tribe yang pangkas lead time 60-70% di phase pra-development — dengan 1 checkpoint approval (bukan 3 gate granular). 2 spec file consolidated + wireframe HTML preview.</p>
-      <p style="margin-top:16px;"><strong>Tagline:</strong> <em>Contract first. Evidence always. AI proposes, human approves. 2 spec files + wireframe HTML — bukan 5 artefak terpisah.</em></p>
+      <p>Workflow multi-tribe yang pangkas lead time 60-70% di phase pra-development — dengan 1 checkpoint approval (bukan 3 gate granular). <strong>3 file consolidated</strong> (SPEC-BE + SPEC-FE + IMPL-PLAN) + wireframe HTML preview.</p>
+      <p style="margin-top:16px;"><strong>Tagline:</strong> <em>Contract first. Evidence always. AI proposes, human approves. Spec consolidated + wireframe HTML + auto-generated timeline.</em></p>
 
-      <div class="callout" style="margin-top:20px; font-size:0.9rem; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.06);">
-        <strong>⚠️ v3.0 (May 2026) — BREAKING CHANGE:</strong> Collapse 3 gate pra-dev (PRD/TD/Plan) jadi 1 Phase Spec dengan single checkpoint. Wireframe HTML untuk FE handoff. BE-FE paralel work via <code>[BE-CONTRACT-FROZEN]</code> marker. Backward-compatible — feature folder v2.x tetap valid. <a href="MIGRATION-v2-to-v3.md">Migration guide →</a> · <a href="CHANGELOG.md">Changelog →</a>
+      <div class="callout" style="margin-top:20px; font-size:0.9rem; border-color: rgba(96,165,250,0.4); background: rgba(96,165,250,0.06);">
+        <strong>🆕 v3.1 (May 2026) — Timeline addition:</strong> <code>/spec</code> sekarang auto-generate <strong>IMPL-PLAN.md</strong> (lightweight timeline + critical path ASCII gantt) dari estimate output 2 agent. Plus <code>scripts/new-feature.sh</code> default scaffold v3.0 scheme (flag <code>--legacy-v2</code> untuk backward-compat). <a href="CHANGELOG.md">Lihat v3.1 changelog →</a>
+      </div>
+
+      <div class="callout" style="margin-top:12px; font-size:0.9rem; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.06);">
+        <strong>⚠️ v3.0 (May 2026) — BREAKING CHANGE:</strong> Collapse 3 gate pra-dev (PRD/TD/Plan) jadi 1 Phase Spec dengan single checkpoint. Wireframe HTML untuk FE handoff. BE-FE paralel work via <code>[BE-CONTRACT-FROZEN]</code> marker. Backward-compatible — feature folder v2.x tetap valid. <a href="MIGRATION-v2-to-v3.md">Migration guide →</a>
       </div>
     </section>
 
@@ -129,29 +133,30 @@
       <div class="grid grid-3">
         <div class="card">
           <div class="label" style="color: var(--warn);">👤 PM / BA · ~30 min</div>
-          <p style="margin-top:8px;"><a href="phases/1-grooming.html">Gate 1 Grooming</a> · <a href="templates/PRD-template.md">PRD Template</a></p>
+          <p style="margin-top:8px;"><a href="commands/spec.md">/spec</a> · <a href="templates/SPEC-BE-template.md">SPEC-BE Template</a> · <a href="templates/IMPL-PLAN-template.md">IMPL-PLAN Template</a></p>
         </div>
         <div class="card">
           <div class="label" style="color: var(--warn);">👤 Tech Lead · ~45 min</div>
-          <p style="margin-top:8px;"><a href="phases/2-tech-design.html">Gate 2 Tech Design</a> · <a href="#principles">Prinsip 19 Existing Analysis</a></p>
+          <p style="margin-top:8px;"><a href="templates/SPEC-BE-template.md">SPEC-BE Template</a> · <a href="#principles">Prinsip 19 Existing Analysis</a> · <a href="templates/IMPL-PLAN-template.md">IMPL-PLAN Template</a></p>
         </div>
         <div class="card">
           <div class="label" style="color: var(--warn);">👤 Developer · ~1 hour</div>
-          <p style="margin-top:8px;"><a href="phases/4-development.html">Gate 4 Dev</a> · <a href="#principles">Prinsip 20 Git Hygiene</a> · <a href="commands/implement.md">/implement</a></p>
+          <p style="margin-top:8px;"><a href="commands/implement.md">/implement BE/FE</a> · <a href="#principles">Prinsip 20 Git Hygiene</a> · <a href="templates/SPEC-BE-template.md">SPEC-BE</a></p>
         </div>
         <div class="card">
           <div class="label" style="color: var(--warn);">👤 Designer / FE Dev · ~30 min</div>
-          <p style="margin-top:8px;"><a href="templates/UI-Impact-template.md">UI-Impact Template</a> · <a href="phases/1-grooming.html">Gate 1 Pre-Dev</a></p>
+          <p style="margin-top:8px;"><a href="templates/SPEC-FE-template.md">SPEC-FE Template</a> · <a href="templates/wireframe-template.html">Wireframe Starter</a> · <a href="commands/ui-impact-analysis.md">/ui-impact-analysis</a></p>
         </div>
         <div class="card">
           <div class="label" style="color: var(--warn);">👤 QA · ~30 min</div>
-          <p style="margin-top:8px;"><a href="phases/5-testing.html">Gate 5 Testing</a> · <a href="templates/TestPlan-template.md">Test Plan Template</a></p>
+          <p style="margin-top:8px;"><a href="phases/5-testing.html">Phase 3 Testing (Gate 5)</a> · <a href="templates/TestPlan-template.md">Test Plan Template</a></p>
         </div>
         <div class="card">
           <div class="label" style="color: var(--warn);">👤 SRE · ~30 min</div>
-          <p style="margin-top:8px;"><a href="phases/7-live.html">Gate 7 Live</a> · runbook structure</p>
+          <p style="margin-top:8px;"><a href="phases/7-live.html">Phase 3 Live (Gate 7)</a> · runbook structure</p>
         </div>
       </div>
+      <p style="margin-top:12px; font-size:0.85rem; color:var(--text-dim);"><strong>Migrating dari v2.x?</strong> Lihat <a href="MIGRATION-v2-to-v3.md">MIGRATION-v2-to-v3.md</a> untuk mapping artifact + step-by-step.</p>
     </section>
 
     <section id="what-changed">
@@ -1126,7 +1131,7 @@ make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
     <div class="footer">
       Agent Playbook v2.1 — Team Edition · Disusun untuk tim multi-tribe yang ingin AI handle fase paling sakit (grooming, tech disc, dev, testing) dengan tetap menjaga keputusan di developer.<br>
       Berbasis Agent Playbook v1 (<a href="https://aldhirs.github.io/ai-agent-playbook/index.html">SafeTech</a>) — dengan 6 prinsip operating+quality, 7 gate workflow, 3-layer tribe architecture, UI-Impact workflow, hierarchical task mode, dan rollout 90 hari.<br>
-      Last updated: 2026-05-24 · v3.0 · <a href="CHANGELOG.md">Changelog</a> · <a href="README.md">README</a> · <a href="MIGRATION-v2-to-v3.md">Migration v2→v3</a> · <a href="https://github.com/aldhirs/ai-agent-playbook-v2">GitHub</a>
+      Last updated: 2026-05-25 · v3.1 · <a href="CHANGELOG.md">Changelog</a> · <a href="README.md">README</a> · <a href="MIGRATION-v2-to-v3.md">Migration v2→v3</a> · <a href="https://github.com/aldhirs/ai-agent-playbook-v2">GitHub</a>
     </div>
 
   </main>
