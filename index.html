@@ -411,7 +411,7 @@ qa-greenlight + sre runbook     → Phase 3 (retain v2.x Gate 5-7)</pre>
 
     <section id="tribe-arch">
       <h2>4. Tribe Architecture — Berbagi Tanpa Coupling</h2>
-      <p>Konteks kerja Aldhi: tribe 1, 2, 3a, 3b, 3c. Tribe 3 share <em>domain context</em> tapi fokus berbeda. v2 menjawab ini dengan struktur 3-layer.</p>
+      <p>Konteks tipikal: multi-tribe (mis. tribe 1, 2, 3a, 3b, 4, 5 — 6 tribes total di adopter project). Sub-tribe (mis. 3a/3b) share <em>domain context</em> tapi fokus berbeda. v2 introduce struktur 3-layer ini; v3 retain unchanged.</p>
 
       <div class="diagram">
         <svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
@@ -520,28 +520,44 @@ qa-greenlight + sre runbook     → Phase 3 (retain v2.x Gate 5-7)</pre>
 
           <g transform="translate(40,580)">
             <text x="0" y="0" font-size="10" fill="#fbbf24" font-weight="700">LESSON PROMOTION:</text>
-            <text x="125" y="0" font-size="10" fill="#e6e9ef">lesson di service → tribe (≥2 service) → org (≥2 tribe) · monthly cross-tribe scan oleh Triage Agent</text>
+            <text x="125" y="0" font-size="10" fill="#e6e9ef">lesson di service → tribe (≥2 service) → org (≥2 tribe) · monthly cross-tribe scan oleh qa-engineer (triage mode)</text>
           </g>
         </svg>
         <div class="caption">Diagram 2 · Tribe architecture 3-layer. Tribe 3a/3b/3c berbagi <code>tribes/3/CLAUDE.md</code>; sub-tribe CLAUDE.md hanya dipakai kalau perlu deviasi.</div>
       </div>
 
-      <h3>4.1 Hierarki CLAUDE.md &amp; Skills</h3>
+      <h3>4.1 Hierarki CLAUDE.md, Agents &amp; Commands (v3.x)</h3>
       <pre><code>org/
 ├── .claude/
-│   ├── CLAUDE.md            # 14+4 principles, glossary, do/don't org-wide
-│   ├── skills/              # skill yang relevan semua tribe
-│   │   ├── golang-microservice/
-│   │   ├── vue-frontend/
-│   │   ├── grpc-contract/
-│   │   └── openapi-design/
-│   └── commands/            # slash command shared
-│       ├── groom.md
-│       ├── tech-design.md
-│       ├── plan.md
-│       ├── implement.md
-│       ├── test-plan.md
-│       └── code-review.md
+│   ├── CLAUDE.md            # 14 prinsip v1 + 6 prinsip v2 (15-20) — retain di v3
+│   ├── agents/              # 11 subagent project-level (shareable via git)
+│   │   ├── pm.md
+│   │   ├── solution-architect.md
+│   │   ├── ui-impact-analyst.md
+│   │   ├── backend-engineer.md
+│   │   ├── frontend-engineer.md
+│   │   ├── qa-engineer.md
+│   │   ├── security-engineer.md
+│   │   ├── sre.md
+│   │   ├── product-designer.md
+│   │   ├── verification-gatekeeper.md
+│   │   └── domain-expert-*.md          # worked example (mis. -elearning-payment)
+│   └── commands/            # 5 slash command active + 3 archived
+│       ├── spec.md          # Phase 1 — invoke 3 agent sequential
+│       ├── implement.md     # Phase 2 — BE/FE chunk
+│       ├── ui-impact-analysis.md  # wireframe gen + verify
+│       ├── code-review.md
+│       ├── test-plan.md     # Phase 3 (Gate 5)
+│       └── _archived-v2/    # /groom, /tech-design, /plan (backward-compat)
+│
+├── templates/
+│   ├── SPEC-BE-template.md         # v3.0
+│   ├── SPEC-FE-template.md         # v3.0
+│   ├── IMPL-PLAN-template.md       # v3.1
+│   ├── wireframe-template.html     # v3.0 — Tailwind CDN
+│   ├── PUSHBACK-TO-PRODUCT-template.md
+│   ├── TestPlan-template.md
+│   └── _archived-v2/               # PRD, TechDesign, UI-Impact (backward-compat)
 │
 ├── tribes/
 │   ├── 1/
@@ -549,24 +565,21 @@ qa-greenlight + sre runbook     → Phase 3 (retain v2.x Gate 5-7)</pre>
 │   │   └── LESSONS.md
 │   ├── 2/...
 │   └── 3/
-│       ├── CLAUDE.md        # SHARED untuk 3a/3b/3c (domain payment, regulasi, dsb)
-│       ├── 3a/
-│       │   ├── CLAUDE.md    # fokus spesifik 3a
-│       │   └── services/
-│       ├── 3b/...
-│       └── 3c/...
+│       ├── CLAUDE.md        # SHARED untuk 3a/3b (domain glossary, do/don't)
+│       ├── 3a/CLAUDE.md     # fokus spesifik 3a
+│       └── 3b/CLAUDE.md     # fokus spesifik 3b
 │
-└── services/
-    └── &lt;service-name&gt;/
-        ├── CLAUDE.md        # quirk &amp; convention service
-        ├── features/
-        │   └── &lt;feature-slug&gt;/
-        │       ├── G1-PRD.md
-        │       ├── G2-TECH-DESIGN.md
-        │       ├── G3-IMPL-PLAN.md
-        │       ├── G5-TEST-PLAN.md
-        │       └── evidence/
-        └── ...
+└── &lt;tribe&gt;/features/&lt;slug&gt;/  # feature folder v3.x scheme
+    ├── SPEC-BE.md
+    ├── SPEC-FE.md
+    ├── IMPL-PLAN.md
+    ├── wireframes/
+    │   └── *.html
+    ├── contract/openapi.yaml
+    ├── migrations/
+    ├── evidence/{be,fe}/
+    ├── G5-TEST-PLAN.md      # Phase 3 retain
+    └── G7-POST-LAUNCH-RETRO.md
 </code></pre>
 
       <p>Claude Code otomatis mengakumulasi CLAUDE.md dari leaf → root. Jadi saat dev kerja di <code>tribes/3/3a/services/payment-gateway/</code>, agent membaca:</p>
@@ -578,7 +591,7 @@ qa-greenlight + sre runbook     → Phase 3 (retain v2.x Gate 5-7)</pre>
       </ol>
 
       <h3>4.2 Memory Federation — Lessons</h3>
-      <p>Setiap tribe punya <code>LESSONS.md</code> sendiri. Tiap akhir bulan, Triage Agent run cross-tribe scan: lesson yang muncul di ≥2 tribe → promote ke <code>org/.claude/LESSONS.md</code> dan (kalau pattern engineering) dikodifikasi sebagai principle baru di <code>org/.claude/CLAUDE.md</code>.</p>
+      <p>Setiap tribe punya <code>LESSONS.md</code> sendiri. Tiap akhir bulan, <code>qa-engineer</code> (triage mode) run cross-tribe scan: lesson yang muncul di ≥2 tribe → promote ke <code>org/.claude/LESSONS.md</code> dan (kalau pattern engineering) dikodifikasi sebagai principle baru di <code>org/.claude/CLAUDE.md</code>.</p>
 
       <table>
         <tr><th>Skenario</th><th>Aksi</th></tr>
@@ -587,8 +600,8 @@ qa-greenlight + sre runbook     → Phase 3 (retain v2.x Gate 5-7)</pre>
         <tr><td>Tribe 1 &amp; 2 juga punya kasus serupa</td><td>Promote ke <code>org/.claude/CLAUDE.md</code> sebagai principle ke-19, 20, dst.</td></tr>
       </table>
 
-      <h3>4.3 Cross-Tribe Review (Wajib di Gate 2)</h3>
-      <p>Untuk tech design (Gate 2), <strong>minimal 1 reviewer dari tribe lain</strong>. Tujuan: bukan "permission" tapi <em>cross-pollination</em> — supaya pola di tribe 3 tidak buta tribe 1, dst. Reviewer punya 24 jam SLA; lewat itu, otomatis di-skip (tidak block).</p>
+      <h3>4.3 Cross-Tribe Review (Wajib di Phase 1.5 Checkpoint)</h3>
+      <p>Untuk SPEC-BE (Phase 1.5 checkpoint), <strong>minimal 1 reviewer dari tribe lain</strong> di-tag sebagai LGTM-SPEC-BE consultant. Tujuan: bukan "permission" tapi <em>cross-pollination</em> — supaya pola di tribe 3 tidak buta tribe 1, dst. Reviewer punya 24 jam SLA; lewat itu, otomatis di-skip (tidak block).</p>
 
       <div class="callout warn">
         <strong>Anti-pattern:</strong> Tribe yang membangun ulang CLAUDE.md dari nol. Selalu mulai dari org-level, override seperlunya. Kalau merasa &gt;50% perlu di-override, itu sinyal arsitektur tribe terlalu beda dari org — bicarakan di forum tech lead, jangan fork diam-diam.
@@ -599,95 +612,98 @@ qa-greenlight + sre runbook     → Phase 3 (retain v2.x Gate 5-7)</pre>
       <h2>5. Feature Folder — Struktur Output Kanonik</h2>
       <p>Aturan emas (Prinsip 17): <strong>1 feature = 1 folder = semua output di sana</strong>. Tidak ada artefak yang tercecer di Slack, DM, root repo, atau wiki terpisah. Kalau seseorang ingin tahu apa pun tentang feature X, mereka buka <code>features/&lt;slug&gt;/</code> dan menemukan semuanya — dari PRD sampai runbook produksi.</p>
 
-      <h3>5.1 Struktur Folder Lengkap (v2.1 — Gate-based naming)</h3>
+      <h3>5.1 Struktur Folder v3.x (default untuk feature baru)</h3>
 <pre><code>features/&lt;slug&gt;/
-├── README.md                    ← Auto-generated index, link ke semua artefak
-├── manifest.yaml                ← target_repos + sync map + has_ui_impact flag (NEW v2.1)
-├── G1-PRD.md                       ← Gate 1 · Problem + user stories + AC + § 5 UI Vision
-├── G1-UI-IMPACT.md                 ← Gate 1 (Pre-Dev) + Gate 4 (Post-Dev) + agent analysis (NEW v2.1)
-├── G2-TECH-DESIGN.md               ← Gate 2 · § 0 Existing Analysis + Decision + sequence + risk
-├── G3-IMPL-PLAN.md                 ← Gate 3 · Task list + dependency graph
-├── G5-TEST-PLAN.md                 ← Gate 5 (mulai Gate 3) · Test matrix + edge case
-├── G7-POST-LAUNCH-RETRO.md         ← Gate 7 · T+7 retro + lessons extracted
-├── PUSHBACK-TO-PRODUCT.md          ← Opsional · gap analysis kalau adopt PRD eksternal (NEW v2.1)
+├── README.md                    ← Auto-generated index per scheme
+├── manifest.yaml                ← target_repos + sync map + has_ui_impact + spec_version
+├── SPEC-BE.md                   ← Phase 1 · Consolidated BE spec (12 section + § 11.6 estimate)
+├── SPEC-FE.md                   ← Phase 1 · Consolidated FE spec (kalau has_ui_impact)
+├── IMPL-PLAN.md                 ← Phase 1 · v3.1 · Auto-generated timeline + critical path
+├── OPEN-QUESTIONS.md            ← Push-back signal (created on-demand, cap 2 round)
 │
-├── decisions/                   ← ADR per keputusan besar (pisah dari TD kalau perlu)
-│   └── ADR-001-&lt;judul&gt;.md
+├── wireframes/                  ← Phase 1 · D2 mitigation untuk FE handoff
+│   ├── index.html               ← Navigation hub ke semua page
+│   └── &lt;page-name&gt;.html         ← Per-page wireframe (Tailwind CDN, 5-state interactive)
 │
-├── contract/                    ← API contract khusus feature ini
+├── contract/                    ← Auto-extracted dari SPEC-BE § 4
 │   ├── openapi.yaml             ← REST endpoint additions/changes
-│   └── proto/
-│       └── &lt;name&gt;.proto         ← gRPC definitions
+│   └── proto/&lt;name&gt;.proto       ← gRPC definitions (kalau applicable)
 │
-├── migrations/                  ← DB migration scoped ke feature ini
+├── migrations/                  ← Auto-extracted dari SPEC-BE § 3
 │   ├── 001-&lt;name&gt;.up.sql
 │   └── 001-&lt;name&gt;.down.sql      ← WAJIB pasangan, backward-compatible
 │
-├── tests/                       ← Test file yang lahir bersama feature
+├── tests/                       ← Test file (Phase 2)
 │   ├── integration/             ← Go testcontainers test
 │   ├── e2e/                     ← Playwright E2E
-│   └── exploratory.md           ← Manual exploratory scenario
+│   └── exploratory.md
 │
-├── runbook/                     ← SRE &amp; on-call artifacts (Gate 7)
-│   ├── failure-modes.md         ← Top 3-5 failure: symptom → check → mitigation
-│   ├── alerts.yaml              ← Alert config (Grafana / Datadog)
-│   └── dashboard.json           ← Dashboard panel definition
+├── evidence/                    ← Phase 2 · per chunk (bukan per task lagi)
+│   ├── be/                      ← BE PR evidence
+│   │   ├── curl.txt
+│   │   └── test.log
+│   └── fe/                      ← FE PR evidence
+│       ├── test.log
+│       └── screenshots/         ← Min. 5 per page utama (5-state coverage)
 │
-├── evidence/                    ← Bukti per task (Gate 4)
-│   └── &lt;task-id&gt;/
-│       ├── curl.txt             ← Request/response endpoint
-│       ├── test.log             ← Output test run
-│       └── screenshots/         ← Min. 3 kalau UI change
+├── runbook/                     ← Phase 3 · SRE &amp; on-call artifacts
+│   ├── failure-modes.md
+│   ├── alerts.yaml
+│   └── dashboard.json
 │
-└── G4-CODE-MANIFEST.md             ← Pointer ke file CODE di service layout
-                                    (karena Go module butuh standard layout)
+├── G5-TEST-PLAN.md              ← Phase 3 (retain Gate 5 v2.x)
+└── G7-POST-LAUNCH-RETRO.md      ← Phase 3 (retain Gate 7 v2.x)
 </code></pre>
 
-      <h3>5.2 Mapping Artefak per Gate</h3>
+      <div class="callout">
+        <strong>Backward-compat:</strong> Feature folder pakai v2.x scheme (<code>G1-PRD.md</code>, <code>G2-TECH-DESIGN.md</code>, dst) tetap valid — finish dengan struktur lama. Scaffold v2.x scheme via <code>bash scripts/new-feature.sh &lt;slug&gt; &lt;tribe&gt; --legacy-v2</code>. Lihat <a href="MIGRATION-v2-to-v3.md">MIGRATION-v2-to-v3.md</a> untuk artifact mapping.
+      </div>
+
+      <h3>5.2 Mapping Artefak per Phase (v3.x)</h3>
       <table>
-        <tr><th>Gate</th><th>Artefak yang dihasilkan</th><th>Lokasi di feature folder</th></tr>
-        <tr><td>1 Grooming</td><td>PRD + <strong>UI Impact Pre-Dev (v2.1)</strong></td><td><code>G1-PRD.md</code> + <code>G1-UI-IMPACT.md</code></td></tr>
-        <tr><td>2 Tech Disc.</td><td>Tech design (+ <strong>§ 0 Existing Analysis</strong>), ADR, API contract, migration plan</td><td><code>G2-TECH-DESIGN.md</code> · <code>decisions/</code> · <code>contract/</code> · <code>migrations/</code></td></tr>
-        <tr><td>3 Planning</td><td>Impl plan, task breakdown</td><td><code>G3-IMPL-PLAN.md</code></td></tr>
-        <tr><td>4 Development</td><td>Evidence per task + <strong>UI Impact Post-Dev (v2.1)</strong></td><td><code>evidence/&lt;task-id&gt;/</code> + update <code>G4-CODE-MANIFEST.md</code> + <code>G1-UI-IMPACT.md</code> Section 2-3</td></tr>
-        <tr><td>5 Testing</td><td>Test plan, test files</td><td><code>G5-TEST-PLAN.md</code> · <code>tests/</code></td></tr>
-        <tr><td>6 Defects</td><td>Regression test, lesson candidate</td><td><code>tests/</code> + (lesson di <code>tribes/&lt;id&gt;/LESSONS.md</code>)</td></tr>
-        <tr><td>7 Live</td><td>Runbook, alerts, retro</td><td><code>runbook/</code> · <code>G7-POST-LAUNCH-RETRO.md</code></td></tr>
+        <tr><th>Phase</th><th>Artefak yang dihasilkan</th><th>Lokasi di feature folder</th></tr>
+        <tr><td>1 Spec (autonomous)</td><td>Consolidated spec BE + FE + wireframes + IMPL-PLAN + contract + migrations</td><td><code>SPEC-BE.md</code> + <code>SPEC-FE.md</code> + <code>IMPL-PLAN.md</code> + <code>wireframes/</code> + <code>contract/</code> + <code>migrations/</code></td></tr>
+        <tr><td>1.5 Checkpoint</td><td>LGTM grep-able di SPEC § 12</td><td><code>SPEC-BE.md § 12</code> + <code>SPEC-FE.md § 12</code> (+ optional <code>IMPL-PLAN.md § 7</code>)</td></tr>
+        <tr><td>1 Push-back (kalau ada)</td><td>Pertanyaan ambigu yang block downstream</td><td><code>OPEN-QUESTIONS.md</code></td></tr>
+        <tr><td>2 Dev BE</td><td>Code di repo target + evidence chunk</td><td><code>evidence/be/{curl.txt, test.log}</code> + 1 PR di repo target</td></tr>
+        <tr><td>2 Dev FE</td><td>Code di repo target + evidence chunk + post-dev wireframe verification</td><td><code>evidence/fe/{screenshots/, test.log}</code> + 1 PR + update <code>SPEC-FE.md</code> Appendix Post-Dev</td></tr>
+        <tr><td>3 Testing (Gate 5)</td><td>Test plan, test files</td><td><code>G5-TEST-PLAN.md</code> + <code>tests/</code></td></tr>
+        <tr><td>3 Defects (Gate 6)</td><td>Regression test, lesson candidate</td><td><code>tests/</code> + (lesson di <code>tribes/&lt;id&gt;/LESSONS.md</code>)</td></tr>
+        <tr><td>3 Live (Gate 7)</td><td>Runbook, alerts, retro</td><td><code>runbook/</code> + <code>G7-POST-LAUNCH-RETRO.md</code></td></tr>
       </table>
 
-      <h3>5.3 Code Manifest — Kenapa Ada?</h3>
-      <p>Code (Go handler/usecase/repo, Vue component) tetap harus di standard service layout — bukan di feature folder — karena Go module &amp; bundler perlu layout standar. Tapi tetap harus bisa ditemukan dari feature folder.</p>
-      <p><strong>Solusi:</strong> <code>features/&lt;slug&gt;/G4-CODE-MANIFEST.md</code> mencatat semua file code yang disentuh feature ini:</p>
-<pre><code># Code Manifest — apple-pay-checkout
+      <h3>5.3 Code Tracking — PR Description &amp; SPEC Reference (v3.x)</h3>
+      <p>Code (Go handler/usecase/repo, Vue component) tetap di standard service layout. Tracking "file apa saja yang disentuh" sekarang di <strong>PR description</strong> (link ke SPEC-BE/SPEC-FE section per perubahan), bukan separate <code>G4-CODE-MANIFEST.md</code> file (deprecated di v3).</p>
+      <p><strong>Pattern PR description (v3.x):</strong></p>
+<pre><code>## SPEC reference
+- SPEC-BE.md § 3 (Migration) → migrations/2026_05_25_001_apple_pay_token.up.sql
+- SPEC-BE.md § 4 (API Contract) → internal/handler/http/apple_pay.go
+- SPEC-BE.md § 5 (Usecase) → internal/usecase/apple_pay_charge.go
 
-## Files added
-- `internal/handler/http/apple_pay.go` (Gate 4 · Task T03)
-- `internal/usecase/apple_pay_charge.go` (Gate 4 · Task T05)
-- `internal/repository/apple_pay_token.go` (Gate 4 · Task T04)
-- `web/src/components/ApplePayButton.vue` (Gate 4 · Task T07)
+## Self-review checklist (refer commands/implement.md § 7)
+- [x] Git hygiene done (Prinsip 20)
+- [x] Contract conformance (match SPEC-BE § 4)
+- [x] § 0 Reuse plan diikuti
+- [x] Observability lengkap (log + metric + trace per § 6)
+- [x] Banned-field test green
+- [x] PR diff &lt;500 lines (soft cap)
 
-## Files modified
-- `internal/handler/http/router.go` (route registration · Task T03)
-- `api/openapi.yaml` (← di-generate dari `features/apple-pay-checkout/contract/openapi.yaml`)
-
-## Migrations applied
-- `migrations/2026_05_12_001_apple_pay_token.up.sql` (← copy dari feature folder)
-
-## Standard locations updated (auto via `make feature-apply`)
-- `monitoring/alerts/apple_pay_checkout.yaml`
-- `runbooks/payment/apple-pay-checkout.md`
+## Evidence
+- features/apple-pay-checkout/evidence/be/curl.txt
+- features/apple-pay-checkout/evidence/be/test.log
 </code></pre>
+
+      <p><strong>Kenapa deprecate <code>G4-CODE-MANIFEST.md</code>?</strong> Di v2.x ini berguna karena task breakdown granular (banyak PR per feature). Di v3.x cuma 2 PR per feature (BE + FE), jadi PR description sudah cukup sebagai single source of truth. Audit trail cross-PR tetap ada via <code>SPEC reference</code> section.</p>
 
       <h3>5.4 Build Tooling — <code>make feature-apply</code></h3>
       <p>Beberapa artefak harus di-mirror ke standard location supaya tooling generic ikut. Ini di-handle satu perintah:</p>
-<pre><code># Saat feature siap merge (Gate 4):
+<pre><code># Saat feature siap merge (Phase 2 — sebelum/saat PR open):
 make feature-apply FEATURE=apple-pay-checkout
 # Yang dilakukan:
 # 1. Merge features/&lt;slug&gt;/contract/openapi.yaml → api/openapi.yaml (additive)
 # 2. Copy features/&lt;slug&gt;/migrations/* → migrations/ (dengan timestamp)
-# 3. Copy features/&lt;slug&gt;/runbook/alerts.yaml → monitoring/alerts/&lt;slug&gt;.yaml
-# 4. Copy features/&lt;slug&gt;/runbook/failure-modes.md → runbooks/&lt;service&gt;/&lt;slug&gt;.md
-# 5. Update G4-CODE-MANIFEST.md dengan timestamp
+# 3. Copy features/&lt;slug&gt;/runbook/alerts.yaml → monitoring/alerts/&lt;slug&gt;.yaml (Phase 3)
+# 4. Copy features/&lt;slug&gt;/runbook/failure-modes.md → runbooks/&lt;service&gt;/&lt;slug&gt;.md (Phase 3)
 
 # Saat perlu rollback feature:
 make feature-rollback FEATURE=apple-pay-checkout
@@ -697,7 +713,7 @@ make feature-rollback FEATURE=apple-pay-checkout
       <h3>5.5 Lifecycle Feature Folder</h3>
       <table>
         <tr><th>Status</th><th>Aksi</th><th>Folder location</th></tr>
-        <tr><td><strong>Active</strong></td><td>Dalam progres (Gate 1-7)</td><td><code>features/&lt;slug&gt;/</code></td></tr>
+        <tr><td><strong>Active</strong></td><td>Dalam progres (Phase 1 → Phase 3)</td><td><code>features/&lt;slug&gt;/</code></td></tr>
         <tr><td><strong>Live &amp; Maintained</strong></td><td>Sudah Gate 7 closed; folder tetap aktif sebagai referensi</td><td><code>features/&lt;slug&gt;/</code></td></tr>
         <tr><td><strong>Archived</strong></td><td>Feature stabil ≥6 bulan; pindahkan ke arsip untuk de-clutter</td><td><code>features/_archived/&lt;year&gt;/&lt;slug&gt;/</code></td></tr>
         <tr><td><strong>Deprecated</strong></td><td>Feature di-sunset; folder tetap untuk historical lesson</td><td><code>features/_archived/&lt;year&gt;/&lt;slug&gt;-DEPRECATED/</code></td></tr>
@@ -736,39 +752,40 @@ make feature-rollback FEATURE=apple-pay-checkout
 make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
 </code></pre>
 
-      <h3>6.2 Slash Commands (per fase)</h3>
-      <p>Disimpan di <code>org/.claude/commands/</code> dan otomatis tersedia di semua repo yang ikut struktur ini.</p>
+      <h3>6.2 Slash Commands (v3.x — 5 active + 3 archived)</h3>
+      <p>Disimpan di <code>&lt;project&gt;/.claude/commands/</code> dan otomatis tersedia di repo yang punya struktur ini.</p>
 
       <table>
-        <tr><th>Command</th><th>Fase</th><th>Aksi</th></tr>
-        <tr><td><code>/groom &lt;jira-id&gt;</code></td><td>1</td><td>Tarik epic, generate PRD draft + open questions</td></tr>
-        <tr><td><code>/tech-design &lt;feature-slug&gt;</code></td><td>2</td><td>Generate tech design + ADR + OpenAPI / proto + risk register</td></tr>
-        <tr><td><code>/plan &lt;feature-slug&gt;</code></td><td>3</td><td>Generate impl plan + task breakdown + estimate</td></tr>
-        <tr><td><code>/implement &lt;task-id&gt;</code></td><td>4</td><td>Implement task spesifik, generate code + test + evidence</td></tr>
-        <tr><td><code>/test-plan &lt;feature-slug&gt;</code></td><td>5</td><td>Generate test plan + skeleton E2E test</td></tr>
-        <tr><td><code>/code-review &lt;pr-id&gt;</code></td><td>4-6</td><td>Self-review checklist + static analysis summary</td></tr>
-        <tr><td><code>/evidence &lt;task-id&gt;</code></td><td>4</td><td>Collect &amp; format curl.txt + test.log + screenshots</td></tr>
-        <tr><td><code>/lesson "&lt;judul&gt;"</code></td><td>6-7</td><td>Tambahkan lesson ke LESSONS.md dengan format konsisten</td></tr>
+        <tr><th>Command</th><th>Phase</th><th>Aksi</th></tr>
+        <tr><td><code>/spec &lt;epic&gt; [tribe] [--no-ui]</code></td><td>1 (autonomous)</td><td>Invoke <code>pm</code> + <code>solution-architect</code> + <code>ui-impact-analyst</code> sequential. Generate SPEC-BE + SPEC-FE + wireframes/*.html + IMPL-PLAN.md + contract + migrations.</td></tr>
+        <tr><td><code>/implement &lt;slug&gt;/be</code> atau <code>/implement &lt;slug&gt;/fe</code></td><td>2</td><td>Implement 1 chunk (BE atau FE) dari SPEC. Soft cap 500 lines diff per PR. Git hygiene 3-step wajib (Prinsip 20). Paralel BE+FE allowed via <code>[BE-CONTRACT-FROZEN]</code> marker.</td></tr>
+        <tr><td><code>/ui-impact-analysis &lt;slug&gt; [--mode=pre-dev|post-dev|quick-diff]</code></td><td>1/2/ad-hoc</td><td>Pre-Dev: generate wireframe HTML + fill SPEC-FE. Post-Dev: compare wireframe vs actual screenshots, flag deviation.</td></tr>
+        <tr><td><code>/code-review &lt;slug&gt;/&lt;chunk&gt;</code></td><td>2</td><td>Self-review checklist + static analysis summary sebelum PR open</td></tr>
+        <tr><td><code>/test-plan &lt;slug&gt;</code></td><td>3 (Gate 5)</td><td>AC mapping + 5-state matrix + 10+ edge case</td></tr>
       </table>
 
-      <h3>6.3 Skills — Stack-Specific Knowledge</h3>
-      <p>Skill di-bundle di <code>org/.claude/skills/</code>. Per skill: SKILL.md + helper scripts + template kode.</p>
+      <p style="margin-top:12px; font-size:0.9rem;"><strong>Archived (v2.x backward-compat di <code>commands/_archived-v2/</code>):</strong> <code>/groom</code>, <code>/tech-design</code>, <code>/plan</code> — folded into <code>/spec</code>. Tetap valid untuk feature aktif yang sudah jalan v2.x scheme.</p>
+
+      <h3>6.3 Subagents — Project-level Specialization</h3>
+      <p>Playbook menyediakan <strong>11 subagent file</strong> di <code>agents/</code> (project-level, shareable via git, menang vs user-level). Refer ke <a href="#operating-model">§2 Operating Model</a> untuk mapping per Phase.</p>
 
       <ul>
-        <li><strong>golang-microservice</strong> — layout standar (cmd/, internal/, pkg/), pattern handler/service/repo, observability hook, graceful shutdown, error wrapping.</li>
-        <li><strong>vue-frontend</strong> — composition API + Pinia store + script setup, 5 UI states (default/loading/empty/error/success), accessibility checklist.</li>
-        <li><strong>grpc-contract</strong> — proto file convention, buf lint, backward-compat rule, codegen pipeline.</li>
-        <li><strong>openapi-design</strong> — spec-first, validation matrix, 422 dengan friendly message (sesuai prinsip v1).</li>
-        <li><strong>test-scaffolding</strong> — Go: table-driven test + testcontainers untuk integration. Vue: Vitest + Playwright.</li>
+        <li><strong>Orchestration (Phase 1 via <code>/spec</code>):</strong> <code>pm</code>, <code>solution-architect</code>, <code>ui-impact-analyst</code></li>
+        <li><strong>Implementation (Phase 2 via <code>/implement</code>):</strong> <code>backend-engineer</code> (Go), <code>frontend-engineer</code> (Vue 3 / Nuxt) — customize per stack project</li>
+        <li><strong>Quality (Phase 3 + cross-cutting):</strong> <code>qa-engineer</code>, <code>security-engineer</code>, <code>sre</code>, <code>verification-gatekeeper</code></li>
+        <li><strong>Support (on-demand):</strong> <code>product-designer</code> (UX principles), <code>domain-expert-elearning-payment</code> (worked example — copy + rename + adapt ke domain Anda)</li>
       </ul>
+
+      <p><strong>Genericization:</strong> 4 agent (<code>backend-engineer</code>, <code>frontend-engineer</code>, <code>solution-architect</code>, <code>ui-impact-analyst</code>) pakai placeholder <code>&lt;your-shared-lib&gt;</code>, <code>&lt;your-fe-monorepo&gt;</code>, <code>&lt;your-app&gt;</code> — replace dengan path actual project saat adopt.</p>
 
       <h3>6.4 MCP Servers (opsional, kuat)</h3>
       <p>Kalau tim siap, sambungkan MCP untuk integrasi langsung:</p>
       <ul>
-        <li><strong>Jira/Linear MCP</strong> — Groomer Agent tarik epic, update status, comment</li>
-        <li><strong>GitHub MCP</strong> — Coder Agent buka PR, baca diff, baca CI log</li>
-        <li><strong>Confluence/Notion MCP</strong> — sync PRD/Tech Design ke wiki tim</li>
-        <li><strong>Monitoring MCP (Grafana/Datadog)</strong> — Reliability Agent baca metric + log untuk post-launch retro</li>
+        <li><strong>Jira/Linear MCP</strong> — <code>/spec</code> tarik epic, update status, comment</li>
+        <li><strong>GitHub/GitLab MCP</strong> — <code>/implement</code> buka PR, baca diff, baca CI log</li>
+        <li><strong>Confluence/Notion MCP</strong> — sync SPEC-BE/SPEC-FE ke wiki tim</li>
+        <li><strong>Monitoring MCP (Grafana/Datadog)</strong> — Phase 3 SRE baca metric + log untuk post-launch retro</li>
+        <li><strong>Figma MCP</strong> — <code>ui-impact-analyst</code> fetch design context untuk Pre-Dev wireframe generation</li>
       </ul>
 
       <div class="callout">
@@ -777,45 +794,72 @@ make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
     </section>
 
     <section id="templates">
-      <h2>7. Templates &amp; Prompts</h2>
-      <p>Template fisik ada di folder <code>templates/</code> di playbook ini. Ringkasan struktur tiap dokumen di bawah. Filosofi: <em>setiap dokumen punya skeleton yang sama di semua tribe</em> supaya reviewer dari tribe lain tidak perlu belajar format baru.</p>
+      <h2>7. Templates &amp; Prompts (v3.x)</h2>
+      <p>Template fisik ada di folder <code>templates/</code>. Filosofi: <em>setiap dokumen punya skeleton yang sama di semua tribe</em> supaya reviewer dari tribe lain tidak perlu belajar format baru.</p>
 
-      <h3>7.1 PRD Template</h3>
+      <h3>7.1 SPEC-BE Template (v3.0 — consolidated)</h3>
+      <p><strong>File:</strong> <code><a href="templates/SPEC-BE-template.md">templates/SPEC-BE-template.md</a></code> · <strong>Pengganti:</strong> v2.x PRD-template + TechDesign-template + G3-IMPL-PLAN (BE parts)</p>
       <ul>
-        <li><strong>Problem statement</strong> (1 paragraf, no jargon)</li>
-        <li><strong>Target user &amp; jobs-to-be-done</strong></li>
-        <li><strong>In scope / Out of scope</strong> (eksplisit)</li>
-        <li><strong>User stories + acceptance criteria</strong> (format Given/When/Then)</li>
-        <li><strong>Non-functional requirements</strong> (perf, security, privacy)</li>
-        <li><strong>Dependencies</strong> (service lain, tim lain, vendor)</li>
-        <li><strong>Risks &amp; mitigations</strong></li>
-        <li><strong>Open questions</strong> (auto-generated oleh Groomer; harus tuntas sebelum Gate 1)</li>
+        <li><strong>§ 0 Existing Analysis (WAJIB Prinsip 19)</strong> — codebase audit + magnitude pick (NO-CHANGE / EXTEND default / NEW-MODULE / REWRITE)</li>
+        <li><strong>§ 1-2 Problem &amp; AC</strong> (Given/When/Then format)</li>
+        <li><strong>§ 3 Database Changes</strong> (migration up/down + backward compat checklist)</li>
+        <li><strong>§ 4 API Contract</strong> dengan marker <code>🔒 [BE-CONTRACT-FROZEN]</code> + validation matrix dengan kolom <em>FE UI placement</em></li>
+        <li><strong>§ 5-9</strong> Logic / Observability / Test / Security / Rollout</li>
+        <li><strong>§ 11.6 BE Implementation Estimate (v3.1)</strong> — sub-items + T-shirt + dependency (input untuk IMPL-PLAN aggregator)</li>
+        <li><strong>§ 12 Approval</strong> — <code>LGTM-SPEC-BE</code> grep-able (BE Dev + TL)</li>
       </ul>
 
-      <h3>7.2 Tech Design Template</h3>
+      <h3>7.2 SPEC-FE Template (v3.0 — consolidated)</h3>
+      <p><strong>File:</strong> <code><a href="templates/SPEC-FE-template.md">templates/SPEC-FE-template.md</a></code> · <strong>Pengganti:</strong> v2.x G1-UI-IMPACT + PRD (FE parts) + G3-IMPL-PLAN (FE parts)</p>
       <ul>
-        <li><strong>Context</strong> (link ke PRD)</li>
-        <li><strong>Options considered</strong> (minimal 3, dengan trade-off matrix)</li>
-        <li><strong>Decision</strong> + rationale (= ADR inline)</li>
-        <li><strong>API contract</strong> (OpenAPI snippet untuk REST, proto untuk gRPC)</li>
-        <li><strong>Data model</strong> (ERD atau struct)</li>
-        <li><strong>Sequence diagram</strong> (Mermaid, jangan PowerPoint)</li>
-        <li><strong>Failure modes &amp; recovery</strong></li>
-        <li><strong>Observability plan</strong> (apa yang di-log/metric/trace)</li>
-        <li><strong>Rollout plan</strong> (feature flag? canary? big-bang?)</li>
-        <li><strong>Cross-tribe reviewer</strong> (nama + tribe)</li>
+        <li><strong>§ 0 Existing Analysis</strong> — page existing reference + catalog komponen reuse + composable/store existing</li>
+        <li><strong>§ 2 Wireframe Preview</strong> — link ke <code>wireframes/*.html</code> (open di browser untuk preview interactive)</li>
+        <li><strong>§ 3-6</strong> DIFF table · State management · API integration (refer SPEC-BE § 4) · 5-state plan per page</li>
+        <li><strong>§ 7 Komponen Detail</strong> — reuse dari catalog + pitfall warning + komponen baru (justify)</li>
+        <li><strong>§ 8-10</strong> A11y plan · Release guard · Test approach</li>
+        <li><strong>§ 11.6 FE Implementation Estimate (v3.1)</strong> — mandatory cross-chunk dep (BE-CONTRACT-FROZEN + BE PR merged)</li>
+        <li><strong>§ 12 Approval</strong> — <code>LGTM-SPEC-FE</code> grep-able (Designer + FE Dev)</li>
       </ul>
 
-      <h3>7.3 Test Plan Template</h3>
+      <h3>7.3 IMPL-PLAN Template (v3.1 — NEW)</h3>
+      <p><strong>File:</strong> <code><a href="templates/IMPL-PLAN-template.md">templates/IMPL-PLAN-template.md</a></code> · <strong>Auto-generated</strong> oleh <code>/spec</code> Step 4 aggregator</p>
       <ul>
-        <li><strong>Scope</strong> (mapping ke acceptance criteria di PRD)</li>
+        <li><strong>§ 1 Effort Estimate (chunk level)</strong> — BE/FE T-shirt + sequential vs paralel days</li>
+        <li><strong>§ 2 Sub-items per Chunk</strong> — 3-7 sub-items dengan dependency intra + cross-chunk</li>
+        <li><strong>§ 3 Critical Path (ASCII Gantt)</strong> — visualize paralel work value via <code>[BE-CONTRACT-FROZEN]</code></li>
+        <li><strong>§ 4 Cross-Chunk Dependency Notes</strong> — unlock condition + risk kalau contract berubah</li>
+        <li><strong>§ 5 Sprint Planning</strong> — target sprint, demo readiness day, risk triggers</li>
+        <li><strong>§ 6 Burndown</strong> — per-chunk status tracking (update during sprint)</li>
+        <li><strong>§ 7 Approval (optional)</strong> — <code>LGTM-PLAN</code> kalau tim formal sign-off</li>
+      </ul>
+
+      <h3>7.4 Wireframe Template (v3.0 — NEW)</h3>
+      <p><strong>File:</strong> <code><a href="templates/wireframe-template.html">templates/wireframe-template.html</a></code> · <strong>D2 mitigation</strong> untuk FE handoff pain</p>
+      <ul>
+        <li>Self-contained HTML dengan Tailwind CDN (no build, double-click open di browser)</li>
+        <li>Multi-page demo (Dashboard + Form + Modal) dengan navigation hub</li>
+        <li><strong>5-state interactive demo</strong> (default/loading/error/success/edge) — click button toggle state via inline JS</li>
+        <li>Inline HTML comment reference komponen catalog (<code>&lt;!-- catalog: &lt;AtomicButton variant="primary"&gt; --&gt;</code>)</li>
+        <li>Spec Notes collapsible (<code>&lt;details&gt;</code>) per section</li>
+      </ul>
+
+      <h3>7.5 Test Plan Template (Phase 3 — retain)</h3>
+      <p><strong>File:</strong> <code><a href="templates/TestPlan-template.md">templates/TestPlan-template.md</a></code> · Retain dari v2.x karena Phase 3 unchanged.</p>
+      <ul>
+        <li><strong>Scope</strong> (mapping ke AC di SPEC-BE § 2 + SPEC-FE § 1)</li>
         <li><strong>Test matrix</strong> (state × action; tiap baris = 1 test case)</li>
-        <li><strong>Edge cases</strong> (Tester Agent generate; QA tambahkan domain-specific)</li>
+        <li><strong>Edge cases</strong> (qa-engineer agent generate; QA tambahkan domain-specific)</li>
         <li><strong>Automation strategy</strong> (mana unit, mana integration, mana E2E)</li>
         <li><strong>Regression set</strong> (tag test mana yang masuk regression suite)</li>
-        <li><strong>Performance / load (jika relevan)</strong></li>
         <li><strong>Exit criteria</strong> (pass rate, defect density threshold)</li>
       </ul>
+
+      <h3>7.6 PUSHBACK-TO-PRODUCT Template (untuk adopt PRD eksternal)</h3>
+      <p><strong>File:</strong> <code><a href="templates/PUSHBACK-TO-PRODUCT-template.md">templates/PUSHBACK-TO-PRODUCT-template.md</a></code> · Untuk situasi tim implementasi adopt PRD dari tim product korporat — gap analysis + feedback loop.</p>
+
+      <div class="callout" style="margin-top:20px;">
+        <strong>Archived v2.x templates</strong> (backward-compat di <code>templates/_archived-v2/</code>): PRD-template, TechDesign-template, UI-Impact-template. Tetap valid untuk feature aktif yang sudah jalan v2.x scheme.
+      </div>
 
       <h3>7.4 CLAUDE.md Template (Service-level)</h3>
       <ul>
@@ -872,17 +916,19 @@ make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
         <li><strong>Owner playbook</strong> ditugaskan eksplisit (1 orang, rotate per kuartal — biar ownership tidak diffuse).</li>
       </ul>
 
-      <h3>8.4 Approval Mekanisme Konkret</h3>
+      <h3>8.4 Approval Mekanisme Konkret (v3.x)</h3>
       <table>
-        <tr><th>Gate</th><th>Bentuk Approval</th></tr>
-        <tr><td>1 (PRD)</td><td>Comment "LGTM-PRD" oleh PM + Tech Lead di file G1-PRD.md di PR; CI cek file ada</td></tr>
-        <tr><td>2 (Tech Design)</td><td>Comment "LGTM-TD" oleh Tech Lead + cross-tribe reviewer di PR</td></tr>
-        <tr><td>3 (Plan)</td><td>Tech Lead merge plan PR; auto-create task di Jira/Linear</td></tr>
-        <tr><td>4 (Dev PR)</td><td>Peer review approve + CI hijau + evidence folder tidak kosong</td></tr>
-        <tr><td>5 (Test)</td><td>QA tag rilis: <code>qa-greenlight</code></td></tr>
-        <tr><td>6 (Defect closure)</td><td>Defect status closed + lesson di-link kalau ada</td></tr>
-        <tr><td>7 (Live)</td><td>SRE checklist hijau + post-launch retro file commit</td></tr>
+        <tr><th>Phase</th><th>Bentuk Approval (grep-able di file)</th></tr>
+        <tr><td>1 Spec (autonomous)</td><td>— (no per-gate approval; AI generate, push-back ke <code>OPEN-QUESTIONS.md</code> kalau ambigu)</td></tr>
+        <tr><td>1.5 Checkpoint — BE</td><td><code>LGTM-SPEC-BE by &lt;nama&gt; on YYYY-MM-DD</code> di <code>SPEC-BE.md</code> § 12 (BE Dev + TL)</td></tr>
+        <tr><td>1.5 Checkpoint — FE</td><td><code>LGTM-SPEC-FE by &lt;nama&gt; on YYYY-MM-DD</code> di <code>SPEC-FE.md</code> § 12 (Designer + FE Dev)</td></tr>
+        <tr><td>1.5 Checkpoint — Plan (optional)</td><td><code>LGTM-PLAN by &lt;nama&gt; on YYYY-MM-DD</code> di <code>IMPL-PLAN.md</code> § 7 (PM + TL — kalau tim formal sign-off plan)</td></tr>
+        <tr><td>2 Dev (PR)</td><td>Peer review approve + CI hijau + evidence folder tidak kosong (<code>evidence/be/</code> + <code>evidence/fe/</code>)</td></tr>
+        <tr><td>3 Test (Gate 5)</td><td>QA tag rilis: <code>qa-greenlight</code></td></tr>
+        <tr><td>3 Defect closure (Gate 6)</td><td>Defect status closed + lesson di-link kalau ada</td></tr>
+        <tr><td>3 Live (Gate 7)</td><td>SRE checklist hijau + <code>G7-POST-LAUNCH-RETRO.md</code> committed</td></tr>
       </table>
+      <p style="margin-top:12px; font-size:0.9rem;"><strong>Catatan:</strong> Approval di Slack/DM <strong>tidak terhitung</strong> (Prinsip 15 — AI Proposes, Human Approves). Harus grep-able di file artefak. CI hook bisa enforce: PR merge block kalau spec file tidak ada <code>LGTM-SPEC-*</code> string.</p>
     </section>
 
     <section id="metrics">
@@ -892,8 +938,8 @@ make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
       <div class="grid grid-2">
         <div class="card">
           <div class="label">Lead time</div>
-          <h3>Hari dari Gate 1 (PRD signed) → Gate 7 (live)</h3>
-          <p>Target: turun 40% dalam 90 hari. Median, bukan rata-rata (outlier menipu).</p>
+          <h3>Hari dari Phase 1.5 (LGTM-SPEC signed) → Phase 3 (live + retro committed)</h3>
+          <p>Target v3: turun 60-70% vs v2 baseline. Median, bukan rata-rata (outlier menipu).</p>
         </div>
         <div class="card">
           <div class="label">Defect escape rate</div>
@@ -944,7 +990,7 @@ make agent-setup    # install hooks, link .claude/, validate CLAUDE.md, dll
         </div>
         <div class="card" style="border-color: rgba(248,113,113,0.3);">
           <div class="label" style="color: var(--danger);">#5 · Quality failure (v2.1)</div>
-          <h3>Skip § 0 Existing Analysis di Gate 2</h3>
+          <h3>Skip § 0 Existing Analysis di Phase 1 Spec</h3>
           <p>Loncat ke "3 options brainstorm" tanpa audit codebase = over-engineer. Default magnitude EXTEND, naik harus justify dengan ADR. Section 0 kosong = tech design ditolak.</p>
         </div>
         <div class="card" style="border-color: rgba(248,113,113,0.3);">
